@@ -109,11 +109,10 @@ const grassFrontStyle = computed(() => {
   return { background: 'linear-gradient(180deg, #d3d3d3 0%, #a9a9a9 100%)' }
 })
 
-// 部署场景：安装 stardew 主题 = 一定显示 stardew 效果
-// 除非用户刻意开启自定义背景，否则优先展示 stardew 场景
+// 强制 stardew 场景：安装这个主题 = 必定显示天空/草地/栅栏
 const isStardewTheme = true
-const showDefaultBackground = computed(() => hasCustomBackground.value)
-const showStardewBackground = computed(() => !hasCustomBackground.value)
+const showDefaultBackground = computed(() => false)
+const showStardewBackground = computed(() => true)
 
 // 内联栅栏 SVG，零素材依赖
 const fenceSvg = `<svg viewBox="0 0 1200 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
