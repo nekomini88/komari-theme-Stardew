@@ -1,246 +1,104 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useVisualStyle } from '@/composables/useVisualStyle'
+import { season as seasonRef, setWeather, isNight, isThunder, isRain, isSnow, isFog } from '@/composables/useStardewAtmosphere'
 
-const { current } = useVisualStyle()
+const season = seasonRef
+const weather = ref<'clear' | 'rain' | 'snow' | 'thunder' | 'fog'>('clear')
+const thumb = ref(0)
+let timer: number | null = null
 
-const now = ref(new Date())
-const season = computed(() => {
-  const m = now.value.getMonth() + 1
-  if (m >= 3 && m <= 5) return 'spring'
-  if (m >= 6 && m <= 8) return 'summer'
-  if (m >= 9 && m <= 11) return 'autumn'
-  return 'winter'
+const sunY = computed(() => {
+  const day = isNight.value ? 1 : Math.sin((thumb.value / 100) * Math.PI)
+  return Math.round(day * 40)
 })
-type Weather = 'clear' | 'rain' | 'fog' | 'snow' | 'thunder'
-const weather = ref<Weather>('clear')
-
-onMounted(() => {
-  const tick = () => { now.value = new Date() }
-  const t = setInterval(tick, 60_000)
-  tick()
-  setWeather()
-  const w = setInterval(setWeather, 5 * 60_000)
-  onUnmounted(() => { clearInterval(t); clearInterval(w) })
+const moonY = computed(() => {
+  const night = isNight.value ? Math.sin((thumb.value / 100) * Math.PI) : 0
+  return Math.round(night * 32)
 })
-
-function setWeather() {
+const tint = computed(() => {
   const s = season.value
-  const r = Math.random()
-  const pool: Weather[] = s === 'winter'
-    ? r < 0.45 ? ['clear'] : r < 0.7 ? ['snow'] : r < 0.85 ? ['thunder'] : ['fog']
-    : s === 'summer'
-    ? r < 0.55 ? ['clear'] : r < 0.8 ? ['rain'] : r < 0.9 ? ['thunder'] : ['fog']
-    : s === 'autumn'
-    ? r < 0.5 ? ['clear'] : r < 0.75 ? ['rain'] : r < 0.85 ? ['fog'] : ['thunder']
-    : r < 0.45 ? ['clear'] : r < 0.7 ? ['rain'] : r < 0.85 ? ['fog'] : ['snow']
-  weather.value = pool[Math.floor(Math.random() * pool.length)] as Weather
-}
+  const l = isNight.value ? 0.78 : 0.92
+  if (s === 'spring') return `oklch(0.72 0.06 138 / 0.28)`
+  if (s === 'summer') return `oklch(0.8 0.08 92 / 0.24)`
+  if (s === 'autumn') return `oklch(0.78 0.08 72 / 0.24)`
+  return `oklch(0.88 0.04 235 / 0.18)`
+})
 
-function sunX() {
-  const d = now.value
-  const mins = d.getHours() * 60 + d.getMinutes()
-  const dayStart = 5 * 60
-  const dayEnd = 19 * 60
-  if (mins <= dayStart) return '0%'
-  if (mins >= dayEnd) return '100%'
-  return ((mins - dayStart) / (dayEnd - dayStart)) * 100 + '%'
+function tick() {
+  thumb.value = (thumb.value + 1) % 100
 }
+function mount() { timer = window.setInterval(tick, 1200) }
+function unmount() { if (timer !== null) { clearInterval(timer); timer = null } }
 
-function skyBase(): string {
-  const h = now.value.getHours()
-  const w = weather.value
-  if (w === 'thunder') return 'oklch(0.55 0.04 260)'
-  if (w === 'rain' || w === 'fog' || w === 'snow') {
-    if (h >= 5 && h < 8) return 'oklch(0.82 0.04 70)'
-    if (h >= 8 && h < 17) return 'oklch(0.88 0.03 180)'
-    if (h >= 17 && h < 20) return 'oklch(0.72 0.05 40)'
-    return 'oklch(0.2 0.01 260)'
-  }
-  if (h >= 5 && h < 8) return 'oklch(0.88 0.07 85)'
-  if (h >= 8 && h < 17) return 'oklch(0.94 0.04 95)'
-  if (h >= 17 && h < 20) return 'oklch(0.82 0.08 55)'
-  return 'oklch(0.24 0.02 260)'
-}
+onMounted(mount)
+onUnmounted(unmount)
+
+defineExpose({ setWeather, season, tint, sunY, moonY })
 </script>
 
 <template>
-  <div v-if="current === 'stardew'" class="stardew-sky" :data-season="season" :data-weather="weather">
-    <div class="sky-gradient" :style="{ background: skyBase() }"></div>
-
-    <!-- celestial -->
-    <div class="sky-sun" :style="{ left: sunX() }" aria-hidden="true"></div>
-    <div class="sky-moon" aria-hidden="true"></div>
-
-    <!-- clouds -->
-    <div class="sky-clouds" aria-hidden="true">
-      <span class="cloud c1"></span>
-      <span class="cloud c2"></span>
-      <span class="cloud c3"></span>
-    </div>
-
-    <!-- weather overlays -->
-    <div class="sky-overlay" :data-weather="weather" aria-hidden="true"></div>
-
-    <!-- ground layers -->
-    <img
-      class="sky-layer tree"
-      src="/private-assets/stardew/tree.png"
-      alt=""
-      aria-hidden="true"
-      @error="($event.target as HTMLImageElement).style.display='none'"
+  <div class="stardew-sky" :style="{ background: `linear-gradient(180deg, #cfe8ff 0%, #ffe8a8 70%, #8cbfd8 100%)` }">
+    <div class="stardew-sky-season" :style="{ background: tint }" />
+    <div
+      class="stardew-sun"
+      :style="{
+        top: sunY + '%',
+        background: isNight ? 'rgba(255,240,220,0.7)' : 'radial-gradient(circle, #fff4c2 0%, rgba(255,238,110,0.9) 60%, transparent 100%)',
+      }"
     />
-    <img
-      class="sky-layer grass"
-      src="/private-assets/stardew/grass.png"
-      alt=""
-      aria-hidden="true"
-      @error="($event.target as HTMLImageElement).style.display='none'"
+    <div
+      class="stardew-moon"
+      :style="{
+        top: moonY + '%',
+        opacity: isNight ? 0.85 : 0,
+        background: 'radial-gradient(circle at 35% 35%, #fdfbf0 0%, #eae0c8 55%, transparent 100%)'
+      }"
     />
-    <img
-      class="sky-layer grass"
-      src="/private-assets/stardew/grass-strip.png"
-      alt=""
-      aria-hidden="true"
-      @error="($event.target as HTMLImageElement).style.display='none'"
-    />
-
-    <!-- legacy lighting hook for any third-party visibility -->
-    <div class="sky-light" :data-weather="weather"></div>
+    <div v-if="isRain" class="stardew-rain" />
+    <div v-if="isSnow" class="stardew-snow" />
+    <div v-if="isThunder" class="stardew-thunder" />
+    <div v-if="isFog" class="stardew-fog" />
   </div>
 </template>
 
-<style scoped>
-.stardew-sky {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
+<style>
+.stardew-sky { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+.stardew-sky-season { position: absolute; inset: 0; mix-blend-mode: overlay; }
+.stardew-sun,
+.stardew-moon {
+  position: absolute; left: 68%; width: 110px; height: 110px; border-radius: 50%; transform: translateX(-50%); animation: stardew-sky-arc 32s linear infinite;
 }
-.sky-gradient {
-  position: absolute;
-  inset: 0;
-  transition: background 1.2s ease;
-}
-.sky-sun {
-  position: absolute;
-  top: 18%;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: oklch(0.96 0.18 85);
-  box-shadow:
-    0 0 0 6px oklch(0.94 0.15 80 / 0.35),
-    0 0 30px oklch(0.93 0.18 75 / 0.45);
-  transform: translate(-50%, -50%);
-  transition: left 1.2s ease;
-}
-.sky-moon {
-  position: absolute;
-  top: 14%;
-  right: 14%;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: oklch(0.97 0.02 260);
-  box-shadow: 0 0 12px oklch(0.9 0.03 260 / 0.55);
-}
-.cloud {
-  position: absolute;
-  background: oklch(0.99 0.01 80 / 0.85);
-  border-radius: 12px;
-  box-shadow: inset 0 0 0 2px oklch(0.82 0.02 85 / 0.45);
-  opacity: 0.85;
-}
-.c1 {
-  width: 140px; height: 42px; top: 12%; left: 10%;
-  animation: drift 42s linear infinite;
-}
-.c2 {
-  width: 100px; height: 34px; top: 8%; left: 55%;
-  animation: drift 58s linear infinite;
-}
-.c3 {
-  width: 120px; height: 38px; top: 18%; left: 30%;
-  animation: drift 64s linear infinite reverse;
-}
-@keyframes drift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(110vw); }
-}
-.sky-layer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 26%;
-  background-size: cover;
-  background-position: bottom;
-  background-repeat: repeat-x;
-  pointer-events: none;
-}
-.sky-layer.tree { z-index: 2; height: 34%; }
-.sky-layer.grass { z-index: 3; height: 22%; }
+.stardew-sun { animation: stardew-sun-rise 28s ease-in-out infinite alternate; }
+.stardew-moon { animation: stardew-moon-rise 28s ease-in-out infinite alternate; }
 
-/* ------------------------------------------------------------------ */
-/* weather overlays (CSS-only, no extra assets)                        */
-/* ------------------------------------------------------------------ */
-.sky-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s ease;
+.stardew-rain {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(180deg, rgba(180,210,255,0.45) 0px, rgba(180,210,255,0.45) 2px, transparent 2px, transparent 9px);
+  animation: stardew-rain-move 0.7s linear infinite;
 }
-.sky-overlay[data-weather='rain'] {
-  opacity: 1;
-  background-image:
-    repeating-linear-gradient(120deg, oklch(0.78 0.04 220 / 0.18) 0px, transparent 3px 12px);
-  animation: rainlines 0.9s linear infinite;
+.stardew-snow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 0 3px, transparent 3px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.85) 0 3px, transparent 3px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.75) 0 2px, transparent 2px);
+  animation: stardew-snowdrift 9s linear infinite;
 }
-.sky-overlay[data-weather='fog'] {
-  opacity: 1;
-  background: linear-gradient(180deg, transparent 0%, oklch(0.86 0.02 95 / 0.55) 100%);
+.stardew-thunder {
+  position: fixed; inset: 0; pointer-events: none; background: rgba(255,255,240,0.22); animation: stardew-flash-thunder 1s steps(2, end) infinite;
 }
-.sky-overlay[data-weather='snow'] {
-  opacity: 1;
-  background-image:
-    radial-gradient(oklch(0.98 0 0 / 0.85) 1px, transparent 1.5px);
-  background-size: 12px 12px;
-  animation: snowfall 1.4s linear infinite;
-}
-.sky-overlay[data-weather='thunder'] {
-  opacity: 1;
-  background: transparent;
-  animation: lightning 3.5s ease-in-out infinite;
-}
-.sky-overlay[data-weather='clear'] {
-  opacity: 0;
-  background: transparent;
+.stardew-fog {
+  position: absolute; inset: -20%;
+  background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.35) 0 30%, transparent 60%),
+              radial-gradient(circle at 75% 55%, rgba(255,255,255,0.28) 0 28%, transparent 60%);
+  animation: stardew-fogdrift 10s ease-in-out infinite;
 }
 
-@keyframes rainlines {
-  from { background-position: 0 0; }
-  to   { background-position: 60px 60px; }
-}
-@keyframes snowfall {
-  from { background-position: 0 0; }
-  to   { background-position: 12px 28px; }
-}
-@keyframes lightning {
-  0%, 88%, 92%, 96%, 100% { opacity: 0; }
-  89%, 91%, 95% { opacity: 1; background: oklch(0.98 0.02 90 / 0.25); }
-}
-
-/* legacy hook kept for any third-party themes */
-.sky-light[data-weather='clear'] { background: transparent; }
-.sky-light[data-weather='rain'] {
-  background-image:
-    repeating-linear-gradient(120deg, oklch(0.78 0.04 220 / 0.28) 0px, transparent 3px 12px);
-  animation: rainlines 0.9s linear infinite;
-}
-.sky-light[data-weather='fog'] {
-  background: linear-gradient(180deg, transparent 0%, oklch(0.86 0.02 95 / 0.55) 100%);
-}
+@keyframes stardew-sun-rise { 0% { top: 110%; } 100% { top: 30%; } }
+@keyframes stardew-moon-rise { 0% { top: 90%; opacity: 0.1; } 100% { top: 26%; opacity: 0.85; } }
+@keyframes stardew-sky-arc { 0% { transform: translateX(-50%) translateX(-10vw); } 50% { transform: translateX(-50%) translateX(10vw); } 100% { transform: translateX(-50%) translateX(-10vw); } }
+@keyframes stardew-rain-move { from { transform: translateY(-10px); } to { transform: translateY(20px); } }
+@keyframes stardew-snowdrift { 0% { transform: translate(0,0); opacity: 0.8; } 100% { transform: translate(12px, 12vh); opacity: 0.2; } }
+@keyframes stardew-flash-thunder { 0% { opacity: 0; } 10% { opacity: 1; } 25% { opacity: 0; } 40% { opacity: 0.6; } 55% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes stardew-fogdrift { 0% { transform: translate(-3%,-1%); } 50% { transform: translate(3%,1%); } 100% { transform: translate(-3%,-1%); } }
 </style>
