@@ -1,29 +1,33 @@
 /* v0.16.0 full visual alignment overrides for 127.0.0.1:25774 screenshot QA */
 
-/* === 0. RENDER DEFAULTS === */
+/* === 0. RENDER DEFAULTS — soft pastoral, not pixel === */
 [data-theme="stardew"] {
-  -webkit-font-smoothing: none !important;
-  -moz-osx-font-smoothing: unset !important;
-  font-smooth: never !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: auto !important;
 }
 [data-theme="stardew"] * {
-  image-rendering: pixelated !important;
-  text-rendering: optimizeSpeed !important;
+  image-rendering: auto !important;
+  text-rendering: optimizeLegibility !important;
   -webkit-backface-visibility: hidden !important;
   backface-visibility: hidden !important;
 }
 
-/* === 1. KILL MODERN BACKGROUNDS === */
+/* === 1. PASTORAL BACKGROUND — soft bokeh + cream gradient === */
 [data-theme="stardew"] body,
 [data-theme="stardew"] html,
 [data-theme="stardew"] main,
 [data-theme="stardew"] [class*="background"],
-[data-theme="stardew"] [class*="backdrop"],
-[data-theme="stardew"] [class*="gradient"] {
-  background-image: none !important;
+[data-theme="stardew"] [class*="backdrop"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255, 230, 170, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 85% 30%, rgba(200, 220, 180, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 80%, rgba(220, 200, 160, 0.2) 0%, transparent 50%),
+    linear-gradient(175deg, #f7ecd4 0%, #f4e4c1 35%, #f0dbb5 70%, #ecd9a8 100%) !important;
+  background-attachment: fixed !important;
 }
 [data-theme="stardew"] body {
-  background: var(--bg-0, #f4ead5) !important;
+  background-color: #f4e4c1 !important;
 }
 
 /* === 2. HIDE GLASS ORBS / GLOBES FOR STARDEW === */
@@ -36,7 +40,7 @@
   display: none !important;
 }
 
-/* === 3. FLAT CARDS: SOLID + DOTTED + HARD SHADOW === */
+/* === 3. SOFT CARDS — matte cream glass, rounded, gentle shadow === */
 [data-theme="stardew"] .card,
 [data-theme="stardew"] .server-card,
 [data-theme="stardew"] .node-card,
@@ -44,50 +48,60 @@
 [data-theme="stardew"] [class*="card"],
 [data-theme="stardew"] [class*="glass"],
 [data-theme="stardew"] [class*="panel"] {
-  background: var(--surface, #fbecc8) !important;
+  background:
+    linear-gradient(180deg, rgba(251, 236, 200, 0.92) 0%, rgba(248, 228, 185, 0.88) 100%) !important;
   background-image: none !important;
-  border-style: dotted !important;
-  border-width: 2px !important;
-  border-color: var(--border, #a67c2e) !important;
-  border-radius: 3px !important;
-  box-shadow: 4px 4px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.35) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-color: rgba(166, 124, 46, 0.35) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 1px 2px rgba(140, 95, 27, 0.08),
+    0 6px 18px rgba(140, 95, 27, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(14px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
   overflow: hidden;
 }
 
-/* === 4. OVERVIEW TILES === */
+/* === 4. OVERVIEW TILES — softer pill feel === */
 [data-theme="stardew"] .overview-card,
 [data-theme="stardew"] [class*="overview"] {
-  background: var(--surface, #fbecc8) !important;
+  background:
+    linear-gradient(180deg, rgba(251, 236, 200, 0.94) 0%, rgba(248, 228, 185, 0.9) 100%) !important;
   background-image: none !important;
-  border-style: dotted !important;
-  border-width: 2px !important;
-  border-color: var(--border, #a67c2e) !important;
-  border-radius: 3px !important;
-  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.3) !important;
-  image-rendering: pixelated !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-color: rgba(166, 124, 46, 0.3) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 1px 2px rgba(140, 95, 27, 0.07),
+    0 6px 16px rgba(140, 95, 27, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  image-rendering: auto !important;
+  backdrop-filter: blur(12px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.1) !important;
 }
 
-/* === 5. NODE CARD INTERNAL — kill cutoff/overlap === */
+/* === 5. NODE CARD INTERNAL — generous spacing === */
 [data-theme="stardew"] .node-card {
-  padding: 10px !important;
-  gap: 8px !important;
+  padding: 18px !important;
+  gap: 10px !important;
 }
 [data-theme="stardew"] .node-card .grid,
 [data-theme="stardew"] .node-card [class*="grid"] {
-  gap: 6px !important;
+  gap: 8px !important;
 }
 [data-theme="stardew"] .node-card [class*="stat"],
 [data-theme="stardew"] .node-card [class*="metric"],
 [data-theme="stardew"] .node-card [class*="row"] {
-  gap: 4px !important;
+  gap: 6px !important;
   min-height: 0 !important;
 }
 
-/* === 6. PIXEL TYPOGRAPHY === */
+/* === 6. TYPOGRAPHY — layered hierarchy, readable === */
 [data-theme="stardew"] {
-  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
 }
 [data-theme="stardew"] h1,
 [data-theme="stardew"] h2,
@@ -95,84 +109,94 @@
 [data-theme="stardew"] h4,
 [data-theme="stardew"] h5,
 [data-theme="stardew"] h6 {
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-  line-height: 1.3 !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
 }
 [data-theme="stardew"] .overview-card-value,
 [data-theme="stardew"] .overview-card-unit,
 [data-theme="stardew"] .traffic-stat-value,
 [data-theme="stardew"] .traffic-volume-value,
 [data-theme="stardew"] .tabular-nums {
-  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
-  text-rendering: optimizeSpeed !important;
-  -webkit-font-smoothing: none !important;
-  letter-spacing: 0.06em !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  letter-spacing: 0.04em !important;
 }
 
-/* === 7. BUTTONS === */
+/* === 7. BUTTONS — soft pixel-ish but rounded === */
 [data-theme="stardew"] button,
 [data-theme="stardew"] .btn,
 [data-theme="stardew"] [role="button"],
 [data-theme="stardew"] [role="tab"] {
-  background: var(--surface-elev, #fff3cc) !important;
+  background: linear-gradient(180deg, #fff3cc 0%, #fbecc8 100%) !important;
   background-image: none !important;
-  border: 2px solid var(--border, #a67c2e) !important;
-  border-radius: 4px !important;
-  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  -webkit-font-smoothing: none !important;
-  image-rendering: pixelated !important;
+  border: 1px solid rgba(166, 124, 46, 0.45) !important;
+  border-radius: 10px !important;
+  box-shadow:
+    0 1px 2px rgba(140, 95, 27, 0.08),
+    0 4px 10px rgba(140, 95, 27, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  text-transform: none !important;
+  letter-spacing: 0.04em !important;
+  -webkit-font-smoothing: antialiased !important;
+  image-rendering: auto !important;
 }
 [data-theme="stardew"] button[aria-pressed="true"],
 [data-theme="stardew"] [role="tab"][aria-selected="true"] {
-  background: var(--surface-elev, #fff3cc) !important;
-  box-shadow: inset 0 -2px 0 0 var(--border-strong, #8c5f1b), 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  background: linear-gradient(180deg, #fff3cc 0%, #f5d88a 100%) !important;
+  box-shadow:
+    inset 0 -2px 0 0 rgba(140, 95, 27, 0.25),
+    0 2px 8px rgba(140, 95, 27, 0.12) !important;
 }
 
-/* === 8. INPUTS === */
+/* === 8. INPUTS — soft, readable === */
 [data-theme="stardew"] input,
 [data-theme="stardew"] textarea,
 [data-theme="stardew"] select {
-  background: var(--surface-elev, #fff3cc) !important;
+  background: rgba(255, 243, 204, 0.85) !important;
   background-image: none !important;
-  border: 2px solid var(--border, #a67c2e) !important;
-  border-radius: 3px !important;
-  box-shadow: inset 2px 2px 0 0 rgba(120, 85, 35, 0.25) !important;
-  image-rendering: pixelated !important;
+  border: 1px solid rgba(166, 124, 46, 0.45) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 2px rgba(120, 85, 35, 0.12) !important;
+  image-rendering: auto !important;
 }
 
-/* === 9. PROGRESS/BARS === */
+/* === 9. PROGRESS/BARS — softer ends, keep color tokens === */
 [data-theme="stardew"] .metric-bar,
 [data-theme="stardew"] .ping-bar,
 [data-theme="stardew"] [class*="metric-bar"],
 [data-theme="stardew"] [class*="ping-bar"],
 [data-theme="stardew"] [class*="progress"] {
-  image-rendering: pixelated !important;
-  border-radius: 0 !important;
+  image-rendering: auto !important;
+  border-radius: 999px !important;
   box-shadow: none !important;
 }
 
-/* === 10. DROPDOWNS/MENUS === */
+/* === 10. DROPDOWNS/MENUS — soft glass === */
 [data-theme="stardew"] [role="menu"],
 [data-theme="stardew"] .dropdown-menu,
 [data-theme="stardew"] [class*="Menu"] {
-  background: var(--surface, #fbecc8) !important;
+  background:
+    linear-gradient(180deg, rgba(251, 236, 200, 0.96) 0%, rgba(248, 228, 185, 0.94) 100%) !important;
   background-image: none !important;
-  border: 2px dotted var(--border, #a67c2e) !important;
-  border-radius: 4px !important;
-  box-shadow: 6px 6px 0 0 var(--border-strong, #8c5f1b) !important;
-  image-rendering: pixelated !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+  border: 1px solid rgba(166, 124, 46, 0.4) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 1px 2px rgba(140, 95, 27, 0.08),
+    0 10px 24px rgba(140, 95, 27, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  image-rendering: auto !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.1) !important;
+  backdrop-filter: blur(16px) saturate(1.1) !important;
 }
 [data-theme="stardew"] [role="menuitem"],
 [data-theme="stardew"] [class*="menu-item"] {
-  text-rendering: optimizeSpeed !important;
-  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  text-rendering: optimizeLegibility !important;
+  font-family: inherit !important;
+  text-transform: none !important;
+  letter-spacing: 0.03em !important;
 }
 
 /* === 11. LOADING COVER STYLING (pixel matte) === */
@@ -210,11 +234,14 @@ html[data-theme="stardew"] .stardew-sky {
   background: none !important;
 }
 
-/* Force plain background in stardew; kill decorative overlays */
-html[data-theme="stardew"],
-html[data-theme="stardew"] body {
-  background-color: var(--bg-0, #f4ead5) !important;
-  background-image: none !important;
+/* Pastoral soft-light texture keeps vibe without flat color */
+[data-theme="stardew"] body,
+[data-theme="stardew"] html {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(210, 230, 185, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(235, 215, 170, 0.12) 0%, transparent 55%) !important;
+  background-color: #f4e4c1 !important;
 }
 
 /* Last-resort: if runtime injects decorative canvas/non-sky elements, mask them */
@@ -225,19 +252,27 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   display: none !important;
 }
 
-/* === 12. SCANLINES (subtle) === */
+/* === 12. SCANLINES — soft organic texture === */
 [data-theme="stardew"] body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 3px);
-  mix-blend-mode: multiply;
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(210, 230, 185, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(235, 215, 170, 0.15) 0%, transparent 55%);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
 }
 [data-appearance="dark"][data-theme="stardew"] body::after {
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(180, 210, 160, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(220, 190, 140, 0.08) 0%, transparent 55%);
   mix-blend-mode: screen;
+  opacity: 0.35;
 }
 
 /* === 13. FOOTER — left / center / right pills === */
