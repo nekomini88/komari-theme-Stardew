@@ -6,6 +6,7 @@
 @import './matte-pixel.css';
 @import './traffic-cost-metric.css';
 @import './metric-polish.css';
+@import './page-spacing-footer.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 

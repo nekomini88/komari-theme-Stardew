@@ -1,0 +1,134 @@
+/* v0.13.0 page-level spacing, heading rhythm, and footer QA */
+
+/* Masthead / title block alignment */
+[data-theme="stardew"] .theme-masthead,
+[data-theme="stardew"] [class*="masthead"] {
+  padding-block: 16px !important;
+  padding-inline: 14px !important;
+}
+[data-theme="stardew"] .theme-masthead h1,
+[data-theme="stardew"] .theme-masthead h3,
+[data-theme="stardew"] [class*="masthead"] h1,
+[data-theme="stardew"] [class*="masthead"] h3 {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+/* Page-level container rhythm */
+[data-theme="stardew"] main,
+[data-theme="stardew"] .container,
+[data-theme="stardew"] [class*="container"] {
+  padding-block: 10px;
+  padding-inline: 12px;
+  gap: 10px;
+}
+[data-theme="stardew"] main > * + *,
+[data-theme="stardew"] .container > * + * {
+  margin-block-start: 10px;
+}
+
+/* Node card group spacing */
+[data-theme="stardew"] .tabpanel,
+[data-theme="stardew"] [class*="tabpanel"],
+[data-theme="stardew"] .node-list,
+[data-theme="stardew"] [class*="node-list"] {
+  gap: 10px !important;
+}
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] [class*="node-card"] {
+  margin-block-end: 10px;
+}
+
+/* Search / filter row */
+[data-theme="stardew"] .flex-wrap,
+[data-theme="stardew"] [class*="flex-wrap"],
+[data-theme="stardew"] .search-row,
+[data-theme="stardew"] [class*="search"] {
+  gap: 8px !important;
+  padding-block: 6px;
+}
+
+/* Footer QA */
+[data-theme="stardew"] footer,
+[data-theme="stardew"] .footer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-block: 10px !important;
+  padding-inline: 14px !important;
+  gap: 10px !important;
+  border-top: 3px solid var(--border, #a67c2e) !important;
+  box-shadow: inset 0 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  background: var(--surface, #fbecc8) !important;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+[data-theme="stardew"] footer a,
+[data-theme="stardew"] .footer a {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+[data-theme="stardew"] footer .footer-left,
+[data-theme="stardew"] footer .footer-center,
+[data-theme="stardew"] footer .footer-right,
+[data-theme="stardew"] .footer .footer-left,
+[data-theme="stardew"] .footer .footer-center,
+[data-theme="stardew"] .footer .footer-right {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+[data-theme="stardew"] footer .location-pill,
+[data-theme="stardew"] .footer .location-pill,
+[data-theme="stardew"] footer [class*="location"],
+[data-theme="stardew"] .footer [class*="location"],
+[data-theme="stardew"] footer .footer-center,
+[data-theme="stardew"] .footer .footer-center {
+  border: 2px dotted var(--border, #a67c2e) !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  background: var(--surface-elev, #fff3cc) !important;
+  box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: none;
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace;
+}
+[data-appearance="dark"][data-theme="stardew"] footer,
+[data-appearance="dark"][data-theme="stardew"] .footer {
+  background: #35281a !important;
+}
+[data-appearance="dark"][data-theme="stardew"] footer .location-pill,
+[data-appearance="dark"][data-theme="stardew"] .footer .location-pill,
+[data-appearance="dark"][data-theme="stardew"] footer .footer-center,
+[data-appearance="dark"][data-theme="stardew"] .footer .footer-center {
+  background: #40321f !important;
+}
+
+/* Instance/tab spacing */
+[data-theme="stardew"] .tablist,
+[data-theme="stardew"] [class*="tablist"] {
+  gap: 6px !important;
+}
+[data-theme="stardew"] [role="tab"] {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 4px 10px !important;
+  border: 2px solid transparent;
+  border-radius: 4px !important;
+}
+[data-theme="stardew"] [role="tab"][aria-selected="true"] {
+  background: var(--surface-elev, #fff3cc);
+  border-color: var(--border, #a67c2e);
+  box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b);
+}
+
+/* Button group spacing */
+[data-theme="stardew"] [role="group"],
+[data-theme="stardew"] [class*="button-group"] {
+  gap: 6px !important;
+}
