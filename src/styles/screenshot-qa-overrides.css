@@ -188,6 +188,43 @@
 /* Hide loading cover in stardew theme */
 [data-theme="stardew"] .loading-cover { display:none !important; }
 
+/* === 12. KILL STARDEW SKY / BACKGROUND DECORATIONS === */
+html[data-theme="stardew"] .stardew-sky,
+html[data-theme="stardew"] .stardew-sky *,
+html[data-theme="stardew"] .stardew-sky-season,
+html[data-theme="stardew"] .stardew-sun,
+html[data-theme="stardew"] .stardew-moon,
+html[data-theme="stardew"] .stardew-rain,
+html[data-theme="stardew"] .stardew-snow,
+html[data-theme="stardew"] .stardew-thunder,
+html[data-theme="stardew"] .stardew-fog,
+html[data-theme="stardew"] .stardew-flora-fauna,
+html[data-theme="stardew"] .stardew-life,
+html[data-theme="stardew"] .stardew-lightning {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+  pointer-events: none !important;
+}
+html[data-theme="stardew"] .stardew-sky {
+  background: none !important;
+}
+
+/* Force plain background in stardew; kill decorative overlays */
+html[data-theme="stardew"],
+html[data-theme="stardew"] body {
+  background-color: var(--bg-0, #f4ead5) !important;
+  background-image: none !important;
+}
+
+/* Last-resort: if runtime injects decorative canvas/non-sky elements, mask them */
+html[data-theme="stardew"] [class*="globe"],
+html[data-theme="stardew"] [class*="world-map"],
+html[data-theme="stardew"] [class*="network-map"],
+html[data-theme="stardew"] [class*="dot-matrix"] {
+  display: none !important;
+}
+
 /* === 12. SCANLINES (subtle) === */
 [data-theme="stardew"] body::after {
   content: "";
