@@ -17,3 +17,26 @@ describe('theme integration', () => {
     expect(css).toContain('Jersey 10')
   })
 })
+
+describe('matte pixel surfaces under stardew theme', () => {
+  it('MUST disable glass blur and enforce matte surfaces in main.css', () => {
+    const css = readFileSync('src/styles/main.css', 'utf8')
+    expect(css).toContain("matte-pixel.css")
+    expect(css).toContain("backdrop-filter: none !important")
+    // pixel shadow signature is enforced in matte-pixel.css and visual-card-patch.css
+    const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
+    expect(matte).toContain("[data-theme=\"stardew\"]")
+    expect(matte).toContain("box-shadow:")
+    expect(matte).toContain("var(--border-strong")
+  })
+
+  it('MUST use solid matte borders and pixel shadows in matte-pixel.css', () => {
+    const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
+    expect(matte).toContain('[data-theme="stardew"]')
+    expect(matte).toContain('border: 2px solid var(--border, #a67c2e) !important')
+    // pixel shadow signature (multi-line is ok)
+    expect(matte).toContain('4px 4px 0 0 var(--border-strong')
+    // no glass blur in Stardew mode
+    expect(matte).toContain('backdrop-filter: none !important')
+  })
+})
