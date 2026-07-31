@@ -213,3 +213,55 @@ html[data-theme="stardew"] .stardew-lightning {
   animation: inherit !important;
   pointer-events: none !important;
 }
+
+/* === 8. 全局木牌卡片（不依赖 NodeCard.vue scoped class） === */
+/* 直接覆盖所有 .node-card，确保即使部署版本 NodeCard 组件不同也能生效 */
+[data-theme="stardew"] .node-card {
+  background: linear-gradient(180deg, #f3e2bd 0%, #e8d5a8 100%) !important;
+  border: 4px solid #5c3a1e !important;
+  box-shadow: 6px 6px 0 #3E2723 !important;
+  border-radius: 10px !important;
+  image-rendering: pixelated !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-theme="stardew"] .node-card.offline,
+[data-theme="stardew"] .node-card.is-offline,
+[data-theme="stardew"] .node-card[data-offline="true"] {
+  background: linear-gradient(180deg, #d4a5a5 0%, #c08080 100%) !important;
+  border-color: #7f1d1d !important;
+  box-shadow: 6px 6px 0 #5c1a1a !important;
+}
+/* 卡片内部进度条像素化 */
+[data-theme="stardew"] .node-card [class*="progress"],
+[data-theme="stardew"] .node-card [class*="bar"],
+[data-theme="stardew"] .node-card [role="progressbar"] {
+  image-rendering: pixelated !important;
+  border-radius: 0 !important;
+  height: 12px !important;
+  background: repeating-linear-gradient(90deg, #0000002e 0px, #0000002e 2px, transparent 2px, transparent 6px), var(--progress-bg, #d9b96e) !important;
+}
+[data-theme="stardew"] .node-card [class*="progress"] > *,
+[data-theme="stardew"] .node-card [class*="bar"] > *,
+[data-theme="stardew"] .node-card [role="progressbar"] > * {
+  border-radius: 0 !important;
+}
+
+/* === 9. 全局 footer 木牌化 === */
+[data-theme="stardew"] footer,
+[data-theme="stardew"] .footer,
+[data-theme="stardew"] [class*="footer"] {
+  background: var(--surface, #fbecc8) !important;
+  border-top: 3px solid var(--border, #a67c2e) !important;
+  box-shadow: inset 0 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  font-size: 11px !important;
+}
+[data-theme="stardew"] footer a,
+[data-theme="stardew"] .footer a,
+[data-theme="stardew"] [class*="footer"] a {
+  color: var(--text-primary, #4a2e0b) !important;
+  text-decoration: none !important;
+}
