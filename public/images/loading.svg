@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" preserveAspectRatio="xMidYMid slice">
+  <rect x="0" y="0" width="48" height="48" fill="#fbecc8" />
+  <rect x="4" y="4" width="40" height="40" fill="none" stroke="#a67c2e" stroke-width="2" />
+  <rect x="8" y="8" width="32" height="32" fill="#fff3cc" stroke="#a67c2e" stroke-width="2" />
+  <text x="24" y="26" text-anchor="middle" fill="#4a2e0b" font-family="Silkscreen,monospace" font-size="10">Nekomini</text>
+  <text x="24" y="38" text-anchor="middle" fill="#7f5630" font-family="Silkscreen,monospace" font-size="8">LOADING</text>
+</svg>
