@@ -1,0 +1,141 @@
+/* v0.14.0 hard Stardew pixel matte core — force visual baseline */
+/* Must be imported FIRST, before tailwind/tokens, because it sets render defaults */
+
+[data-theme="stardew"] *,
+[data-theme="stardew"] *::before,
+[data-theme="stardew"] *::after {
+  image-rendering: pixelated;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: none;
+  font-smoothing: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Disable ALL backdrop blur globally for stardew */
+[data-theme="stardew"] {
+  --tw-backdrop-blur: none !important;
+}
+[data-theme="stardew"] *,
+[data-theme="stardew"] *::before,
+[data-theme="stardew"] *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Force hard shadows only — no blur anywhere */
+[data-theme="stardew"] {
+  --tw-shadow: 0 0 0 0 transparent !important;
+  --tw-shadow-colored: 0 0 0 0 transparent !important;
+}
+[data-theme="stardew"] * {
+  box-shadow: none !important;
+}
+
+/* Re-apply pixel shadows through tokenized rules only — defined later in matte-pixel.css */
+
+/* Flat backgrounds — kill gradients */
+[data-theme="stardew"] {
+  background-image: none !important;
+}
+
+/* Node cards: force solid fill + hard shadow */
+[data-theme="stardew"] .card,
+[data-theme="stardew"] .server-card,
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] .glass-panel,
+[data-theme="stardew"] [class*="glass"],
+[data-theme="stardew"] [class*="card"],
+[data-theme="stardew"] [class*="panel"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border-style: dotted !important;
+  border-width: 2px !important;
+  border-color: var(--border, #a67c2e) !important;
+  box-shadow: 4px 4px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.35) !important;
+  border-radius: 3px !important;
+  image-rendering: pixelated !important;
+  text-rendering: optimizeSpeed !important;
+  -webkit-font-smoothing: none !important;
+  font-smoothing: none !important;
+}
+
+/* Overview tiles: enforce pixel matte */
+[data-theme="stardew"] .overview-card,
+[data-theme="stardew"] [class*="overview"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border-style: dotted !important;
+  border-width: 2px !important;
+  border-color: var(--border, #a67c2e) !important;
+  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.3) !important;
+  border-radius: 3px !important;
+  image-rendering: pixelated !important;
+}
+
+/* Kill soft rounded buttons — force pixel buttons */
+[data-theme="stardew"] button,
+[data-theme="stardew"] .btn,
+[data-theme="stardew"] [role="button"] {
+  background: var(--surface-elev, #fff3cc) !important;
+  background-image: none !important;
+  border: 2px solid var(--border, #a67c2e) !important;
+  border-radius: 4px !important;
+  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b) !important;
+  image-rendering: pixelated !important;
+  -webkit-font-smoothing: none !important;
+  font-smoothing: none !important;
+  text-rendering: optimizeSpeed !important;
+}
+
+/* Inputs */
+[data-theme="stardew"] input,
+[data-theme="stardew"] textarea,
+[data-theme="stardew"] select {
+  background: var(--surface-elev, #fff3cc) !important;
+  background-image: none !important;
+  border: 2px solid var(--border, #a67c2e) !important;
+  border-radius: 3px !important;
+  box-shadow: inset 2px 2px 0 0 rgba(120, 85, 35, 0.25) !important;
+  image-rendering: pixelated !important;
+}
+
+/* Progress/bars: hard pixel, no radius */
+[data-theme="stardew"] .metric-bar,
+[data-theme="stardew"] .ping-bar,
+[data-theme="stardew"] [class*="metric-bar"],
+[data-theme="stardew"] [class*="ping-bar"] {
+  image-rendering: pixelated !important;
+  background: repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 6px), var(--bar-fill, #4ade80) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Dropdowns/menus */
+[data-theme="stardew"] [role="menu"],
+[data-theme="stardew"] .dropdown-menu,
+[data-theme="stardew"] [class*="Menu"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border: 2px dotted var(--border, #a67c2e) !important;
+  border-radius: 4px !important;
+  box-shadow: 6px 6px 0 0 var(--border-strong, #8c5f1b) !important;
+  image-rendering: pixelated !important;
+  backdrop-filter: none !important;
+}
+
+/* Scanline overlay for retro pixel feel */
+[data-theme="stardew"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+[data-appearance="dark"][data-theme="stardew"] body::after {
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
