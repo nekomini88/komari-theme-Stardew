@@ -18,7 +18,7 @@
 [data-theme="stardew"] .glass-panel,
 [data-theme="stardew"] [class*="glass"] {
   background: var(--surface, #fbecc8) !important;
-  border-style: solid !important;
+  border-style: dotted !important;
   border-width: 2px !important;
   border-color: var(--border, #a67c2e) !important;
   box-shadow:
