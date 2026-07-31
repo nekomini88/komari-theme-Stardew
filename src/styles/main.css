@@ -511,3 +511,30 @@ html.no-glass body {
   font-family: "Jersey 10", "Chill RoundM", sans-serif;
 }
 
+
+
+/* === Stardew seasonal light/dark palettes === */
+[data-theme="stardew"][data-season="spring"][data-appearance="light"] {
+  --surface:#fbecc8; --surface-elev:#fff3cc; --border:#a89a72; --border-strong:#7d8c64; --hairline:#c7d5a8;
+}
+[data-theme="stardew"][data-season="summer"][data-appearance="light"] {
+  --surface:#fde8b0; --surface-elev:#fff3cc; --border:#b47a38; --border-strong:#c2552b; --hairline:#f3cc8c;
+}
+[data-theme="stardew"][data-season="autumn"][data-appearance="light"] {
+  --surface:#f2cc8f; --surface-elev:#fde8c8; --border:#8c5e34; --border-strong:#b5542a; --hairline:#d9a06b;
+}
+[data-theme="stardew"][data-season="winter"][data-appearance="light"] {
+  --surface:#e8f0f5; --surface-elev:#f3f7fa; --border:#7397b8; --border-strong:#5b7f9a; --hairline:#a3c1d6;
+}
+[data-theme="stardew"][data-season="spring"][data-appearance="dark"] {
+  --bg-0:#1f241a; --surface:#2a3324; --surface-elev:#354230; --border:#7d8c64; --border-strong:#a2b07a; --hairline:#5a6a48;
+}
+[data-theme="stardew"][data-season="summer"][data-appearance="dark"] {
+  --bg-0:#241c15; --surface:#33231b; --surface-elev:#4a3125; --border:#b47a38; --border-strong:#d08848; --hairline:#6a4830;
+}
+[data-theme="stardew"][data-season="autumn"][data-appearance="dark"] {
+  --bg-0:#221813; --surface:#2f201a; --surface-elev:#3f2a22; --border:#b5542a; --border-strong:#d06538; --hairline:#6e402c;
+}
+[data-theme="stardew"][data-season="winter"][data-appearance="dark"] {
+  --bg-0:#141920; --surface:#1b232d; --surface-elev:#22303d; --border:#7397b8; --border-strong:#8db0cc; --hairline:#3e546a;
+}
