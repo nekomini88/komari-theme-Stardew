@@ -1,0 +1,16 @@
+spec:
+  schema: "1.0"
+  version: "1.2.0"
+
+project:
+  type: web_fullstack
+  name: komari-theme-Stardew
+  description: Stardew Valley theme for Komari based on komari-theme-Neko UI
+
+references:
+  mode: merge
+  items:
+    - architecture
+    - testing
+    - devops
+    - security
