@@ -185,6 +185,8 @@
 [data-appearance="dark"][data-theme="stardew"] .loading-cover {
   background: #22180a !important;
 }
+/* Hide loading cover in stardew theme */
+[data-theme="stardew"] .loading-cover { display:none !important; }
 
 /* === 12. SCANLINES (subtle) === */
 [data-theme="stardew"] body::after {
