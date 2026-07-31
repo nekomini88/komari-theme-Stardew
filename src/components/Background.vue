@@ -109,11 +109,11 @@ const grassFrontStyle = computed(() => {
   return { background: 'linear-gradient(180deg, #d3d3d3 0%, #a9a9a9 100%)' }
 })
 
-// 部署场景：没有 CUSTOM 背景，且 THIS 主题是 stardew，就显示 stardew 背景
-const themeName = (window as any).__KOMARI_THEME_NAME__ || ''
-const isStardewTheme = isStardew.value || themeName.toLowerCase().includes('stardew')
-const showDefaultBackground = computed(() => !hasCustomBackground.value && !isStardewTheme)
-const showStardewBackground = computed(() => isStardewTheme && !hasCustomBackground.value)
+// 部署场景：安装 stardew 主题 = 一定显示 stardew 效果
+// 除非用户刻意开启自定义背景，否则优先展示 stardew 场景
+const isStardewTheme = true
+const showDefaultBackground = computed(() => hasCustomBackground.value)
+const showStardewBackground = computed(() => !hasCustomBackground.value)
 
 // 内联栅栏 SVG，零素材依赖
 const fenceSvg = `<svg viewBox="0 0 1200 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
