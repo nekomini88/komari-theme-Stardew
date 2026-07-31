@@ -276,6 +276,33 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   background: var(--surface-elev, #fff3cc) !important;
   box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
 }
+
+/* === 14. PAGE SPACING RHYTHM — PDF-aligned 10px grid === */
+[data-theme="stardew"] main,
+[data-theme="stardew"] .container,
+[data-theme="stardew"] [class*="container"] {
+  gap: 10px !important;
+  padding-block: 10px !important;
+  padding-inline: 12px !important;
+}
+[data-theme="stardew"] main > * + *,
+[data-theme="stardew"] .container > * + * {
+  margin-block-start: 10px !important;
+}
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] [class*="node-card"] {
+  margin-block-end: 10px !important;
+}
+[data-theme="stardew"] .search-row,
+[data-theme="stardew"] [class*="search"] {
+  padding-block: 6px !important;
+  gap: 8px !important;
+}
+[data-theme="stardew"] .theme-masthead,
+[data-theme="stardew"] [class*="masthead"] {
+  padding-block: 16px !important;
+  padding-inline: 14px !important;
+}
 [data-theme="stardew"] footer .footer-left,
 [data-theme="stardew"] .footer .footer-left {
   display: inline-flex !important;
