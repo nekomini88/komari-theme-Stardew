@@ -1,0 +1,152 @@
+/* v0.7.0 Metric/Detail Polish + Floating Controls + Nav Matte */
+
+/* --- instance detail / node detail metric bars --- */
+[data-theme="stardew"] .metric-bar,
+[data-theme="stardew"] .ping-bar,
+[data-theme="stardew"] .traffic-stat,
+[data-theme="stardew"] .traffic-bar,
+[data-theme="stardew"] .metric-color-picker,
+[data-theme="stardew"] [class*="metric-bar"],
+[data-theme="stardew"] [class*="ping-bar"],
+[data-theme="stardew"] [class*="traffic-"] {
+  text-rendering: optimizespeed;
+  -webkit-font-smoothing: none;
+  font-family: "Jersey 10", Chill RoundM, ui-monospace, monospace;
+  letter-spacing: .06em;
+}
+[data-theme="stardew"] .metric-bar,
+[data-theme="stardew"] [class*="metric-bar"],
+[data-theme="stardew"] .ping-bar,
+[data-theme="stardew"] [class*="ping-bar"] {
+  border-radius: 0 !important;
+  image-rendering: pixelated;
+  height: 10px !important;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.18) 0px,
+      rgba(0,0,0,0.18) 2px,
+      transparent 2px,
+      transparent 6px
+    ),
+    var(--bar-fill,#4ade80);
+}
+
+/* traffic/network stat small pills */
+[data-theme="stardew"] .traffic-stat,
+[data-theme="stardew"] [class*="traffic-stat"] {
+  border-width: var(--visual-border-width);
+  border-style: dotted;
+  border-color: var(--border,#a67c2e);
+  border-radius: var(--visual-radius-control,6px);
+  background-color: var(--surface,#fbecc8);
+  box-shadow: 1px 1px 0 0 var(--border-strong,#8c5f1b);
+  padding: 2px 6px;
+}
+
+/* --- floating controls / metric color picker matte --- */
+[data-theme="stardew"] .floating-controls,
+[data-theme="stardew"] .metric-color-picker,
+[data-theme="stardew"] [class*="metric-color-picker"],
+[data-theme="stardew"] [class*="color-picker"],
+[data-theme="stardew"] [class*="chart-controls"],
+[data-theme="stardew"] [class*="control-bar"] {
+  border-width: var(--visual-border-width);
+  border-style: dotted;
+  border-color: var(--border,#a67c2e);
+  border-radius: var(--visual-radius-control,6px);
+  background-color: var(--surface,#fbecc8);
+  box-shadow: 3px 3px 0 0 var(--border-strong,#8c5f1b);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  image-rendering: pixelated;
+  padding: 6px;
+  gap: 6px;
+}
+[data-theme="stardew"] .floating-controls button,
+[data-theme="stardew"] .metric-color-picker button,
+[data-theme="stardew"] [class*="metric-color-picker"] button,
+[data-theme="stardew"] [class*="color-picker"] button,
+[data-theme="stardew"] [class*="chart-controls"] button,
+[data-theme="stardew"] [class*="control-bar"] button,
+[data-theme="stardew"] [class*="control-bar"] [role="button"],
+[data-theme="stardew"] [class*="chart-controls"] [role="button"] {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--border,#a67c2e);
+  border-radius: 6px;
+  background: var(--surface-elev,#fff3cc);
+  box-shadow: 2px 2px 0 0 var(--border-strong,#8c5f1b);
+  font-family: "Jersey 10", Chill RoundM, ui-monospace, monospace;
+  letter-spacing: .06em;
+  padding: 4px 8px;
+  text-rendering: optimizespeed;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+}
+[data-theme="stardew"] .floating-controls button[aria-pressed="true"],
+[data-theme="stardew"] .metric-color-picker button[aria-pressed="true"],
+[data-theme="stardew"] [class*="metric-color-picker"] button[aria-pressed="true"],
+[data-theme="stardew"] [class*="color-picker"] button[aria-pressed="true"],
+[data-theme="stardew"] [class*="chart-controls"] button[aria-pressed="true"],
+[data-theme="stardew"] [class*="control-bar"] button[aria-pressed="true"] {
+  background: var(--border-strong,#8c5f1b);
+  color: #fff;
+  border-color: var(--border-strong,#8c5f1b);
+}
+
+/* --- nav bar + dropdown matte --- */
+[data-theme="stardew"] header,
+[data-theme="stardew"] [class*="navbar"],
+[data-theme="stardew"] [class*="main-nav"],
+[data-theme="stardew"] [class*="app-bar"],
+[data-theme="stardew"] [role="navigation"] {
+  border-bottom: 2px dotted var(--border,#a67c2e);
+  background: color-mix(in srgb, var(--surface,#fbecc8) 88%, #000 12%);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  image-rendering: pixelated;
+}
+[data-theme="stardew"] [data-slot="dropdown-menu"],
+[data-theme="stardew"] [role="menu"],
+[data-theme="stardew"] [class*="dropdown-menu"],
+[data-theme="stardew"] [class*="menu"] {
+  border-width: var(--visual-border-width);
+  border-style: dotted;
+  border-color: var(--border,#a67c2e);
+  border-radius: var(--visual-radius-control,6px);
+  background: var(--surface,#fbecc8);
+  box-shadow: 4px 4px 0 0 var(--border-strong,#8c5f1b);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  image-rendering: pixelated;
+}
+[data-theme="stardew"] [role="menuitem"],
+[data-theme="stardew"] [data-slot="dropdown-menu-item"],
+[data-theme="stardew"] [class*="dropdown-menu-item"],
+[data-theme="stardew"] [class*="menu-item"] {
+  font-family: "Jersey 10", Chill RoundM, ui-monospace, monospace;
+  letter-spacing: .06em;
+}
+[data-theme="stardew"] [role="menuitem"][aria-selected="true"],
+[data-theme="stardew"] [class*="dropdown-menu-item"][data-highlighted],
+[data-theme="stardew"] [class*="menu-item"][data-highlighted] {
+  background: var(--surface-elev,#fff3cc);
+  outline: 2px dotted var(--border-strong,#8c5f1b);
+  outline-offset: -4px;
+}
+
+/* --- node detail chart surfaces --- */
+[data-theme="stardew"] .chart-card,
+[data-theme="stardew"] [class*="chart-card"],
+[data-theme="stardew"] [class*="panel"] {
+  border-width: var(--visual-border-width);
+  border-style: dotted;
+  border-color: var(--border,#a67c2e);
+  border-radius: var(--visual-radius-card,6px);
+  background: var(--surface,#fbecc8);
+  box-shadow: 3px 3px 0 0 var(--border-strong,#8c5f1b);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  image-rendering: pixelated;
+}
