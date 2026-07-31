@@ -1,45 +1,25 @@
-/* v0.17.4 exact PDF reference alignment */
-/* Card: cream #FCEED3 surface, dark brown #3E2723 wooden frame, hard shadow */
-/* Body: white forum bg, sky+grass rendered inside card */
-/* Font: VT323 / Press Start 2P pixel font */
+/* v0.18.0 Stardew 主题增强层
+ * 作用：在 Background.vue / StardewSky / FloraFauna 组件渲染的
+ * 天空/草地/栅栏/昼夜/四季/天气/动植物之上，叠加：
+ *   - 木牌卡片
+ *   - 像素字体
+ *   - 星露谷能量条
+ *   - 扫描线像素质感
+ * 不再屏蔽组件自带效果，只做增强。
+ */
 
-/* === 0. PIXEL RENDER DEFAULTS === */
+/* === 0. 像素渲染 + 字体 === */
 [data-theme="stardew"] {
   -webkit-font-smoothing: none !important;
   -moz-osx-font-smoothing: unset !important;
   font-smooth: never !important;
+  font-family: "Press Start 2P", "VT323", "Courier New", monospace !important;
+  letter-spacing: 0.04em !important;
+  color: #3a2a1a !important;
 }
 [data-theme="stardew"] * {
   image-rendering: pixelated !important;
   text-rendering: optimizeSpeed !important;
-}
-
-/* === 1. BODY — white forum background === */
-[data-theme="stardew"] body,
-[data-theme="stardew"] html,
-[data-theme="stardew"] main,
-[data-theme="stardew"] [class*="background"],
-[data-theme="stardew"] [class*="backdrop"] {
-  background: #FFFFFF !important;
-  background-image: none !important;
-  background-color: #FFFFFF !important;
-}
-
-/* === 2. HIDE GLASS ORBS / GLOBES / CANVAS === */
-[data-theme="stardew"] .glass-orbs,
-[data-theme="stardew"] .glass-orb,
-[data-theme="stardew"] [class*="globe"],
-[data-theme="stardew"] [class*="world-map"],
-[data-theme="stardew"] [class*="network-map"],
-[data-theme="stardew"] canvas {
-  display: none !important;
-}
-
-/* === 3. PIXEL FONT === */
-[data-theme="stardew"] {
-  font-family: "VT323", "Press Start 2P", "Courier New", monospace !important;
-  letter-spacing: 0.05em !important;
-  color: #333333 !important;
 }
 [data-theme="stardew"] h1,
 [data-theme="stardew"] h2,
@@ -48,206 +28,177 @@
 [data-theme="stardew"] h5,
 [data-theme="stardew"] h6 {
   font-family: "Press Start 2P", "VT323", monospace !important;
-  letter-spacing: 0.08em !important;
-  line-height: 1.5 !important;
-  text-transform: none !important;
-  color: #3E2723 !important;
-}
-[data-theme="stardew"] .overview-card-value,
-[data-theme="stardew"] .overview-card-unit,
-[data-theme="stardew"] .tabular-nums {
-  font-family: "VT323", "Press Start 2P", monospace !important;
   letter-spacing: 0.06em !important;
-  color: #333333 !important;
+  line-height: 1.6 !important;
+  text-transform: none !important;
+  color: #3a2a1a !important;
+}
+[data-theme="stardew"] .tabular-nums,
+[data-theme="stardew"] [class*="value"] {
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  letter-spacing: 0.04em !important;
 }
 
-/* === 4. WOODEN CARD FRAMES (PDF tokens) === */
-/* Card surface: cream parchment #FCEED3 */
-/* Card border: dark brown #3E2723, 4px, hard edges */
-/* Card shadow: hard offset shadow, no blur */
-[data-theme="stardew"] .card,
-[data-theme="stardew"] .server-card,
-[data-theme="stardew"] .node-card,
-[data-theme="stardew"] .glass-panel,
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] .chart-card,
-[data-theme="stardew"] [class*="card"],
-[data-theme="stardew"] [class*="glass"],
-[data-theme="stardew"] [class*="panel"] {
-  background: #FCEED3 !important;
-  background-image: none !important;
-  border: 4px solid #3E2723 !important;
-  border-radius: 8px !important;
-  box-shadow: 4px 4px 0px #3E2723 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  padding: 14px !important;
-  color: #333333 !important;
+/* === 1. 木牌卡片 === */
+/* 奶油羊皮纸底 + 木纹边框 + 硬阴影 */
+[data-theme="stardew"] .stardew-wood-card {
   position: relative;
+  background-color: #f3e2bd !important;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(139, 90, 43, 0.10) 0px,
+      rgba(139, 90, 43, 0.10) 2px,
+      rgba(160, 110, 55, 0.05) 4px,
+      rgba(160, 110, 55, 0.05) 8px
+    ),
+    linear-gradient(180deg, #f6e7c4 0%, #ecd7a6 100%) !important;
+  border: 4px solid #6b4423 !important;
+  border-radius: 10px !important;
+  box-shadow: 4px 4px 0 #4a2e16 !important;
+  color: #3a2a1a !important;
   overflow: hidden;
 }
-
-/* === 5. CARD INTERNAL SKY + GRASS (scenic bg inside card) === */
-/* Sky gradient at top of card */
-[data-theme="stardew"] .card::before,
-[data-theme="stardew"] .server-card::before,
-[data-theme="stardew"] .node-card::before,
-[data-theme="stardew"] .overview-card::before,
-[data-theme="stardew"] .chart-card::before,
-[data-theme="stardew"] [class*="card"]::before,
-[data-theme="stardew"] [class*="panel"]::before {
+[data-theme="stardew"] .stardew-wood-card::before {
+  /* 顶部高光木边 */
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 35%;
-  background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #C8E6C9 100%) !important;
-  z-index: 0;
+  inset: 0;
+  border-top: 3px solid rgba(255, 255, 255, 0.35);
+  border-radius: 7px 7px 0 0;
   pointer-events: none;
 }
-
-/* Grass at bottom of card */
-[data-theme="stardew"] .card::after,
-[data-theme="stardew"] .server-card::after,
-[data-theme="stardew"] .node-card::after,
-[data-theme="stardew"] .overview-card::after,
-[data-theme="stardew"] .chart-card::after,
-[data-theme="stardew"] [class*="card"]::after,
-[data-theme="stardew"] [class*="panel"]::after {
-  content: "";
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 20%;
-  background: linear-gradient(0deg, #4CAF50 0%, #66BB6A 40%, #81C784 100%) !important;
-  z-index: 0;
-  pointer-events: none;
+[data-theme="stardew"] .stardew-wood-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 #4a2e16 !important;
+}
+[data-theme="stardew"] .stardew-wood-card-offline {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(120, 60, 40, 0.12) 0px,
+      rgba(120, 60, 40, 0.12) 2px,
+      rgba(140, 80, 50, 0.06) 4px,
+      rgba(140, 80, 50, 0.06) 8px
+    ),
+    linear-gradient(180deg, #e9d2b0 0%, #d8bd92 100%) !important;
+  border-color: #7a3b2a !important;
+  box-shadow: 4px 4px 0 #5a2417 !important;
+}
+/* 让卡片内部文字/数值在木牌上清晰 */
+[data-theme="stardew"] .stardew-wood-card * {
+  color: #3a2a1a !important;
+  border-color: rgba(107, 68, 35, 0.5) !important;
 }
 
-/* Card content above sky/grass */
-[data-theme="stardew"] .card > *,
-[data-theme="stardew"] .server-card > *,
-[data-theme="stardew"] .node-card > *,
-[data-theme="stardew"] .overview-card > *,
-[data-theme="stardew"] .chart-card > *,
-[data-theme="stardew"] [class*="card"] > *,
-[data-theme="stardew"] [class*="panel"] > * {
-  position: relative;
-  z-index: 1;
+/* === 2. 星露谷能量条 === */
+[data-theme="stardew"] .stardew-wood-card [class*="progress"],
+[data-theme="stardew"] .stardew-wood-card [class*="bar"],
+[data-theme="stardew"] .stardew-wood-card [role="progressbar"] {
+  height: 14px !important;
+  border: 2px solid #6b4423 !important;
+  border-radius: 4px !important;
+  background: #d9c39a !important;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.12) !important;
+  overflow: hidden;
+  image-rendering: pixelated !important;
+}
+[data-theme="stardew"] .stardew-wood-card [class*="progress"] > *,
+[data-theme="stardew"] .stardew-wood-card [class*="bar"] > *,
+[data-theme="stardew"] .stardew-wood-card [role="progressbar"] > * {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #6ab04c 0px,
+    #6ab04c 6px,
+    #57a043 6px,
+    #57a043 8px
+  ) !important;
+  background-color: #6ab04c !important;
+  border: none !important;
+  image-rendering: pixelated !important;
 }
 
-/* === 6. BUTTONS === */
+/* === 3. 按钮 / 输入 木牌化 === */
 [data-theme="stardew"] button,
 [data-theme="stardew"] .btn,
 [data-theme="stardew"] [role="button"],
 [data-theme="stardew"] [role="tab"] {
-  background: #FCEED3 !important;
+  background: #f3e2bd !important;
   background-image: none !important;
-  border: 3px solid #3E2723 !important;
-  border-radius: 6px !important;
-  box-shadow: 3px 3px 0px #3E2723 !important;
+  border: 3px solid #6b4423 !important;
+  border-radius: 8px !important;
+  box-shadow: 3px 3px 0 #4a2e16 !important;
   text-transform: none !important;
-  letter-spacing: 0.06em !important;
-  font-family: "VT323", monospace !important;
-  -webkit-font-smoothing: none !important;
+  letter-spacing: 0.05em !important;
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  color: #3a2a1a !important;
   image-rendering: pixelated !important;
-  color: #333333 !important;
 }
 [data-theme="stardew"] button[aria-pressed="true"],
 [data-theme="stardew"] [role="tab"][aria-selected="true"] {
-  background: #F5D88A !important;
-  box-shadow: inset 0 -3px 0 0 #3E2723, 3px 3px 0px #3E2723 !important;
+  background: #e9c46a !important;
+  box-shadow: inset 0 -3px 0 0 #4a2e16, 3px 3px 0 #4a2e16 !important;
 }
-
-/* === 7. INPUTS === */
 [data-theme="stardew"] input,
 [data-theme="stardew"] textarea,
 [data-theme="stardew"] select {
-  background: #FCEED3 !important;
-  background-image: none !important;
-  border: 3px solid #3E2723 !important;
-  border-radius: 6px !important;
-  box-shadow: 2px 2px 0px #3E2723 !important;
-  font-family: "VT323", monospace !important;
-  -webkit-font-smoothing: none !important;
-  image-rendering: pixelated !important;
-  color: #333333 !important;
+  background: #f6e7c4 !important;
+  border: 3px solid #6b4423 !important;
+  border-radius: 8px !important;
+  box-shadow: 2px 2px 0 #4a2e16 !important;
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  color: #3a2a1a !important;
 }
 
-/* === 8. PROGRESS/BARS === */
-[data-theme="stardew"] .metric-bar,
-[data-theme="stardew"] .ping-bar,
-[data-theme="stardew"] [class*="metric-bar"],
-[data-theme="stardew"] [class*="ping-bar"],
-[data-theme="stardew"] [class*="progress"] {
-  image-rendering: pixelated !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  height: 12px !important;
-}
-
-/* === 9. DROPDOWNS/MENUS === */
+/* === 4. 下拉/菜单 木牌化 === */
 [data-theme="stardew"] [role="menu"],
 [data-theme="stardew"] .dropdown-menu,
 [data-theme="stardew"] [class*="Menu"] {
-  background: #FCEED3 !important;
-  background-image: none !important;
-  border: 3px solid #3E2723 !important;
-  border-radius: 6px !important;
-  box-shadow: 4px 4px 0px #3E2723 !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  font-family: "VT323", monospace !important;
-  color: #333333 !important;
-}
-[data-theme="stardew"] [role="menuitem"],
-[data-theme="stardew"] [class*="menu-item"] {
-  font-family: inherit !important;
-  text-transform: none !important;
-  letter-spacing: 0.06em !important;
+  background: #f3e2bd !important;
+  border: 3px solid #6b4423 !important;
+  border-radius: 8px !important;
+  box-shadow: 4px 4px 0 #4a2e16 !important;
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  color: #3a2a1a !important;
 }
 
-/* === 10. SPACING RHYTHM === */
-[data-theme="stardew"] main,
-[data-theme="stardew"] .container,
-[data-theme="stardew"] [class*="container"] {
-  gap: 20px !important;
-  padding-block: 14px !important;
-  padding-inline: 16px !important;
-}
-[data-theme="stardew"] main > * + *,
-[data-theme="stardew"] .container > * + * {
-  margin-block-start: 20px !important;
-}
-[data-theme="stardew"] .node-card,
-[data-theme="stardew"] [class*="node-card"] {
-  margin-block-end: 20px !important;
-  padding: 14px !important;
-  gap: 12px !important;
-}
-[data-theme="stardew"] .search-row,
-[data-theme="stardew"] [class*="search"] {
-  padding-block: 10px !important;
-  gap: 10px !important;
-}
-
-/* === 11. FOOTER === */
+/* === 5. 页脚 木牌底 === */
 [data-theme="stardew"] footer,
 [data-theme="stardew"] .footer {
-  background: #3E2723 !important;
-  color: #FCEED3 !important;
-  border-top: 4px solid #5D4037 !important;
-  font-family: "VT323", monospace !important;
-  font-size: 16px !important;
-  letter-spacing: 0.08em !important;
+  background: #4a2e16 !important;
+  color: #f3e2bd !important;
+  border-top: 4px solid #2c1a0c !important;
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  font-size: 15px !important;
+  letter-spacing: 0.06em !important;
 }
 [data-theme="stardew"] footer a,
 [data-theme="stardew"] .footer a {
-  color: #F5D88A !important;
+  color: #e9c46a !important;
 }
 
-/* === 12. SKY/SEASON/WEATHER VISIBILITY === */
+/* === 6. 扫描线像素质感（轻） === */
+[data-theme="stardew"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.035) 0px,
+    rgba(0, 0, 0, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  ) !important;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+/* === 7. 不破坏组件自带的天空/天气/动植物 === */
+/* Background.vue 的 .stardew-scene 与 StardewSky / FloraFaunaOverlay 照常显示 */
 html[data-theme="stardew"] .stardew-sky,
 html[data-theme="stardew"] .stardew-sky *,
-html[data-theme="stardew"] .stardew-sky-season,
 html[data-theme="stardew"] .stardew-sun,
 html[data-theme="stardew"] .stardew-moon,
 html[data-theme="stardew"] .stardew-rain,
@@ -261,23 +212,4 @@ html[data-theme="stardew"] .stardew-lightning {
   opacity: 1 !important;
   animation: inherit !important;
   pointer-events: none !important;
-}
-
-/* === 13. LOADING / SCANLINES === */
-[data-theme="stardew"] .loading-cover { display:none !important; }
-[data-theme="stardew"] body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0.04) 0px,
-    rgba(0,0,0,0.04) 1px,
-    transparent 1px,
-    transparent 3px
-  ) !important;
-  mix-blend-mode: multiply;
-  opacity: 0.4;
 }

@@ -105,8 +105,8 @@ function hasRegion(region: string | null | undefined): boolean {
 <template>
   <CardX
     hoverable
-    class="node-card w-full cursor-pointer backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none shadow-[0_0_0_3px] shadow-transparent hover:bg-background/60 hover:shadow-slate-500/10 transition-all duration-200 rounded-lg ring-1 ring-foreground/[0.06] glass-hover-blur"
-    :class="[!props.node.online && '!shadow-red-600/20']" @click="emit('click')"
+    class="node-card w-full cursor-pointer stardew-wood-card transition-all duration-200 rounded-[10px]"
+    :class="[!props.node.online && '!stardew-wood-card-offline']" @click="emit('click')"
   >
     <template #header>
       <div class="flex gap-2 min-w-0 items-center">
