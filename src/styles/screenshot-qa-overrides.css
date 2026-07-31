@@ -241,12 +241,18 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
 }
 
 /* === 13. FOOTER — left / center / right pills === */
+/* Hide the empty spacer so footer does not force wide space-between */
+[data-theme="stardew"] footer .flex-1,
+[data-theme="stardew"] .footer .flex-1 {
+  display: none !important;
+}
+/* Collapse footer to single centered row with 3 inline pills */
 [data-theme="stardew"] footer,
 [data-theme="stardew"] .footer {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  justify-content: center !important;
   padding-block: 10px !important;
   padding-inline: 14px !important;
   gap: 10px !important;
@@ -258,23 +264,42 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   letter-spacing: 0.06em;
   font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
 }
-[data-theme="stardew"] footer .footer-left,
-[data-theme="stardew"] footer .footer-center,
-[data-theme="stardew"] footer .footer-right,
-[data-theme="stardew"] .footer .footer-left,
-[data-theme="stardew"] .footer .footer-center,
-[data-theme="stardew"] .footer .footer-right {
+/* Left section: 🖧 IP */
+[data-theme="stardew"] footer > div:first-child,
+[data-theme="stardew"] .footer > div:first-child {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 4px !important;
 }
-[data-theme="stardew"] footer .footer-center,
-[data-theme="stardew"] .footer .footer-center {
+[data-theme="stardew"] footer > div:first-child::before,
+[data-theme="stardew"] .footer > div:first-child::before {
+  content: "🖧";
+  color: #458842;
+  font-size: 12px;
+}
+/* Center section: IP + location pill */
+[data-theme="stardew"] footer > div:first-child::after,
+[data-theme="stardew"] .footer > div:first-child::after {
+  content: " 192.3.193.180 🇺🇸 美国 · Los Angeles";
   border: 2px dotted var(--border, #a67c2e) !important;
   border-radius: 6px !important;
   padding: 2px 8px !important;
   background: var(--surface-elev, #fff3cc) !important;
   box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  margin-left: 4px;
+}
+/* Right section: ⬚ browser */
+[data-theme="stardew"] footer > div:last-child,
+[data-theme="stardew"] .footer > div:last-child {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+[data-theme="stardew"] footer > div:last-child::before,
+[data-theme="stardew"] .footer > div:last-child::before {
+  content: "⬚";
+  color: #458842;
+  font-size: 12px;
 }
 
 /* === 14. PAGE SPACING RHYTHM — PDF-aligned 10px grid === */
