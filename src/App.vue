@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { destroyInitManager, initApp } from '@/utils/init'
 import Background from './components/Background.vue'
 import StardewSky from './components/StardewSky.vue'
+import FloraFaunaOverlay from './components/FloraFaunaOverlay.vue'
 import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import LoadingCover from './components/LoadingCover.vue'
@@ -39,6 +40,7 @@ onUnmounted(() => {
   <Provider>
     <Background />
     <StardewSky />
+    <FloraFaunaOverlay />
     <div v-if="appStore.enableGlassEffect" class="glass-orbs" aria-hidden="true">
       <div class="glass-orb glass-orb-1" />
       <div class="glass-orb glass-orb-2" />
