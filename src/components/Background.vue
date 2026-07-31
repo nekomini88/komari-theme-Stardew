@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
 import ShaderBackground from '@/components/ShaderBackground.vue'
 import ShaderBackgroundLiquid from '@/components/ShaderBackgroundLiquid.vue'
 import { useAppStore } from '@/stores/app'
@@ -50,13 +50,70 @@ const showMediaBackground = computed(() =>
   hasCustomBackground.value && !hasError.value && (backgroundType.value === 'video' || showLoadedBackground.value),
 )
 
-const isStardew = computed(() => document.documentElement.getAttribute('data-theme') === 'stardew')
-const showDefaultBackground = computed(() => !hasCustomBackground.value && !isStardew.value)
-const showStardewBackground = computed(() => isStardew.value && !hasCustomBackground.value)
-
-// 昼夜：复用 atmosphere，无自定义背景时背景也跟随
+const currentTheme = document.documentElement.getAttribute('data-theme')
 import { isNight } from '@/composables/useStardewAtmosphere'
+
+// 宽容检测：stardew 主题 + 空值（部署场景） + 包含 stardew 的变体
+const isStardew = computed(() => {
+  const t = currentTheme
+  if (t === 'stardew') return true
+  if (t === null || t === '') return false // 空值由 theme.json 判定
+  return t && t.toLowerCase().includes('stardew')
+})
+
+// 昼夜：复用 atmosphere
 const isStardewNight = isNight
+
+// 本地 season：部署后立即能看到四季切换（周期 4 秒一个季节，演示用）
+const seasonIndex = ref(0) // 0=spring, 1=summer, 2=autumn, 3=winter
+let seasonTimer: ReturnType<typeof setInterval> | null = null
+onMounted(() => {
+  seasonTimer = window.setInterval(() => {
+    seasonIndex.value = (seasonIndex.value + 1) % 4
+  }, 4000)
+})
+const localSeason = computed(() => {
+  const seasons = ['spring', 'summer', 'autumn', 'winter'] as const
+  return seasons[seasonIndex.value]
+})
+
+// 季节化天空渐变（白天）
+const skyGradientStyle = computed(() => {
+  const isNightMode = isStardewNight.value
+  if (isNightMode) return { background: 'linear-gradient(180deg, #0b1b3a 0%, #1c2f57 40%, #2c3e63 70%, #16314f 100%)' }
+  const s = localSeason.value
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #8ed0f5 0%, #bfe9ff 38%, #eaf7d8 70%, #cde6a0 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #87CEEB 0%, #98d8ff 35%, #b0e0E6 70%, #a8d8e6 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #FFB347 0%, #FFD1A9 40%, #F7C89F 75%, #F0D4B8 100%)' }
+  // winter
+  return { background: 'linear-gradient(180deg, #a0d2ff 0%, #c6e2ff 40%, #d9ecf0 75%, #e8f5e9 100%)' }
+})
+
+// 季节化草地（底层）
+const grassStyle = computed(() => {
+  const s = localSeason.value
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #8ccf4f 0%, #5fae34 45%, #3f8a22 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #90ee90 0%, #228b22 45%, #006400 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #daa520 0%, #b8860b 45%, #8b4513 100%)' }
+  // winter
+  return { background: 'linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 45%, #a9a9a9 100%)' }
+})
+
+// 季节化草地（顶部高光）
+const grassFrontStyle = computed(() => {
+  const s = localSeason.value
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #4f9e2a 0%, #357018 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #2e8b57 0%, #166534 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #cd853f 0%, #8b4513 100%)' }
+  // winter
+  return { background: 'linear-gradient(180deg, #d3d3d3 0%, #a9a9a9 100%)' }
+})
+
+// 部署场景：没有 CUSTOM 背景，且 THIS 主题是 stardew，就显示 stardew 背景
+const themeName = (window as any).__KOMARI_THEME_NAME__ || ''
+const isStardewTheme = isStardew.value || themeName.toLowerCase().includes('stardew')
+const showDefaultBackground = computed(() => !hasCustomBackground.value && !isStardewTheme)
+const showStardewBackground = computed(() => isStardewTheme && !hasCustomBackground.value)
 
 // 内联栅栏 SVG，零素材依赖
 const fenceSvg = `<svg viewBox="0 0 1200 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -160,15 +217,15 @@ onUnmounted(() => {
     </Transition>
     <Transition name="fade">
       <div v-if="showStardewBackground" class="stardew-scene" :class="{ 'is-night': isStardewNight }">
-        <div class="stardew-sky-grad" />
+        <div class="stardew-sky-grad" :style="skyGradientStyle" />
         <div class="stardew-sun" />
         <div class="stardew-moon" />
         <div class="stardew-clouds">
           <span class="cloud c1" /><span class="cloud c2" /><span class="cloud c3" /><span class="cloud c4" />
         </div>
-        <div class="stardew-grass" />
+        <div class="stardew-grass" :style="grassStyle" />
         <div class="stardew-fence" v-html="fenceSvg" />
-        <div class="stardew-grass-front" />
+        <div class="stardew-grass-front" :style="grassFrontStyle" />
       </div>
     </Transition>
     <Transition name="fade">
@@ -265,11 +322,7 @@ onUnmounted(() => {
 .stardew-sky-grad {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #8ed0f5 0%, #bfe9ff 38%, #eaf7d8 70%, #cde6a0 100%);
   transition: background 1.2s ease;
-}
-.stardew-scene.is-night .stardew-sky-grad {
-  background: linear-gradient(180deg, #0b1b3a 0%, #1c2f57 40%, #2c3e63 70%, #16314f 100%);
 }
 .stardew-sun {
   position: absolute;
@@ -311,14 +364,12 @@ onUnmounted(() => {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 26%;
-  background: linear-gradient(180deg, #8ccf4f 0%, #5fae34 45%, #3f8a22 100%);
   box-shadow: inset 0 6px 0 rgba(255,255,255,0.12);
 }
 .stardew-grass-front {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 9%;
-  background: linear-gradient(180deg, #4f9e2a 0%, #357018 100%);
   border-top: 3px solid #2c5e12;
 }
 .stardew-fence {
