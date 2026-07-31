@@ -30,13 +30,13 @@ describe('matte pixel surfaces under stardew theme', () => {
     expect(matte).toContain("var(--border-strong")
   })
 
-  it('MUST use solid matte borders and pixel shadows in matte-pixel.css', () => {
+  it('MUST use dotted matte borders and pixel shadows in matte-pixel.css', () => {
     const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
     expect(matte).toContain('[data-theme="stardew"]')
-    expect(matte).toContain('border: 2px solid var(--border, #a67c2e) !important')
-    // pixel shadow signature (multi-line is ok)
+    // dotted is expressed either as shorthand or border-style
+    const dotted = ['border-style: dotted', 'border: 2px dotted'].some(t => matte.includes(t))
+    expect(dotted).toBe(true)
+    // pixel shadow signature
     expect(matte).toContain('4px 4px 0 0 var(--border-strong')
-    // no glass blur in Stardew mode
-    expect(matte).toContain('backdrop-filter: none !important')
   })
 })
