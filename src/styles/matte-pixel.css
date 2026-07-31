@@ -1,12 +1,16 @@
 /* Matte pixel surfaces under data-theme="stardew. Pastoral hard shadows, no glass blur. */
 
-/* Disable glass orbs and blur globally for stardew */
-[data-theme="stardew"] .glass-orbs,
+/* Disable glass orbs and blur globally for stardew.
+ * NOTE: Only clear the blur; do NOT use display:none on these classes,
+ * otherwise legitimate cards/panels that adopt blur utility classes
+ * will be removed from the layout. */
+[data-theme="stardew"] .glass-orbs {
+  display: none !important;
+}
 [data-theme="stardew"] .backdrop-blur-sm,
 [data-theme="stardew"] .backdrop-blur-md,
 [data-theme="stardew"] .backdrop-blur-lg,
 [data-theme="stardew"] .backdrop-blur-xl {
-  display: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
