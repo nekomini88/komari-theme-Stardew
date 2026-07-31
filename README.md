@@ -16,7 +16,7 @@
 - [ ] `spec validate` 通过
 - [ ] `bun run build` 产出 `komari-theme-stardew-build-*.zip`
 - [ ] zip 内包含 `komari-theme.json`、`preview.png`、`dist/`
-- [ ] `python3 tests/run_all.py` 输出 `ALL TESTS PASSED`
+- [ ] `bun run test` 输出 `12 passed`
 - [ ] Header 主题选择可见 "星露" 选项
 - [ ] CSS 存在 `data-theme="stardew"` 变量
 - [ ] 预览图存在 `docs/preview.png`
@@ -56,7 +56,7 @@ bun run build
 ## 测试
 
 ```bash
-python3 tests/run_all.py
+bun run test
 ```
 
 覆盖：
