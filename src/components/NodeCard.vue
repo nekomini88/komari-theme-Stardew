@@ -346,6 +346,20 @@ function hasRegion(region: string | null | undefined): boolean {
   overflow: hidden;
 }
 
+.stardew-wood-card {
+  background: linear-gradient(180deg, #f3e2bd 0%, #e8d5a8 100%) !important;
+  border: 3px solid #5c3a1e !important;
+  box-shadow: 4px 4px 0 #3E2723 !important;
+  border-radius: 8px !important;
+  image-rendering: pixelated;
+}
+
+.stardew-wood-card-offline {
+  background: linear-gradient(180deg, #d4a5a5 0%, #c08080 100%) !important;
+  border-color: #7f1d1d !important;
+  box-shadow: 4px 4px 0 #5c1a1a !important;
+}
+
 .node-offline-overlay {
   position: absolute;
   inset: 0;

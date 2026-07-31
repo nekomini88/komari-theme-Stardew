@@ -64,13 +64,13 @@ const isStardew = computed(() => {
 // 昼夜：复用 atmosphere
 const isStardewNight = isNight
 
-// 本地 season：部署后立即能看到四季切换（周期 4 秒一个季节，演示用）
+// 本地 season：部署后立即能看到四季切换（周期 8 秒一个季节）
 const seasonIndex = ref(0) // 0=spring, 1=summer, 2=autumn, 3=winter
 let seasonTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   seasonTimer = window.setInterval(() => {
     seasonIndex.value = (seasonIndex.value + 1) % 4
-  }, 4000)
+  }, 8000)
 })
 const localSeason = computed(() => {
   const seasons = ['spring', 'summer', 'autumn', 'winter'] as const
@@ -82,21 +82,21 @@ const skyGradientStyle = computed(() => {
   const isNightMode = isStardewNight.value
   if (isNightMode) return { background: 'linear-gradient(180deg, #0b1b3a 0%, #1c2f57 40%, #2c3e63 70%, #16314f 100%)' }
   const s = localSeason.value
-  if (s === 'spring') return { background: 'linear-gradient(180deg, #8ed0f5 0%, #bfe9ff 38%, #eaf7d8 70%, #cde6a0 100%)' }
-  if (s === 'summer') return { background: 'linear-gradient(180deg, #87CEEB 0%, #98d8ff 35%, #b0e0E6 70%, #a8d8e6 100%)' }
-  if (s === 'autumn') return { background: 'linear-gradient(180deg, #FFB347 0%, #FFD1A9 40%, #F7C89F 75%, #F0D4B8 100%)' }
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #87CEEB 0%, #a8d8e6 35%, #c5e3a4 70%, #e8f5e9 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #5DADE2 0%, #85C1E9 35%, #aed6f1 70%, #d5f5e3 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #f4d03f 0%, #f8c471 35%, #f5b041 70%, #fad7a0 100%)' }
   // winter
-  return { background: 'linear-gradient(180deg, #a0d2ff 0%, #c6e2ff 40%, #d9ecf0 75%, #e8f5e9 100%)' }
+  return { background: 'linear-gradient(180deg, #d5dbdb 0%, #d6eaf8 35%, #eaf2f8 70%, #f8f9f9 100%)' }
 })
 
 // 季节化草地（底层）
 const grassStyle = computed(() => {
   const s = localSeason.value
-  if (s === 'spring') return { background: 'linear-gradient(180deg, #8ccf4f 0%, #5fae34 45%, #3f8a22 100%)' }
-  if (s === 'summer') return { background: 'linear-gradient(180deg, #90ee90 0%, #228b22 45%, #006400 100%)' }
-  if (s === 'autumn') return { background: 'linear-gradient(180deg, #daa520 0%, #b8860b 45%, #8b4513 100%)' }
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #8bc34a 0%, #689f38 45%, #33691e 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #7cb342 0%, #558b2f 45%, #1b5e20 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #d4a017 0%, #b8860b 45%, #6d4c1d 100%)' }
   // winter
-  return { background: 'linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 45%, #a9a9a9 100%)' }
+  return { background: 'linear-gradient(180deg, #d5dbdb 0%, #bdc3c7 45%, #95a5a6 100%)' }
 })
 
 // 季节化草地（顶部高光）
