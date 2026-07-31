@@ -1,16 +1,32 @@
-<h3 align="center"> Komari Neko </h3>
+<h3 align="center"> Komari Stardew </h3>
 <p align="center">
-基于 Vue 3 + Vite + reka-ui + Tailwind CSS v4 构建的 Komari Monitor 主题
+星露谷物语主题 · 基于 <a href="https://github.com/nekomini88/komari-theme-Neko">komari-theme-Neko</a> UI 定制
 </p>
 
 ![preview](/docs/preview.png)
 
+## 项目
+
+基于 Vue 3 + Vite + reka-ui + Tailwind CSS v4 构建，参考 [LuminaPlus](https://github.com/shanyang242/Komari-Theme-LuminaPlus) 的增强思路，专用于 Komari Monitor。
+
+内置主题：`emerald` / `sunrise` / `green-mountain` / `blue-water` / `night` / `material-indigo` / `material-pink` / `material-teal` / `stardew`
+
+## 验收标准 DoD
+
+- [ ] `spec validate` 通过
+- [ ] `bun run build` 产出 `komari-theme-stardew-build-*.zip`
+- [ ] zip 内包含 `komari-theme.json`、`preview.png`、`dist/`
+- [ ] `python3 tests/run_all.py` 输出 `ALL TESTS PASSED`
+- [ ] Header 主题选择可见 "星露" 选项
+- [ ] CSS 存在 `data-theme="stardew"` 变量
+- [ ] 预览图存在 `docs/preview.png`
+
 ## 使用
 
-1. 从 [Release 页面](https://github.com/Tokinx/komari-theme-emerald/releases) 下载最新的 `komari-theme-emerald-build-*.zip` 文件
-2. 登录 Komari Monitor 后，点击 `设置`，选择 `主题管理` 选项卡
-3. 点击 `上传主题` 按钮，选择下载的 `komari-theme-emerald-build-*.zip` 文件
-4. 刷新页面，即可看到新的主题
+1. 从 [Release 页面](https://github.com/nekomini88/komari-theme-Stardew/releases) 下载 `komari-theme-stardew-build-*.zip`
+2. 登录 Komari Monitor 后，点击 `设置` → `主题管理`
+3. `上传主题` 选择 zip 文件
+4. 刷新页面，在 Header 主题选择中切换 `星露`
 
 ## 环境要求
 
@@ -20,25 +36,33 @@
 ## 开发
 
 ```bash
-# 安装依赖
 bun install
-
-# 启动开发服务器
-bun run dev
-
-# 代码检查
-bun run lint
+bun run dev -- --host 0.0.0.0
 ```
+
+Mock 数据：
+- `http://localhost:5173/?mock=1` 启用本地模拟
 
 ## 构建
 
 ```bash
-# 类型检查 + 生产构建
 bun run build
-
-# 预览生产构建
-bun run preview
 ```
+
+产物：
+- `dist/`
+- `komari-theme-stardew-build-<sha>.zip`
+
+## 测试
+
+```bash
+python3 tests/run_all.py
+```
+
+覆盖：
+- `verify_spec`：`spec.yaml` 结构校验
+- `verify_build`：zip / manifest / preview 文件校验
+- `verify_dev`：stardew 主题源码入口校验
 
 ## 技术栈
 
@@ -54,19 +78,6 @@ bun run preview
 | 图标     | @iconify/vue                     |
 | 图表     | vue-echarts                      |
 | 3D 地球  | cobe                             |
-| 实用工具 | @vueuse/core, dayjs              |
-| 代码规范 | ESLint (@antfu/eslint-config)    |
-
-## 鸣谢
-
-- [Komari](https://github.com/komari-monitor/komari)
-- [Komari Naive](https://github.com/tonyliuzj/komari-naive)
-- [Vue 3](https://vuejs.org/)
-- [Vite](https://vitejs.dev/)
-- [reka-ui](https://reka-ui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-
-本主题基座基于 [Komari Naive](https://github.com/lyimoexiao/komari-theme-naive)，特此感谢
 
 ## License
 
