@@ -212,7 +212,8 @@
 /* Hide loading cover in stardew theme */
 [data-theme="stardew"] .loading-cover { display:none !important; }
 
-/* === 12. KILL STARDEW SKY / BACKGROUND DECORATIONS === */
+/* === 12. SEASON/WEATHER KEEP — do NOT hide sky or flora/fauna === */
+/* The Stardew sky, seasons, sun/moon, rain/snow, butterflies are the reference signature. */
 html[data-theme="stardew"] .stardew-sky,
 html[data-theme="stardew"] .stardew-sky *,
 html[data-theme="stardew"] .stardew-sky-season,
@@ -225,13 +226,10 @@ html[data-theme="stardew"] .stardew-fog,
 html[data-theme="stardew"] .stardew-flora-fauna,
 html[data-theme="stardew"] .stardew-life,
 html[data-theme="stardew"] .stardew-lightning {
-  display: none !important;
-  opacity: 0 !important;
-  animation: none !important;
+  display: block !important;
+  opacity: 1 !important;
+  animation: inherit !important;
   pointer-events: none !important;
-}
-html[data-theme="stardew"] .stardew-sky {
-  background: none !important;
 }
 
 /* Pastoral soft-light texture keeps vibe without flat color */
