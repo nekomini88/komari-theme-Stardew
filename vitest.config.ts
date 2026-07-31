@@ -14,6 +14,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.vue', 'src/**/*.ts'],
+      exclude: ['src/main.ts'],
       thresholds: {
         lines: 80,
         branches: 70,
