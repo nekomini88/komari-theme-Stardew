@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import './visual-styles.css';
 @import './matte-pixel.css';
+@import './traffic-cost-metric.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
