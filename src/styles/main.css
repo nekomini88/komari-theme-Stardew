@@ -3,6 +3,7 @@
 @import './visual-styles.css';
 @import './matte-pixel.css';
 @import './traffic-cost-metric.css';
+@import './metric-polish.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
