@@ -82,11 +82,11 @@ const skyGradientStyle = computed(() => {
   const isNightMode = isStardewNight.value
   if (isNightMode) return { background: 'linear-gradient(180deg, #0b1b3a 0%, #1c2f57 40%, #2c3e63 70%, #16314f 100%)' }
   const s = localSeason.value
-  if (s === 'spring') return { background: 'linear-gradient(180deg, #87CEEB 0%, #a8d8e6 35%, #c5e3a4 70%, #e8f5e9 100%)' }
-  if (s === 'summer') return { background: 'linear-gradient(180deg, #5DADE2 0%, #85C1E9 35%, #aed6f1 70%, #d5f5e3 100%)' }
-  if (s === 'autumn') return { background: 'linear-gradient(180deg, #f4d03f 0%, #f8c471 35%, #f5b041 70%, #fad7a0 100%)' }
+  if (s === 'spring') return { background: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #d5f5e3 70%, #e8f5e9 100%)' }
+  if (s === 'summer') return { background: 'linear-gradient(180deg, #5DADE2 0%, #85C1E9 25%, #aed6f1 60%, #d5f5e3 100%)' }
+  if (s === 'autumn') return { background: 'linear-gradient(180deg, #f4d03f 0%, #f8c471 30%, #f5b041 65%, #fad7a0 100%)' }
   // winter
-  return { background: 'linear-gradient(180deg, #d5dbdb 0%, #d6eaf8 35%, #eaf2f8 70%, #f8f9f9 100%)' }
+  return { background: 'linear-gradient(180deg, #d5dbdb 0%, #d6eaf8 30%, #eaf2f8 65%, #f8f9f9 100%)' }
 })
 
 // 季节化草地（底层）

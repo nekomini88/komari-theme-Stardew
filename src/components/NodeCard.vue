@@ -348,26 +348,26 @@ function hasRegion(region: string | null | undefined): boolean {
 
 .stardew-wood-card {
   background: linear-gradient(180deg, #f3e2bd 0%, #e8d5a8 100%) !important;
-  border: 3px solid #5c3a1e !important;
-  box-shadow: 4px 4px 0 #3E2723 !important;
-  border-radius: 8px !important;
+  border: 4px solid #5c3a1e !important;
+  box-shadow: 6px 6px 0 #3E2723 !important;
+  border-radius: 10px !important;
   image-rendering: pixelated;
 }
 
 .stardew-wood-card-offline {
   background: linear-gradient(180deg, #d4a5a5 0%, #c08080 100%) !important;
   border-color: #7f1d1d !important;
-  box-shadow: 4px 4px 0 #5c1a1a !important;
+  box-shadow: 6px 6px 0 #5c1a1a !important;
 }
 
 /* 木牌卡片内部像素化 */
 .stardew-wood-card :deep(.node-card) {
-  border-radius: 6px !important;
+  border-radius: 8px !important;
 }
 
 .stardew-wood-card :deep(.progress-thin) {
   border-radius: 0 !important;
-  height: 10px !important;
+  height: 12px !important;
   background: repeating-linear-gradient(90deg, #0000002e 0px, #0000002e 2px, transparent 2px, transparent 6px), var(--progress-bg, #d9b96e) !important;
 }
 
