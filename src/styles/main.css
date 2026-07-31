@@ -2,10 +2,10 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './visual-styles.css';
+@import './pdf-alignment.css';
 @import './matte-pixel.css';
 @import './traffic-cost-metric.css';
 @import './metric-polish.css';
-@import './pdf-alignment.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
