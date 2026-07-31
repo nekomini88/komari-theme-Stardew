@@ -4,7 +4,7 @@ import { season, isNight, isThunder, isRain, isSnow, isFog } from '@/composables
 
 const items = ref<Array<{ id: number; x: number; y: number; type: string; life: number }>>([])
 let nextId = 0
-const MAX = 14
+const MAX = 22
 let raf: number | null = null
 let last = 0
 const SPAWN_INTERVAL = 900
@@ -21,17 +21,39 @@ const SPRITES: Record<string, string> = {
   ice: '/src/assets/sprites/ice.svg',
   fogwisp: '/src/assets/sprites/fogwisp.svg',
   lightning: '/src/assets/sprites/fogwisp.svg',
+  star: '/src/assets/sprites/star.svg',
+  cloud: '/src/assets/sprites/cloud.svg',
 }
 
 function pickType() {
   const s = season.value
-  if (isThunder.value) return 'lightning'
-  if (s === 'winter') {
-    if (isSnow.value) return Math.random() < 0.7 ? 'snowflake' : 'ice'
-    return 'snowflake'
+  if (isThunder.value) {
+    const p = Math.random()
+    if (p < 0.25) return 'lightning'
+    if (p < 0.45) return 'cloud'
+    return 'raindrop'
   }
-  if (isRain.value) return 'raindrop'
-  if (isFog.value) return Math.random() < 0.6 ? 'fogwisp' : 'leaf'
+  if (s === 'winter') {
+    const p = Math.random()
+    if (p < 0.12) return 'star'
+    if (p < 0.22) return 'cloud'
+    if (isSnow.value) return Math.random() < 0.7 ? 'snowflake' : 'ice'
+    return Math.random() < 0.5 ? 'snowflake' : 'cloud'
+  }
+  if (isRain.value) {
+    const p = Math.random()
+    if (p < 0.18) return 'cloud'
+    return 'raindrop'
+  }
+  if (isFog.value) {
+    const p = Math.random()
+    if (p < 0.35) return 'fogwisp'
+    if (p < 0.55) return 'cloud'
+    return 'leaf'
+  }
+  const p = Math.random()
+  if (p < 0.18) return 'cloud'
+  if (isNight.value && p < 0.35) return 'star'
   const pool = ['firefly', 'butterfly', 'flower', 'leaf', 'bunny', 'bird'] as const
   if (s === 'spring') return Math.random() < 0.5 ? 'flower' : 'butterfly'
   if (s === 'summer') return Math.random() < 0.5 ? 'butterfly' : 'firefly'
@@ -139,12 +161,33 @@ onUnmounted(() => {
   height: 16px;
   animation: stardew-fogdrift 10s ease-in-out infinite;
 }
+.stardew-life.star {
+  width: 10px;
+  height: 10px;
+  animation: stardew-twinkle 2.4s ease-in-out infinite, stardew-drift 9s linear infinite;
+}
+.stardew-life.cloud {
+  width: 28px;
+  height: 12px;
+  animation: stardew-cloud-drift 22s linear infinite;
+  opacity: 0.85;
+}
 .stardew-lightning {
   position: fixed;
   inset: 0;
   pointer-events: none;
   background: rgba(255, 255, 240, 0.18);
   animation: stardew-flash-thunder 1s steps(2, end) infinite;
+}
+
+@keyframes stardew-twinkle {
+  0%, 100% { opacity: 0.55; transform: translate(-50%,-50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%,-50%) scale(1.35); }
+}
+@keyframes stardew-cloud-drift {
+  0% { transform: translate(-60px, 0); opacity: 0.75; }
+  50% { opacity: 0.95; }
+  100% { transform: translate(60px, -14px); opacity: 0.75; }
 }
 
 @keyframes stardew-drift {
