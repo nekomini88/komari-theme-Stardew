@@ -46,13 +46,7 @@ onUnmounted(() => {
       <div class="glass-orb glass-orb-2" />
       <div class="glass-orb glass-orb-3" />
     </div>
-    <Transition
-      enter-active-class="transition-all duration-100 ease-out" enter-from-class="opacity-0 backdrop-blur-0"
-      enter-to-class="opacity-100 backdrop-blur-sm" leave-active-class="transition-all duration-100 ease-in"
-      leave-from-class="opacity-100 backdrop-blur-sm" leave-to-class="opacity-0 backdrop-blur-0"
-    >
-      <LoadingCover v-if="appStore.loading" />
-    </Transition>
+    <LoadingCover v-if="appStore.loading" />
     <Header />
     <main v-if="!appStore.loading" class="relative z-10 min-h-screen overflow-hidden">
       <div class="max-w-[1600px] mx-auto">

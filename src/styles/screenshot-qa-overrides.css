@@ -1,0 +1,271 @@
+/* v0.16.0 full visual alignment overrides for 127.0.0.1:25774 screenshot QA */
+
+/* === 0. RENDER DEFAULTS === */
+[data-theme="stardew"] {
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
+}
+[data-theme="stardew"] * {
+  image-rendering: pixelated !important;
+  text-rendering: optimizeSpeed !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+/* === 1. KILL MODERN BACKGROUNDS === */
+[data-theme="stardew"] body,
+[data-theme="stardew"] html,
+[data-theme="stardew"] main,
+[data-theme="stardew"] [class*="background"],
+[data-theme="stardew"] [class*="backdrop"],
+[data-theme="stardew"] [class*="gradient"] {
+  background-image: none !important;
+}
+[data-theme="stardew"] body {
+  background: var(--bg-0, #f4ead5) !important;
+}
+
+/* === 2. HIDE GLASS ORBS / GLOBES FOR STARDEW === */
+[data-theme="stardew"] .glass-orbs,
+[data-theme="stardew"] .glass-orb,
+[data-theme="stardew"] [class*="globe"],
+[data-theme="stardew"] [class*="network-map"],
+[data-theme="stardew"] [class*="world-map"],
+[data-theme="stardew"] canvas {
+  display: none !important;
+}
+
+/* === 3. FLAT CARDS: SOLID + DOTTED + HARD SHADOW === */
+[data-theme="stardew"] .card,
+[data-theme="stardew"] .server-card,
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] .glass-panel,
+[data-theme="stardew"] [class*="card"],
+[data-theme="stardew"] [class*="glass"],
+[data-theme="stardew"] [class*="panel"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border-style: dotted !important;
+  border-width: 2px !important;
+  border-color: var(--border, #a67c2e) !important;
+  border-radius: 3px !important;
+  box-shadow: 4px 4px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.35) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: hidden;
+}
+
+/* === 4. OVERVIEW TILES === */
+[data-theme="stardew"] .overview-card,
+[data-theme="stardew"] [class*="overview"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border-style: dotted !important;
+  border-width: 2px !important;
+  border-color: var(--border, #a67c2e) !important;
+  border-radius: 3px !important;
+  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b), inset 0 0 0 1px rgba(120, 85, 35, 0.3) !important;
+  image-rendering: pixelated !important;
+}
+
+/* === 5. NODE CARD INTERNAL — kill cutoff/overlap === */
+[data-theme="stardew"] .node-card {
+  padding: 10px !important;
+  gap: 8px !important;
+}
+[data-theme="stardew"] .node-card .grid,
+[data-theme="stardew"] .node-card [class*="grid"] {
+  gap: 6px !important;
+}
+[data-theme="stardew"] .node-card [class*="stat"],
+[data-theme="stardew"] .node-card [class*="metric"],
+[data-theme="stardew"] .node-card [class*="row"] {
+  gap: 4px !important;
+  min-height: 0 !important;
+}
+
+/* === 6. PIXEL TYPOGRAPHY === */
+[data-theme="stardew"] {
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+}
+[data-theme="stardew"] h1,
+[data-theme="stardew"] h2,
+[data-theme="stardew"] h3,
+[data-theme="stardew"] h4,
+[data-theme="stardew"] h5,
+[data-theme="stardew"] h6 {
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.3 !important;
+}
+[data-theme="stardew"] .overview-card-value,
+[data-theme="stardew"] .overview-card-unit,
+[data-theme="stardew"] .traffic-stat-value,
+[data-theme="stardew"] .traffic-volume-value,
+[data-theme="stardew"] .tabular-nums {
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+  text-rendering: optimizeSpeed !important;
+  -webkit-font-smoothing: none !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* === 7. BUTTONS === */
+[data-theme="stardew"] button,
+[data-theme="stardew"] .btn,
+[data-theme="stardew"] [role="button"],
+[data-theme="stardew"] [role="tab"] {
+  background: var(--surface-elev, #fff3cc) !important;
+  background-image: none !important;
+  border: 2px solid var(--border, #a67c2e) !important;
+  border-radius: 4px !important;
+  box-shadow: 3px 3px 0 0 var(--border-strong, #8c5f1b) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  -webkit-font-smoothing: none !important;
+  image-rendering: pixelated !important;
+}
+[data-theme="stardew"] button[aria-pressed="true"],
+[data-theme="stardew"] [role="tab"][aria-selected="true"] {
+  background: var(--surface-elev, #fff3cc) !important;
+  box-shadow: inset 0 -2px 0 0 var(--border-strong, #8c5f1b), 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
+}
+
+/* === 8. INPUTS === */
+[data-theme="stardew"] input,
+[data-theme="stardew"] textarea,
+[data-theme="stardew"] select {
+  background: var(--surface-elev, #fff3cc) !important;
+  background-image: none !important;
+  border: 2px solid var(--border, #a67c2e) !important;
+  border-radius: 3px !important;
+  box-shadow: inset 2px 2px 0 0 rgba(120, 85, 35, 0.25) !important;
+  image-rendering: pixelated !important;
+}
+
+/* === 9. PROGRESS/BARS === */
+[data-theme="stardew"] .metric-bar,
+[data-theme="stardew"] .ping-bar,
+[data-theme="stardew"] [class*="metric-bar"],
+[data-theme="stardew"] [class*="ping-bar"],
+[data-theme="stardew"] [class*="progress"] {
+  image-rendering: pixelated !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* === 10. DROPDOWNS/MENUS === */
+[data-theme="stardew"] [role="menu"],
+[data-theme="stardew"] .dropdown-menu,
+[data-theme="stardew"] [class*="Menu"] {
+  background: var(--surface, #fbecc8) !important;
+  background-image: none !important;
+  border: 2px dotted var(--border, #a67c2e) !important;
+  border-radius: 4px !important;
+  box-shadow: 6px 6px 0 0 var(--border-strong, #8c5f1b) !important;
+  image-rendering: pixelated !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+[data-theme="stardew"] [role="menuitem"],
+[data-theme="stardew"] [class*="menu-item"] {
+  text-rendering: optimizeSpeed !important;
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* === 11. LOADING COVER STYLING (pixel matte) === */
+[data-theme="stardew"] .loading-cover {
+  background: var(--surface, #fbecc8) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 3px solid var(--border, #a67c2e);
+}
+[data-appearance="dark"][data-theme="stardew"] .loading-cover {
+  background: #22180a !important;
+}
+
+/* === 12. SCANLINES (subtle) === */
+[data-theme="stardew"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+[data-appearance="dark"][data-theme="stardew"] body::after {
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+
+/* === 13. FOOTER — left / center / right pills === */
+[data-theme="stardew"] footer,
+[data-theme="stardew"] .footer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-block: 10px !important;
+  padding-inline: 14px !important;
+  gap: 10px !important;
+  border-top: 3px solid var(--border, #a67c2e) !important;
+  box-shadow: inset 0 2px 0 0 var(--border-strong, #8c5f1b) !important;
+  background: var(--surface, #fbecc8) !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
+}
+[data-theme="stardew"] footer .footer-left,
+[data-theme="stardew"] footer .footer-center,
+[data-theme="stardew"] footer .footer-right,
+[data-theme="stardew"] .footer .footer-left,
+[data-theme="stardew"] .footer .footer-center,
+[data-theme="stardew"] .footer .footer-right {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+[data-theme="stardew"] footer .footer-center,
+[data-theme="stardew"] .footer .footer-center {
+  border: 2px dotted var(--border, #a67c2e) !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  background: var(--surface-elev, #fff3cc) !important;
+  box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
+}
+[data-theme="stardew"] footer .footer-left,
+[data-theme="stardew"] .footer .footer-left {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+[data-theme="stardew"] footer .footer-left::before,
+[data-theme="stardew"] .footer .footer-left::before {
+  content: "🖧";
+  color: #458842;
+  font-size: 12px;
+}
+[data-theme="stardew"] footer .footer-right,
+[data-theme="stardew"] .footer .footer-right {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+[data-theme="stardew"] footer .footer-right::before,
+[data-theme="stardew"] .footer .footer-right::before {
+  content: "⬚";
+  color: #458842;
+  font-size: 12px;
+}
+[data-appearance="dark"][data-theme="stardew"] footer,
+[data-appearance="dark"][data-theme="stardew"] .footer {
+  background: #35281a !important;
+}
+[data-appearance="dark"][data-theme="stardew"] footer .footer-center,
+[data-appearance="dark"][data-theme="stardew"] .footer .footer-center {
+  background: #40321f !important;
+}
