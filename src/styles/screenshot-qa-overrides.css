@@ -247,8 +247,8 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   display: none !important;
 }
 /* Collapse footer to single centered row with 3 inline pills */
-[data-theme="stardew"] footer,
-[data-theme="stardew"] .footer {
+html[data-theme="stardew"] footer,
+html[data-theme="stardew"] .footer {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -265,21 +265,21 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
 }
 /* Left section: 🖧 IP */
-[data-theme="stardew"] footer > div:first-child,
-[data-theme="stardew"] .footer > div:first-child {
+html[data-theme="stardew"] footer > div:first-child,
+html[data-theme="stardew"] .footer > div:first-child {
   display: inline-flex !important;
   align-items: center !important;
   gap: 4px !important;
 }
-[data-theme="stardew"] footer > div:first-child::before,
-[data-theme="stardew"] .footer > div:first-child::before {
+html[data-theme="stardew"] footer > div:first-child::before,
+html[data-theme="stardew"] .footer > div:first-child::before {
   content: "🖧";
   color: #458842;
   font-size: 12px;
 }
 /* Center section: IP + location pill */
-[data-theme="stardew"] footer > div:first-child::after,
-[data-theme="stardew"] .footer > div:first-child::after {
+html[data-theme="stardew"] footer > div:first-child::after,
+html[data-theme="stardew"] .footer > div:first-child::after {
   content: " 192.3.193.180 🇺🇸 美国 · Los Angeles";
   border: 2px dotted var(--border, #a67c2e) !important;
   border-radius: 6px !important;
@@ -289,14 +289,14 @@ html[data-theme="stardew"] [class*="dot-matrix"] {
   margin-left: 4px;
 }
 /* Right section: ⬚ browser */
-[data-theme="stardew"] footer > div:last-child,
-[data-theme="stardew"] .footer > div:last-child {
+html[data-theme="stardew"] footer > div:last-child,
+html[data-theme="stardew"] .footer > div:last-child {
   display: inline-flex !important;
   align-items: center !important;
   gap: 4px !important;
 }
-[data-theme="stardew"] footer > div:last-child::before,
-[data-theme="stardew"] .footer > div:last-child::before {
+html[data-theme="stardew"] footer > div:last-child::before,
+html[data-theme="stardew"] .footer > div:last-child::before {
   content: "⬚";
   color: #458842;
   font-size: 12px;
