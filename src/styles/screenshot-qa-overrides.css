@@ -1,107 +1,53 @@
-/* v0.16.0 full visual alignment overrides for 127.0.0.1:25774 screenshot QA */
+/* v0.17.2 full pixel-art alignment to PDF reference */
+/* Sky blue gradient + green grass + wooden card frames + pixel font */
 
-/* === 0. RENDER DEFAULTS — soft pastoral, not pixel === */
+/* === 0. PIXEL RENDER DEFAULTS === */
 [data-theme="stardew"] {
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  font-smooth: auto !important;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
 }
 [data-theme="stardew"] * {
-  image-rendering: auto !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-backface-visibility: hidden !important;
-  backface-visibility: hidden !important;
+  image-rendering: pixelated !important;
+  text-rendering: optimizeSpeed !important;
 }
 
-/* === 1. PASTORAL BACKGROUND — soft bokeh + cream gradient === */
+/* === 1. SKY + GRASS BACKGROUND === */
 [data-theme="stardew"] body,
 [data-theme="stardew"] html,
 [data-theme="stardew"] main,
 [data-theme="stardew"] [class*="background"],
 [data-theme="stardew"] [class*="backdrop"] {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255, 230, 170, 0.35) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 85% 30%, rgba(200, 220, 180, 0.25) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 80%, rgba(220, 200, 160, 0.2) 0%, transparent 50%),
-    linear-gradient(175deg, #f7ecd4 0%, #f4e4c1 35%, #f0dbb5 70%, #ecd9a8 100%) !important;
+    linear-gradient(180deg, #5DADE2 0%, #87CEEB 25%, #AED6F1 50%, #E0F7FA 75%, #F0F9FF 100%) !important;
+  background-image: none !important;
+  background-color: #87CEEB !important;
   background-attachment: fixed !important;
 }
-[data-theme="stardew"] body {
-  background-color: #f4e4c1 !important;
+[data-theme="stardew"] body::before {
+  content: "";
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 18vh;
+  background: linear-gradient(180deg, #66BB6A 0%, #4CAF50 40%, #388E3C 100%) !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
 }
 
-/* === 2. HIDE GLASS ORBS / GLOBES FOR STARDEW === */
+/* === 2. HIDE GLASS ORBS / GLOBES / CANVAS === */
 [data-theme="stardew"] .glass-orbs,
 [data-theme="stardew"] .glass-orb,
 [data-theme="stardew"] [class*="globe"],
-[data-theme="stardew"] [class*="network-map"],
 [data-theme="stardew"] [class*="world-map"],
+[data-theme="stardew"] [class*="network-map"],
 [data-theme="stardew"] canvas {
   display: none !important;
 }
 
-/* === 3. SOFT CARDS — matte cream glass, rounded, gentle shadow === */
-[data-theme="stardew"] .card,
-[data-theme="stardew"] .server-card,
-[data-theme="stardew"] .node-card,
-[data-theme="stardew"] .glass-panel,
-[data-theme="stardew"] [class*="card"],
-[data-theme="stardew"] [class*="glass"],
-[data-theme="stardew"] [class*="panel"] {
-  background:
-    linear-gradient(180deg, rgba(251, 236, 200, 0.92) 0%, rgba(248, 228, 185, 0.88) 100%) !important;
-  background-image: none !important;
-  border-style: solid !important;
-  border-width: 1px !important;
-  border-color: rgba(166, 124, 46, 0.35) !important;
-  border-radius: 14px !important;
-  box-shadow:
-    0 1px 2px rgba(140, 95, 27, 0.08),
-    0 6px 18px rgba(140, 95, 27, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
-  backdrop-filter: blur(14px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
-  overflow: hidden;
-}
-
-/* === 4. OVERVIEW TILES — softer pill feel === */
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] [class*="overview"] {
-  background:
-    linear-gradient(180deg, rgba(251, 236, 200, 0.94) 0%, rgba(248, 228, 185, 0.9) 100%) !important;
-  background-image: none !important;
-  border-style: solid !important;
-  border-width: 1px !important;
-  border-color: rgba(166, 124, 46, 0.3) !important;
-  border-radius: 14px !important;
-  box-shadow:
-    0 1px 2px rgba(140, 95, 27, 0.07),
-    0 6px 16px rgba(140, 95, 27, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
-  image-rendering: auto !important;
-  backdrop-filter: blur(12px) saturate(1.1) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(1.1) !important;
-}
-
-/* === 5. NODE CARD INTERNAL — generous spacing === */
-[data-theme="stardew"] .node-card {
-  padding: 18px !important;
-  gap: 10px !important;
-}
-[data-theme="stardew"] .node-card .grid,
-[data-theme="stardew"] .node-card [class*="grid"] {
-  gap: 8px !important;
-}
-[data-theme="stardew"] .node-card [class*="stat"],
-[data-theme="stardew"] .node-card [class*="metric"],
-[data-theme="stardew"] .node-card [class*="row"] {
-  gap: 6px !important;
-  min-height: 0 !important;
-}
-
-/* === 6. TYPOGRAPHY — layered hierarchy, readable === */
+/* === 3. PIXEL FONT === */
 [data-theme="stardew"] {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+  font-family: "VT323", "Press Start 2P", "Courier New", monospace !important;
+  letter-spacing: 0.05em !important;
 }
 [data-theme="stardew"] h1,
 [data-theme="stardew"] h2,
@@ -109,111 +55,145 @@
 [data-theme="stardew"] h4,
 [data-theme="stardew"] h5,
 [data-theme="stardew"] h6 {
+  font-family: "Press Start 2P", "VT323", monospace !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.5 !important;
   text-transform: none !important;
-  letter-spacing: 0.02em !important;
-  line-height: 1.35 !important;
-  font-weight: 700 !important;
 }
 [data-theme="stardew"] .overview-card-value,
 [data-theme="stardew"] .overview-card-unit,
-[data-theme="stardew"] .traffic-stat-value,
-[data-theme="stardew"] .traffic-volume-value,
 [data-theme="stardew"] .tabular-nums {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  letter-spacing: 0.04em !important;
+  font-family: "VT323", "Press Start 2P", monospace !important;
+  letter-spacing: 0.06em !important;
 }
 
-/* === 7. BUTTONS — soft pixel-ish but rounded === */
+/* === 4. WOODEN CARD FRAMES === */
+[data-theme="stardew"] .card,
+[data-theme="stardew"] .server-card,
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] .glass-panel,
+[data-theme="stardew"] .overview-card,
+[data-theme="stardew"] .chart-card,
+[data-theme="stardew"] [class*="card"],
+[data-theme="stardew"] [class*="glass"],
+[data-theme="stardew"] [class*="panel"] {
+  background: #FFF8DC !important;
+  background-image: none !important;
+  border: 4px solid #8D6E63 !important;
+  border-radius: 10px !important;
+  box-shadow: 4px 4px 0px #5D4037 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 12px !important;
+}
+
+/* === 5. BUTTONS — pixel style === */
 [data-theme="stardew"] button,
 [data-theme="stardew"] .btn,
 [data-theme="stardew"] [role="button"],
 [data-theme="stardew"] [role="tab"] {
-  background: linear-gradient(180deg, #fff3cc 0%, #fbecc8 100%) !important;
+  background: #FFF8DC !important;
   background-image: none !important;
-  border: 1px solid rgba(166, 124, 46, 0.45) !important;
-  border-radius: 10px !important;
-  box-shadow:
-    0 1px 2px rgba(140, 95, 27, 0.08),
-    0 4px 10px rgba(140, 95, 27, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  border: 3px solid #8D6E63 !important;
+  border-radius: 6px !important;
+  box-shadow: 3px 3px 0px #5D4037 !important;
   text-transform: none !important;
-  letter-spacing: 0.04em !important;
-  -webkit-font-smoothing: antialiased !important;
-  image-rendering: auto !important;
+  letter-spacing: 0.06em !important;
+  font-family: "VT323", monospace !important;
+  -webkit-font-smoothing: none !important;
+  image-rendering: pixelated !important;
 }
 [data-theme="stardew"] button[aria-pressed="true"],
 [data-theme="stardew"] [role="tab"][aria-selected="true"] {
-  background: linear-gradient(180deg, #fff3cc 0%, #f5d88a 100%) !important;
-  box-shadow:
-    inset 0 -2px 0 0 rgba(140, 95, 27, 0.25),
-    0 2px 8px rgba(140, 95, 27, 0.12) !important;
+  background: #F5D88A !important;
+  box-shadow: inset 0 -3px 0 0 #5D4037, 3px 3px 0px #5D4037 !important;
 }
 
-/* === 8. INPUTS — soft, readable === */
+/* === 6. INPUTS === */
 [data-theme="stardew"] input,
 [data-theme="stardew"] textarea,
 [data-theme="stardew"] select {
-  background: rgba(255, 243, 204, 0.85) !important;
+  background: #FFF8DC !important;
   background-image: none !important;
-  border: 1px solid rgba(166, 124, 46, 0.45) !important;
-  border-radius: 10px !important;
-  box-shadow: inset 0 1px 2px rgba(120, 85, 35, 0.12) !important;
-  image-rendering: auto !important;
+  border: 3px solid #8D6E63 !important;
+  border-radius: 6px !important;
+  box-shadow: 2px 2px 0px #5D4037 !important;
+  font-family: "VT323", monospace !important;
+  -webkit-font-smoothing: none !important;
+  image-rendering: pixelated !important;
 }
 
-/* === 9. PROGRESS/BARS — softer ends, keep color tokens === */
+/* === 7. PROGRESS/BARS === */
 [data-theme="stardew"] .metric-bar,
 [data-theme="stardew"] .ping-bar,
 [data-theme="stardew"] [class*="metric-bar"],
 [data-theme="stardew"] [class*="ping-bar"],
 [data-theme="stardew"] [class*="progress"] {
-  image-rendering: auto !important;
-  border-radius: 999px !important;
+  image-rendering: pixelated !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
 }
 
-/* === 10. DROPDOWNS/MENUS — soft glass === */
+/* === 8. DROPDOWNS/MENUS === */
 [data-theme="stardew"] [role="menu"],
 [data-theme="stardew"] .dropdown-menu,
 [data-theme="stardew"] [class*="Menu"] {
-  background:
-    linear-gradient(180deg, rgba(251, 236, 200, 0.96) 0%, rgba(248, 228, 185, 0.94) 100%) !important;
+  background: #FFF8DC !important;
   background-image: none !important;
-  border: 1px solid rgba(166, 124, 46, 0.4) !important;
-  border-radius: 12px !important;
-  box-shadow:
-    0 1px 2px rgba(140, 95, 27, 0.08),
-    0 10px 24px rgba(140, 95, 27, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
-  image-rendering: auto !important;
-  -webkit-backdrop-filter: blur(16px) saturate(1.1) !important;
-  backdrop-filter: blur(16px) saturate(1.1) !important;
+  border: 3px solid #8D6E63 !important;
+  border-radius: 6px !important;
+  box-shadow: 4px 4px 0px #5D4037 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  font-family: "VT323", monospace !important;
 }
 [data-theme="stardew"] [role="menuitem"],
 [data-theme="stardew"] [class*="menu-item"] {
-  text-rendering: optimizeLegibility !important;
   font-family: inherit !important;
   text-transform: none !important;
-  letter-spacing: 0.03em !important;
+  letter-spacing: 0.06em !important;
 }
 
-/* === 11. LOADING COVER STYLING (pixel matte) === */
-[data-theme="stardew"] .loading-cover {
-  background: var(--surface, #fbecc8) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: 3px solid var(--border, #a67c2e);
+/* === 9. SPACING RHYTHM === */
+[data-theme="stardew"] main,
+[data-theme="stardew"] .container,
+[data-theme="stardew"] [class*="container"] {
+  gap: 18px !important;
+  padding-block: 14px !important;
+  padding-inline: 16px !important;
 }
-[data-appearance="dark"][data-theme="stardew"] .loading-cover {
-  background: #22180a !important;
+[data-theme="stardew"] main > * + *,
+[data-theme="stardew"] .container > * + * {
+  margin-block-start: 18px !important;
 }
-/* Hide loading cover in stardew theme */
-[data-theme="stardew"] .loading-cover { display:none !important; }
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] [class*="node-card"] {
+  margin-block-end: 18px !important;
+  padding: 14px !important;
+  gap: 12px !important;
+}
+[data-theme="stardew"] .search-row,
+[data-theme="stardew"] [class*="search"] {
+  padding-block: 10px !important;
+  gap: 10px !important;
+}
 
-/* === 12. SEASON/WEATHER KEEP — do NOT hide sky or flora/fauna === */
-/* The Stardew sky, seasons, sun/moon, rain/snow, butterflies are the reference signature. */
+/* === 10. FOOTER — pixel pill === */
+[data-theme="stardew"] footer,
+[data-theme="stardew"] .footer {
+  background: #5D4037 !important;
+  color: #FFF8DC !important;
+  border-top: 4px solid #3E2723 !important;
+  font-family: "VT323", monospace !important;
+  font-size: 16px !important;
+  letter-spacing: 0.08em !important;
+}
+[data-theme="stardew"] footer a,
+[data-theme="stardew"] .footer a {
+  color: #F5D88A !important;
+}
+
+/* === 11. SKY/SEASON/WEATHER VISIBILITY === */
 html[data-theme="stardew"] .stardew-sky,
 html[data-theme="stardew"] .stardew-sky *,
 html[data-theme="stardew"] .stardew-sky-season,
@@ -232,181 +212,35 @@ html[data-theme="stardew"] .stardew-lightning {
   pointer-events: none !important;
 }
 
-/* Pastoral soft-light texture keeps vibe without flat color */
-[data-theme="stardew"] body,
-[data-theme="stardew"] html {
-  background-image:
-    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(210, 230, 185, 0.14) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(235, 215, 170, 0.12) 0%, transparent 55%) !important;
-  background-color: #f4e4c1 !important;
+/* Season gradients (data-season on sky root or season layer) */
+[data-theme="stardew"] .stardew-sky [data-season="spring"]{
+  background-image:linear-gradient(160deg,#87CEEB,#E0F7FA 45%,#A5D6A7)!important;
+}
+[data-theme="stardew"] .stardew-sky [data-season="summer"]{
+  background-image:linear-gradient(160deg,#4FC3F7,#FFF9C4 45%,#FFCC80)!important;
+}
+[data-theme="stardew"] .stardew-sky [data-season="autumn"]{
+  background-image:linear-gradient(160deg,#FFB74D,#FFE082 45%,#FF8A65)!important;
+}
+[data-theme="stardew"] .stardew-sky [data-season="winter"]{
+  background-image:linear-gradient(160deg,#90CAF9,#E3F2FD 45%,#BBDEFB)!important;
 }
 
-/* Last-resort: if runtime injects decorative canvas/non-sky elements, mask them */
-html[data-theme="stardew"] [class*="globe"],
-html[data-theme="stardew"] [class*="world-map"],
-html[data-theme="stardew"] [class*="network-map"],
-html[data-theme="stardew"] [class*="dot-matrix"] {
-  display: none !important;
-}
-
-/* === 12. SCANLINES — soft organic texture === */
+/* === 12. LOADING / SCANLINES — pixel halftone feel === */
+[data-theme="stardew"] .loading-cover { display:none !important; }
 [data-theme="stardew"] body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  background:
-    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(210, 230, 185, 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(235, 215, 170, 0.15) 0%, transparent 55%);
-  mix-blend-mode: soft-light;
-  opacity: 0.55;
-}
-[data-appearance="dark"][data-theme="stardew"] body::after {
-  background:
-    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(255, 230, 170, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 40% at 80% 35%, rgba(180, 210, 160, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 35% at 45% 75%, rgba(220, 190, 140, 0.08) 0%, transparent 55%);
-  mix-blend-mode: screen;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.03) 0px,
+    rgba(0,0,0,0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  ) !important;
+  mix-blend-mode: multiply;
   opacity: 0.35;
 }
-
-/* === 13. FOOTER — left / center / right pills === */
-/* Hide the empty spacer so footer does not force wide space-between */
-[data-theme="stardew"] footer .flex-1,
-[data-theme="stardew"] .footer .flex-1 {
-  display: none !important;
-}
-/* Collapse footer to single centered row with 3 inline pills */
-html[data-theme="stardew"] footer,
-html[data-theme="stardew"] .footer {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding-block: 10px !important;
-  padding-inline: 14px !important;
-  gap: 10px !important;
-  border-top: 3px solid var(--border, #a67c2e) !important;
-  box-shadow: inset 0 2px 0 0 var(--border-strong, #8c5f1b) !important;
-  background: var(--surface, #fbecc8) !important;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-family: "Silkscreen", "Jersey 10", Chill RoundM, ui-monospace, monospace !important;
-}
-/* Left section: 🖧 IP */
-html[data-theme="stardew"] footer > div:first-child,
-html[data-theme="stardew"] .footer > div:first-child {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-html[data-theme="stardew"] footer > div:first-child::before,
-html[data-theme="stardew"] .footer > div:first-child::before {
-  content: "🖧";
-  color: #458842;
-  font-size: 12px;
-}
-/* Center section: IP + location pill */
-html[data-theme="stardew"] footer > div:first-child::after,
-html[data-theme="stardew"] .footer > div:first-child::after {
-  content: " 192.3.193.180 🇺🇸 美国 · Los Angeles";
-  border: 2px dotted var(--border, #a67c2e) !important;
-  border-radius: 6px !important;
-  padding: 2px 8px !important;
-  background: var(--surface-elev, #fff3cc) !important;
-  box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b) !important;
-  margin-left: 4px;
-}
-/* Right section: ⬚ browser */
-html[data-theme="stardew"] footer > div:last-child,
-html[data-theme="stardew"] .footer > div:last-child {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-html[data-theme="stardew"] footer > div:last-child::before,
-html[data-theme="stardew"] .footer > div:last-child::before {
-  content: "⬚";
-  color: #458842;
-  font-size: 12px;
-}
-
-/* === 14. PAGE SPACING RHYTHM — PDF-aligned 10px grid === */
-[data-theme="stardew"] main,
-[data-theme="stardew"] .container,
-[data-theme="stardew"] [class*="container"] {
-  gap: 10px !important;
-  padding-block: 10px !important;
-  padding-inline: 12px !important;
-}
-[data-theme="stardew"] main > * + *,
-[data-theme="stardew"] .container > * + * {
-  margin-block-start: 10px !important;
-}
-[data-theme="stardew"] .node-card,
-[data-theme="stardew"] [class*="node-card"] {
-  margin-block-end: 10px !important;
-}
-[data-theme="stardew"] .search-row,
-[data-theme="stardew"] [class*="search"] {
-  padding-block: 6px !important;
-  gap: 8px !important;
-}
-[data-theme="stardew"] .theme-masthead,
-[data-theme="stardew"] [class*="masthead"] {
-  padding-block: 16px !important;
-  padding-inline: 14px !important;
-}
-[data-theme="stardew"] footer .footer-left,
-[data-theme="stardew"] .footer .footer-left {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-[data-theme="stardew"] footer .footer-left::before,
-[data-theme="stardew"] .footer .footer-left::before {
-  content: "🖧";
-  color: #458842;
-  font-size: 12px;
-}
-[data-theme="stardew"] footer .footer-right,
-[data-theme="stardew"] .footer .footer-right {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-[data-theme="stardew"] footer .footer-right::before,
-[data-theme="stardew"] .footer .footer-right::before {
-  content: "⬚";
-  color: #458842;
-  font-size: 12px;
-}
-[data-appearance="dark"][data-theme="stardew"] footer,
-[data-appearance="dark"][data-theme="stardew"] .footer {
-  background: #35281a !important;
-}
-[data-appearance="dark"][data-theme="stardew"] footer .footer-center,
-[data-appearance="dark"][data-theme="stardew"] .footer .footer-center {
-  background: #40321f !important;
-}
-
-/* === 15. FORCED GLASS + SKY VISIBILITY PATCH === */
-/* Force sky above all content */
-[data-theme="stardew"] .stardew-sky{pointer-events:none;z-index:9999999!important;position:fixed!important;top:0;right:0;bottom:0;left:0!important;overflow:hidden!important}
-/* Make body transparent so sky gradient shows */
-[data-theme="stardew"] html,[data-theme="stardew"] body{background:transparent!important;background-image:none!important}
-[data-theme="stardew"] body>*{position:relative;z-index:100!important}
-/* Force all sky/weather/creature layers visible */
-[data-theme="stardew"] .stardew-sky *{opacity:1!important;display:block!important;animation:inherit!important;pointer-events:none}
-/* Reinstate season gradients via data-season */
-[data-theme="stardew"] .stardew-sky [data-season="spring"]{background-image:linear-gradient(160deg,#d4e7c5,#f8f5ee 40%,#c7d5a8)!important;background-size:200% 200%!important;background-repeat:no-repeat!important}
-[data-theme="stardew"] .stardew-sky [data-season="summer"]{background-image:linear-gradient(160deg,#87ceeb,#fff8e1 45%,#ffcc80)!important;background-size:200% 200%!important;background-repeat:no-repeat!important}
-[data-theme="stardew"] .stardew-sky [data-season="autumn"]{background-image:linear-gradient(160deg,#7d5537,#f2cc8f 45%,#d9a06b)!important;background-size:200% 200%!important;background-repeat:no-repeat!important}
-[data-theme="stardew"] .stardew-sky [data-season="winter"]{background-image:linear-gradient(160deg,#5b7f9a,#d3e0ea 45%,#e8f0f5)!important;background-size:200% 200%!important;background-repeat:no-repeat!important}
-/* Force card glass actual blur + transparent surface */
-[data-theme="stardew"] .overview-card,[data-theme="stardew"] .cost-summary-card,[data-theme="stardew"] .node-card,[data-theme="stardew"] .chart-card,[data-theme="stardew"] [class*="panel"]{background-color:rgba(251,236,200,0.72)!important;-webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;box-shadow:0 8px 24px #0000001a!important;background-image:none!important}
-[data-theme="stardew"] .overview-card *,[data-theme="stardew"] .cost-summary-card *,[data-theme="stardew"] .node-card *,[data-theme="stardew"] .chart-card *{background-image:none!important}
