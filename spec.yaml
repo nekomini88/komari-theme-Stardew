@@ -1,11 +1,11 @@
-spec:
-  schema: "1.0"
-  version: "1.2.0"
+schema: "1.0"
+version: "1.2.0"
 
 project:
   type: web_fullstack
   name: komari-theme-Stardew
   description: Stardew Valley theme for Komari based on komari-theme-Neko UI
+  base: komari-theme-Neko
 
 references:
   mode: merge
@@ -14,3 +14,19 @@ references:
     - testing
     - devops
     - security
+    - stardew-visual-style
+
+themes:
+  color_palette_options:
+    - sunrise
+    - emerald
+    - stardew
+
+  visual_style:
+    default: stardew
+    allowed:
+      - stardew
+      - baseline
+    storage_keys:
+      explicit: komaritheme:theme
+      default: komaritheme:theme-default
