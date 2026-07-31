@@ -65,6 +65,45 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside, true)
 })
 
+// visual-style state
+const showVisualStyleMenu = ref(false)
+const visualStyleTriggerRef = ref<HTMLElement>()
+const visualStyleMenuRef = ref<HTMLElement>()
+const visualStylePosition = ref({ top: '0px', right: '0px' })
+
+const visualStyleOptions = [
+  { label: '星露谷风格', value: 'stardew', icon: 'icon-park-outline:seed' },
+  { label: '默认风格', value: 'baseline', icon: 'icon-park-outline:default' },
+]
+
+function updateVisualStyleMenuPosition() {
+  if (!visualStyleTriggerRef.value) return
+  const rect = visualStyleTriggerRef.value.getBoundingClientRect()
+  visualStylePosition.value = {
+    top: `${rect.bottom + 8}px`,
+    right: `${window.innerWidth - rect.right}px`,
+  }
+}
+function toggleVisualStyleMenu() {
+  showVisualStyleMenu.value = !showVisualStyleMenu.value
+  if (showVisualStyleMenu.value) nextTick(updateVisualStyleMenuPosition)
+}
+function selectVisualStyle(value: 'stardew' | 'baseline') {
+  const setVisualStyle = inject<((value: 'stardew' | 'baseline') => void) | null>('setVisualStyle')
+  if (setVisualStyle) setVisualStyle(value)
+  showVisualStyleMenu.value = false
+}
+function handleClickOutsideVisualStyle(e: MouseEvent) {
+  if (!showVisualStyleMenu.value) return
+  const target = e.target as HTMLElement
+  if (target.closest('.visual-style-menu-container')) return
+  if (target.closest('.visual-style-menu-dropdown')) return
+  showVisualStyleMenu.value = false
+}
+onMounted(() => {
+  document.addEventListener('click', handleClickOutsideVisualStyle, true)
+})
+
 // 着色器选项
 const shaderOptions: { label: string, value: ShaderType, icon: string }[] = [
   { label: '气泡', value: 'bubbles', icon: 'icon-park-outline:bubble' },
@@ -86,7 +125,6 @@ const paletteOptions = [
   { label: '粉红', value: 'material-pink', color: 'oklch(0.52 0.24 350)' },
   { label: '青蓝', value: 'material-teal', color: 'oklch(0.48 0.12 192)' },
   { label: '翠绿', value: 'emerald', color: 'oklch(0.205 0 0)' },
-      { label: '星露', value: 'stardew', color: 'oklch(0.58 0.18 85)' },
 ]
 
 function updatePaletteMenuPosition() {
@@ -139,6 +177,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutsidePalette, true)
+})
+
+const activeVisualStyle = computed<'stardew' | 'baseline'>(() => {
+  return (document.documentElement.getAttribute('data-theme') as 'stardew' | 'baseline') ?? 'baseline'
 })
 
 const actionButtons = computed(() => {
@@ -203,6 +245,22 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
             </Tooltip>
           </div>
 
+          <!-- 视觉风格入口 -->
+          <div ref="visualStyleTriggerRef" class="relative palette-menu-container">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button variant="ghost" size="icon-sm" @click.stop="toggleVisualStyleMenu" class="text-foreground">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-foreground">
+                    <circle cx="13.5" cy="6.5" r="2.5" />
+                    <circle cx="18.5" cy="11.5" r="2.5" />
+                    <circle cx="8.5" cy="16.5" r="2.5" />
+                    <circle cx="6.5" cy="8.5" r="2.5" />
+                  </svg>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>主题视觉风格</TooltipContent>
+            </Tooltip>
+          </div>
           <!-- 调色板 -->
           <div ref="paletteTriggerRef" class="relative palette-menu-container">
             <Tooltip>
@@ -256,6 +314,38 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
           class="flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-accent/50 cursor-pointer"
           :class="appStore.shaderType === opt.value ? 'text-foreground font-medium bg-accent/30' : 'text-muted-foreground'"
           @click.stop="selectShader(opt.value)"
+        >
+          <Icon :icon="opt.icon" :width="16" :height="16" />
+          <span>{{ opt.label }}</span>
+        </button>
+      </div>
+    </Transition>
+  </Teleport>
+
+
+  <!-- 视觉风格菜单 Teleport 到 body -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition-all duration-150 ease-out"
+      enter-from-class="opacity-0 scale-95 -translate-y-1"
+      enter-to-class="opacity-100 scale-100 translate-y-0"
+      leave-active-class="transition-all duration-100 ease-in"
+      leave-from-class="opacity-100 scale-100 translate-y-0"
+      leave-to-class="opacity-0 scale-95 -translate-y-1"
+    >
+      <div
+        v-if="showVisualStyleMenu"
+        ref="visualStyleMenuRef"
+        class="palette-menu-dropdown fixed w-36 rounded-lg border border-border bg-popover/90 backdrop-blur-xl p-1 shadow-lg z-[9999]"
+        :style="{ top: visualStylePosition.top, right: visualStylePosition.right }"
+      >
+        <button
+          v-for="opt in visualStyleOptions"
+          :key="opt.value"
+          type="button"
+          class="flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-accent/50 cursor-pointer"
+          :class="activeVisualStyle === opt.value ? 'text-foreground font-medium bg-accent/30' : 'text-muted-foreground'"
+          @click.stop="selectVisualStyle(opt.value as 'stardew' | 'baseline')"
         >
           <Icon :icon="opt.icon" :width="16" :height="16" />
           <span>{{ opt.label }}</span>

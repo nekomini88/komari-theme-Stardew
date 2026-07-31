@@ -50,7 +50,9 @@ const showMediaBackground = computed(() =>
   hasCustomBackground.value && !hasError.value && (backgroundType.value === 'video' || showLoadedBackground.value),
 )
 
-const showDefaultBackground = computed(() => !hasCustomBackground.value)
+const isStardew = computed(() => document.documentElement.getAttribute('data-theme') === 'stardew')
+const showDefaultBackground = computed(() => !hasCustomBackground.value && !isStardew.value)
+const showStardewBackground = computed(() => isStardew.value && !hasCustomBackground.value)
 
 const showLoadingBackground = computed(() =>
   hasCustomBackground.value && !isLoaded.value && !hasError.value,
@@ -133,6 +135,9 @@ onUnmounted(() => {
         <!-- Readability overlay: softens shader intensity so card text stays legible -->
         <div class="absolute inset-0 pointer-events-none bg-white/25 dark:bg-black/20" />
       </div>
+    </Transition>
+    <Transition name="fade">
+      <div v-if="showStardewBackground" class="absolute inset-0" style="background-color: var(--bg-0); background-image: linear-gradient(180deg, rgba(255,239,184,0.18), rgba(199,132,55,0.06)); background-size: 100% 100%, auto;" />
     </Transition>
     <Transition name="fade">
       <div v-if="showLoadingBackground" class="background-loading" />

@@ -13,13 +13,13 @@ describe('spec.yaml', () => {
   it('MUST have schema 1.0', () => {
     const yaml = require('yaml')
     const data = yaml.parse(specText)
-    expect(data.spec.schema).toBe('1.0')
+    expect(data.schema).toBe('1.0')
   })
 
   it('MUST be version 1.2.0', () => {
     const yaml = require('yaml')
     const data = yaml.parse(specText)
-    expect(data.spec.version).toBe('1.2.0')
+    expect(data.version).toBe('1.2.0')
   })
 
   it('MUST be web_fullstack', () => {
@@ -38,3 +38,16 @@ describe('spec.yaml', () => {
     expect(refs).toContain('security')
   })
 })
+
+  it('MUST include stardew-visual-style reference', () => {
+    const yaml = require('yaml')
+    const data = yaml.parse(specText)
+    const refs = data.references?.items ?? []
+    expect(refs).toContain('stardew-visual-style')
+  })
+
+  it('MUST define themes.visual_style with allowed baseline+stardew', () => {
+    const yaml = require('yaml')
+    const data = yaml.parse(specText)
+    expect(data.themes?.visual_style?.allowed).toEqual(['stardew', 'baseline'])
+  })

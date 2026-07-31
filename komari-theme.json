@@ -2,7 +2,7 @@
   "name": "Komari Stardew",
   "short": "stardew",
   "description": "Stardew Valley theme for Komari based on komari-theme-Neko UI",
-  "version": "2.1.7",
+  "version": "0.2.0",
   "author": "Neko",
   "url": "https://github.com/nekomini88/komari-theme-Stardew",
   "preview": "preview.png",
@@ -77,6 +77,14 @@
         "default": "emerald",
         "options": "emerald,sunrise,green-mountain,blue-water,night,material-indigo,material-pink,material-teal",
         "help": "选择网站的主题颜色"
+      },
+      {
+        "key": "themeVisualStyle",
+        "name": "主题视觉风格",
+        "type": "select",
+        "default": "stardew",
+        "options": "stardew,baseline",
+        "help": "选择整体 UI 视觉风格：星露谷像素风格或默认风格。部分选项需要浏览器支持 CSS 变量。"
       },
       {
         "key": "stopEarth",

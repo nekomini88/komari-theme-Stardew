@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ThemeMode } from '@/stores/app'
 import { useDark } from '@vueuse/core'
-import { computed, provide, ref, watch } from 'vue'
+import { computed, onMounted, provide, ref, watch } from 'vue'
+import type { VisualStyle } from '@/composables/useVisualStyle'
+import { useVisualStyle } from '@/composables/useVisualStyle'
 import { storeToRefs } from 'pinia'
 import { BackTop } from '@/components/ui/back-top'
 import { useAppStore } from '@/stores/app'
@@ -52,34 +54,44 @@ watch(
   { immediate: true }
 )
 
-// Theme selection from komari-theme-light with client override
+// Theme selection from theme_settings (color palette)
 const themeOverride = ref<string | null>(null)
 provide('themeOverride', themeOverride)
 provide('setThemeOverride', (value: string | null) => {
   themeOverride.value = value
 })
-
-const finalTheme = computed(() => {
-  return (
-    themeOverride.value ??
-    (publicSettings.value?.theme_settings?.themeSelection ?? 'emerald')
-  )
+const finalPalette = computed(() => {
+  return themeOverride.value ?? (publicSettings.value?.theme_settings?.themeSelection ?? 'emerald')
 })
-
 watch(
-  () => finalTheme.value,
+  () => finalPalette.value,
   (newVal) => {
     const root = document.documentElement
+    // Palettes affect styling but do not change visual/mode class except documented palettes.
     if (typeof newVal === 'string' && newVal !== 'emerald') {
-      console.log('[Theme] Setting theme to:', newVal)
+      console.log('[Palette] Setting theme to:', newVal)
       root.setAttribute('data-theme', newVal)
     } else {
-      console.log('[Theme] Resetting to default (emerald)')
+      console.log('[Palette] Resetting to default')
       root.removeAttribute('data-theme')
     }
   },
   { immediate: true }
 )
+
+// Visual style persistence: stardew vs baseline
+const settingsVisualStyle = computed((): VisualStyle | undefined => publicSettings.value?.theme_settings?.themeVisualStyle as VisualStyle)
+
+onMounted(() => {
+  const existing = localStorage.getItem('komaritheme:theme-visual-style-settings')
+  if (!existing && settingsVisualStyle.value) {
+    localStorage.setItem('komaritheme:theme-visual-style-settings', settingsVisualStyle.value)
+  }
+})
+
+const { setVisualStyle: setVisualStyleRaw, resetToDefault } = useVisualStyle()
+provide('setVisualStyle', setVisualStyleRaw)
+provide('resetVisualStyleDefault', resetToDefault)
 </script>
 
 <template>
