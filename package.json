@@ -17,7 +17,8 @@
     "type-check": "vue-tsc --build",
     "publish": "bun scripts/publish.ts",
     "lint": "eslint . --fix --cache",
-    "lint:eslint": "eslint . --fix --cache"
+    "lint:eslint": "eslint . --fix --cache",
+    "test": "python3 tests/run_all.py"
   },
   "dependencies": {
     "@iconify/vue": "^4.3.0",
