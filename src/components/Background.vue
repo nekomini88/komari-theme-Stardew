@@ -362,7 +362,7 @@ onUnmounted(() => {
 .stardew-grass {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 26%;
+  height: 16%;
   box-shadow: inset 0 6px 0 rgba(255,255,255,0.12);
 }
 .stardew-grass-front {
@@ -374,11 +374,12 @@ onUnmounted(() => {
 .stardew-fence {
   position: absolute;
   left: 0; right: 0;
-  bottom: 18%;
+  bottom: 16%;
   height: 80px;
   line-height: 0;
   pointer-events: none;
-  filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12));
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,.12));
+  z-index: 2;
 }
 @keyframes stardew-sun {
   0% { transform: translateY(0) translateX(0); }
