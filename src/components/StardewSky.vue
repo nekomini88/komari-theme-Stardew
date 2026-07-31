@@ -12,7 +12,8 @@ const season = computed(() => {
   if (m >= 9 && m <= 11) return 'autumn'
   return 'winter'
 })
-const weather = ref<'clear' | 'rain' | 'fog'>('clear')
+type Weather = 'clear' | 'rain' | 'fog' | 'snow' | 'thunder'
+const weather = ref<Weather>('clear')
 
 onMounted(() => {
   const tick = () => { now.value = new Date() }
@@ -24,8 +25,16 @@ onMounted(() => {
 })
 
 function setWeather() {
+  const s = season.value
   const r = Math.random()
-  weather.value = r < 0.7 ? 'clear' : r < 0.85 ? 'rain' : 'fog'
+  const pool: Weather[] = s === 'winter'
+    ? r < 0.45 ? ['clear'] : r < 0.7 ? ['snow'] : r < 0.85 ? ['thunder'] : ['fog']
+    : s === 'summer'
+    ? r < 0.55 ? ['clear'] : r < 0.8 ? ['rain'] : r < 0.9 ? ['thunder'] : ['fog']
+    : s === 'autumn'
+    ? r < 0.5 ? ['clear'] : r < 0.75 ? ['rain'] : r < 0.85 ? ['fog'] : ['thunder']
+    : r < 0.45 ? ['clear'] : r < 0.7 ? ['rain'] : r < 0.85 ? ['fog'] : ['snow']
+  weather.value = pool[Math.floor(Math.random() * pool.length)] as Weather
 }
 
 function sunX() {
@@ -40,6 +49,14 @@ function sunX() {
 
 function skyBase(): string {
   const h = now.value.getHours()
+  const w = weather.value
+  if (w === 'thunder') return 'oklch(0.55 0.04 260)'
+  if (w === 'rain' || w === 'fog' || w === 'snow') {
+    if (h >= 5 && h < 8) return 'oklch(0.82 0.04 70)'
+    if (h >= 8 && h < 17) return 'oklch(0.88 0.03 180)'
+    if (h >= 17 && h < 20) return 'oklch(0.72 0.05 40)'
+    return 'oklch(0.2 0.01 260)'
+  }
   if (h >= 5 && h < 8) return 'oklch(0.88 0.07 85)'
   if (h >= 8 && h < 17) return 'oklch(0.94 0.04 95)'
   if (h >= 17 && h < 20) return 'oklch(0.82 0.08 55)'
@@ -61,6 +78,9 @@ function skyBase(): string {
       <span class="cloud c2"></span>
       <span class="cloud c3"></span>
     </div>
+
+    <!-- weather overlays -->
+    <div class="sky-overlay" :data-weather="weather" aria-hidden="true"></div>
 
     <!-- ground layers -->
     <img
@@ -85,7 +105,7 @@ function skyBase(): string {
       @error="($event.target as HTMLImageElement).style.display='none'"
     />
 
-    <!-- lighting -->
+    <!-- legacy lighting hook for any third-party visibility -->
     <div class="sky-light" :data-weather="weather"></div>
   </div>
 </template>
@@ -162,15 +182,63 @@ function skyBase(): string {
 }
 .sky-layer.tree { z-index: 2; height: 34%; }
 .sky-layer.grass { z-index: 3; height: 22%; }
+
+/* ------------------------------------------------------------------ */
+/* weather overlays (CSS-only, no extra assets)                        */
+/* ------------------------------------------------------------------ */
+.sky-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.sky-overlay[data-weather='rain'] {
+  opacity: 1;
+  background-image:
+    repeating-linear-gradient(120deg, oklch(0.78 0.04 220 / 0.18) 0px, transparent 3px 12px);
+  animation: rainlines 0.9s linear infinite;
+}
+.sky-overlay[data-weather='fog'] {
+  opacity: 1;
+  background: linear-gradient(180deg, transparent 0%, oklch(0.86 0.02 95 / 0.55) 100%);
+}
+.sky-overlay[data-weather='snow'] {
+  opacity: 1;
+  background-image:
+    radial-gradient(oklch(0.98 0 0 / 0.85) 1px, transparent 1.5px);
+  background-size: 12px 12px;
+  animation: snowfall 1.4s linear infinite;
+}
+.sky-overlay[data-weather='thunder'] {
+  opacity: 1;
+  background: transparent;
+  animation: lightning 3.5s ease-in-out infinite;
+}
+.sky-overlay[data-weather='clear'] {
+  opacity: 0;
+  background: transparent;
+}
+
+@keyframes rainlines {
+  from { background-position: 0 0; }
+  to   { background-position: 60px 60px; }
+}
+@keyframes snowfall {
+  from { background-position: 0 0; }
+  to   { background-position: 12px 28px; }
+}
+@keyframes lightning {
+  0%, 88%, 92%, 96%, 100% { opacity: 0; }
+  89%, 91%, 95% { opacity: 1; background: oklch(0.98 0.02 90 / 0.25); }
+}
+
+/* legacy hook kept for any third-party themes */
 .sky-light[data-weather='clear'] { background: transparent; }
 .sky-light[data-weather='rain'] {
   background-image:
     repeating-linear-gradient(120deg, oklch(0.78 0.04 220 / 0.28) 0px, transparent 3px 12px);
   animation: rainlines 0.9s linear infinite;
-}
-@keyframes rainlines {
-  from { background-position: 0 0; }
-  to   { background-position: 60px 60px; }
 }
 .sky-light[data-weather='fog'] {
   background: linear-gradient(180deg, transparent 0%, oklch(0.86 0.02 95 / 0.55) 100%);
