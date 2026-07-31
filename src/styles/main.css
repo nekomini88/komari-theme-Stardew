@@ -12,6 +12,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* v0.16.6 visual priority: soft pastoral glass UI */
+[data-theme="stardew"] {
+  --shadow-card: none;
+}
+
 * {
   scrollbar-color: var(--ring) transparent;
   scrollbar-width: thin;
