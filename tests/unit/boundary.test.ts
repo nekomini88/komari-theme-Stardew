@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 
 describe('boundary: spec.yaml and sources', () => {
-  it('spec.yaml should not have empty required fields', () => {
+  it('spec.yaml required fields are non-empty after colon', () => {
     const yaml = readFileSync('spec.yaml', 'utf8')
-    expect(yaml).not.toContain('name: ')
-    expect(yaml).not.toContain('version: ')
+    expect(yaml).not.toMatch(/^name:\s*$/m)
+    expect(yaml).not.toMatch(/^version:\s*$/m)
+    expect(yaml).not.toMatch(/^project_type:\s*$/m)
   })
 
   it('komari-theme.json must have non-empty name and short', () => {
