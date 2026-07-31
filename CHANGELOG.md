@@ -21,3 +21,7 @@
 
 ### Security
 - 排除未跟踪的 `README.md.orig`，避免临时文件泄露
+## [0.1.1] - 2026-07-31
+
+### Fixed
+- fix release workflow zip attachment by bumping version to trigger release
