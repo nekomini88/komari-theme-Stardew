@@ -360,6 +360,21 @@ function hasRegion(region: string | null | undefined): boolean {
   box-shadow: 4px 4px 0 #5c1a1a !important;
 }
 
+/* 木牌卡片内部像素化 */
+.stardew-wood-card :deep(.node-card) {
+  border-radius: 6px !important;
+}
+
+.stardew-wood-card :deep(.progress-thin) {
+  border-radius: 0 !important;
+  height: 10px !important;
+  background: repeating-linear-gradient(90deg, #0000002e 0px, #0000002e 2px, transparent 2px, transparent 6px), var(--progress-bg, #d9b96e) !important;
+}
+
+.stardew-wood-card :deep(.progress-thin-fill) {
+  border-radius: 0 !important;
+}
+
 .node-offline-overlay {
   position: absolute;
   inset: 0;
