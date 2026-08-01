@@ -265,3 +265,31 @@ html[data-theme="stardew"] .stardew-lightning {
   color: var(--text-primary, #4a2e0b) !important;
   text-decoration: none !important;
 }
+
+
+/* === 10. NodeCard .sd-card 木牌边框（对齐 PDF / preview） === */
+[data-theme="stardew"] .sd-card {
+  background: #f6e7c4 !important;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(139, 90, 43, 0.08) 0 2px,
+      rgba(160, 110, 55, 0.04) 2px 8px
+    ) !important;
+  border: 4px solid #6b4423 !important;
+  border-radius: 12px !important;
+  box-shadow: 6px 6px 0 #3E2723 !important;
+  image-rendering: pixelated !important;
+  backdrop-filter: none !important;
+}
+[data-theme="stardew"] .sd-card--offline,
+[data-theme="stardew"] .sd-card.is-offline {
+  background: #e8cfc0 !important;
+  border-color: #7a3b2a !important;
+  box-shadow: 6px 6px 0 #5a2417 !important;
+}
+[data-theme="stardew"] .sd-card .sd-banner {
+  border: 2px solid rgba(62, 39, 35, 0.35) !important;
+  border-radius: 8px !important;
+  box-shadow: 2px 2px 0 rgba(62, 39, 35, 0.25) !important;
+}

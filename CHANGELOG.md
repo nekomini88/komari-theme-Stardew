@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.54.0] - 2026-08-01
+
+### Fixed
+- 背景改为完整像素田园图 `bg-sky.png`（蓝天/草地/远山），对齐 PDF 与 preview
+- 移除 hard-pixel-core 对场景层的 `background-image: none` / 全局 `box-shadow: none` 破坏
+- 页面底色改为天空蓝，避免出现深蓝斜纹底
+
+### Changed
+- TopStatsGrid 改为木牌布局 + 像素图标（对齐 preview 木框卡片）
+- NodeCard `.sd-card` 强制木纹边框与硬阴影
+
+
 ## [1.0.0] - 2026-07-31
 
 ### Added

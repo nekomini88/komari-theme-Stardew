@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 import {
-  grassGradients,
   isFog,
   isNight,
   isRain,
@@ -10,7 +9,6 @@ import {
   moonX,
   moonY,
   season,
-  skyGradients,
   sunX,
   sunY,
   timeOfDay,
@@ -40,11 +38,9 @@ const backgroundStyle = computed(() => {
 const backgroundContainerStyle = computed(() => {
   if (!hasCustomBackground.value)
     return {}
-
   const overlay = appStore.backgroundOverlay
   if (overlay >= 0)
     return {}
-
   return { opacity: 1 - Math.abs(overlay) / 100 }
 })
 
@@ -52,71 +48,54 @@ const overlayStyle = computed(() => {
   const overlay = appStore.backgroundOverlay
   if (overlay <= 0)
     return {}
-
   return { backgroundColor: `rgba(0, 0, 0, ${overlay / 100})` }
 })
 
 const showLoadedBackground = computed(() =>
   hasCustomBackground.value && isLoaded.value && !hasError.value,
 )
-
 const showMediaBackground = computed(() =>
   hasCustomBackground.value && !hasError.value && (backgroundType.value === 'video' || showLoadedBackground.value),
 )
 
-// Stardew living world — always on for this theme package
-const showDefaultBackground = computed(() => false)
 const showStardewBackground = computed(() => true)
 
-const skyStyle = computed(() => {
-  const s = season.value
-  const t = timeOfDay.value
-  return { background: skyGradients[s][t] }
+/** Time-of-day color wash over the pixel sky art (PDF day/dusk/night) */
+const timeTint = computed(() => {
+  if (timeOfDay.value === 'dawn')
+    return 'linear-gradient(180deg, rgba(255,180,120,0.35) 0%, rgba(255,220,160,0.15) 40%, transparent 70%)'
+  if (timeOfDay.value === 'dusk')
+    return 'linear-gradient(180deg, rgba(255,100,40,0.4) 0%, rgba(230,80,60,0.25) 35%, rgba(40,20,60,0.2) 100%)'
+  if (timeOfDay.value === 'night')
+    return 'linear-gradient(180deg, rgba(10,20,50,0.72) 0%, rgba(15,30,60,0.55) 50%, rgba(10,25,40,0.45) 100%)'
+  // day — slight warm lift matching PDF spring/summer brightness
+  if (season.value === 'autumn')
+    return 'linear-gradient(180deg, rgba(255,180,60,0.22) 0%, rgba(200,120,40,0.12) 50%, transparent 100%)'
+  if (season.value === 'winter')
+    return 'linear-gradient(180deg, rgba(200,220,240,0.28) 0%, rgba(180,200,220,0.15) 50%, transparent 100%)'
+  return 'linear-gradient(180deg, rgba(135,206,250,0.08) 0%, transparent 50%)'
 })
-
-const grassStyle = computed(() => grassGradients[season.value].back)
-const grassFrontStyle = computed(() => grassGradients[season.value].front)
 
 const sunStyle = computed(() => ({
   left: `${sunX.value}%`,
-  top: `${sunY.value}%`,
-  opacity: isNight.value ? 0 : (timeOfDay.value === 'dusk' ? 0.85 : 1),
+  top: `${Math.min(sunY.value, 38)}%`,
+  opacity: isNight.value ? 0 : (timeOfDay.value === 'dusk' ? 0.9 : 1),
 }))
 
 const moonStyle = computed(() => ({
   left: `${moonX.value}%`,
   top: `${moonY.value}%`,
-  opacity: isNight.value ? 0.92 : 0,
+  opacity: isNight.value ? 0.95 : 0,
 }))
 
-const showSun = computed(() => !isNight.value && weather.value !== 'thunder')
+const showSun = computed(() => !isNight.value)
 const showMoon = computed(() => isNight.value)
 const showStars = computed(() => isNight.value)
-
-// Season accent decorations (CSS-drawn to avoid extra assets)
 const seasonAccentClass = computed(() => `season-${season.value}`)
-
-const fenceSvg = `<svg viewBox="0 0 1200 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-  <g fill="#8b5a2b" stroke="#5c3a1e" stroke-width="2">
-    <rect x="40" y="20" width="14" height="60" rx="2"/>
-    <rect x="160" y="20" width="14" height="60" rx="2"/>
-    <rect x="280" y="20" width="14" height="60" rx="2"/>
-    <rect x="400" y="20" width="14" height="60" rx="2"/>
-    <rect x="520" y="20" width="14" height="60" rx="2"/>
-    <rect x="640" y="20" width="14" height="60" rx="2"/>
-    <rect x="760" y="20" width="14" height="60" rx="2"/>
-    <rect x="880" y="20" width="14" height="60" rx="2"/>
-    <rect x="1000" y="20" width="14" height="60" rx="2"/>
-    <rect x="1120" y="20" width="14" height="60" rx="2"/>
-    <rect x="20" y="34" width="1160" height="12" rx="3"/>
-    <rect x="20" y="56" width="1160" height="12" rx="3"/>
-  </g>
-</svg>`
 
 const showLoadingBackground = computed(() =>
   hasCustomBackground.value && !isLoaded.value && !hasError.value,
 )
-
 const showFallbackBackground = computed(() =>
   hasCustomBackground.value && hasError.value,
 )
@@ -134,36 +113,20 @@ function clearImageLoader() {
 function loadImage(url: string) {
   isLoaded.value = false
   hasError.value = false
-
   clearImageLoader()
-
   imageLoader = new Image()
-  imageLoader.onload = () => {
-    isLoaded.value = true
-    hasError.value = false
-  }
-  imageLoader.onerror = () => {
-    isLoaded.value = false
-    hasError.value = true
-  }
+  imageLoader.onload = () => { isLoaded.value = true; hasError.value = false }
+  imageLoader.onerror = () => { isLoaded.value = false; hasError.value = true }
   imageLoader.src = url
 }
 
 const videoRef = ref<HTMLVideoElement | null>(null)
-
-function handleVideoLoaded() {
-  isLoaded.value = true
-  hasError.value = false
-}
-function handleVideoError() {
-  isLoaded.value = false
-  hasError.value = true
-}
+function handleVideoLoaded() { isLoaded.value = true; hasError.value = false }
+function handleVideoError() { isLoaded.value = false; hasError.value = true }
 
 watch([currentUrl, backgroundType], ([url, type]) => {
-  if (url && type === 'image') {
+  if (url && type === 'image')
     loadImage(url)
-  }
   else if (url && type === 'video') {
     clearImageLoader()
     isLoaded.value = false
@@ -176,70 +139,65 @@ watch([currentUrl, backgroundType], ([url, type]) => {
   }
 }, { immediate: true })
 
-onUnmounted(() => {
-  clearImageLoader()
-})
+onUnmounted(() => clearImageLoader())
 </script>
 
 <template>
-    <div class="background-container" :style="backgroundContainerStyle">
-    <!-- Living Stardew world: time / season / weather -->
-    <Transition name="fade">
-      <div
-        v-if="showStardewBackground"
-        class="stardew-scene"
-        :class="[
-          seasonAccentClass,
-          `time-${timeOfDay}`,
-          `weather-${weather}`,
-          { 'is-night': isNight },
-        ]"
+  <div class="background-container" :style="backgroundContainerStyle">
+    <div
+      v-if="showStardewBackground"
+      class="stardew-scene"
+      :class="[
+        seasonAccentClass,
+        `time-${timeOfDay}`,
+        `weather-${weather}`,
+        { 'is-night': isNight },
+      ]"
+    >
+      <!-- Full pixel pastoral scene (matches PDF / preview.webp) -->
+      <img
+        class="stardew-bg-art"
+        src="/images/background/bg-sky.png"
+        alt=""
+        draggable="false"
       >
-        <!-- Dynamic sky gradient (PDF day/dusk/night) -->
-        <div class="stardew-sky-grad" :style="skyStyle" />
 
-        <!-- Sun follows real time arc -->
-        <div v-show="showSun" class="stardew-sun" :style="sunStyle" />
+      <!-- Time / season color wash -->
+      <div class="stardew-time-tint" :style="{ background: timeTint }" />
 
-        <!-- Moon at night -->
-        <div v-show="showMoon" class="stardew-moon" :style="moonStyle" />
+      <!-- Sun along real-time arc -->
+      <div v-show="showSun" class="stardew-sun" :style="sunStyle" />
 
-        <!-- Stars -->
-        <div v-if="showStars" class="stardew-stars" aria-hidden="true">
-          <span v-for="n in 24" :key="n" class="star" :style="{
+      <!-- Moon + stars at night -->
+      <div v-show="showMoon" class="stardew-moon" :style="moonStyle" />
+      <div v-if="showStars" class="stardew-stars" aria-hidden="true">
+        <span
+          v-for="n in 28"
+          :key="n"
+          class="star"
+          :style="{
             left: ((n * 37) % 100) + '%',
-            top: ((n * 23) % 45) + '%',
-            animationDelay: (n * 0.17) + 's',
+            top: ((n * 23) % 42) + '%',
+            animationDelay: (n * 0.15) + 's',
             width: (2 + (n % 3)) + 'px',
             height: (2 + (n % 3)) + 'px',
-          }" />
-        </div>
-
-        <!-- Clouds -->
-        <div class="stardew-clouds" :class="{ dense: isRain || isThunder || isFog }">
-          <img class="cloud-img c1" src="/images/background/cloud-1-transparent.png" alt="">
-          <img class="cloud-img c2" src="/images/background/cloud-2-transparent.png" alt="">
-          <img class="cloud-img c3" src="/images/background/cloud-1-transparent.png" alt="">
-        </div>
-
-        <!-- Seasonal ground -->
-        <div class="stardew-grass" :style="grassStyle" />
-        <div class="stardew-grass-front" :style="grassFrontStyle" />
-
-        <!-- Fence -->
-        <div class="stardew-fence" v-html="fenceSvg" />
-
-        <!-- Season flora strip (CSS flowers / leaves / snow / pumpkins) -->
-        <div class="stardew-flora-strip" aria-hidden="true">
-          <span v-for="i in 14" :key="i" class="flora-item" :style="{ left: (i * 7.1 - 2) + '%' }" />
-        </div>
-
-        <!-- Weather layers -->
-        <div v-if="isRain" class="stardew-weather-rain" />
-        <div v-if="isSnow" class="stardew-weather-snow" />
-        <div v-if="isThunder" class="stardew-weather-thunder" />
+          }"
+        />
       </div>
-    </Transition>
+
+      <!-- Extra drifting clouds for life -->
+      <div class="stardew-clouds" :class="{ dense: isRain || isThunder || isFog }">
+        <img class="cloud-img c1" src="/images/background/cloud-1-transparent.png" alt="">
+        <img class="cloud-img c2" src="/images/background/cloud-2-transparent.png" alt="">
+        <img class="cloud-img c3" src="/images/background/cloud-1-transparent.png" alt="">
+      </div>
+
+      <!-- Weather overlays -->
+      <div v-if="isRain" class="stardew-weather-rain" />
+      <div v-if="isSnow" class="stardew-weather-snow" />
+      <div v-if="isFog" class="stardew-weather-fog" />
+      <div v-if="isThunder" class="stardew-weather-thunder" />
+    </div>
 
     <Transition name="fade">
       <div v-if="showLoadingBackground" class="background-loading" />
@@ -280,19 +238,21 @@ onUnmounted(() => {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  background: #4db8f5;
 }
 
 .background-loading {
   position: absolute;
   inset: 0;
-  background-color: var(--background);
+  background-color: #87CEEB;
 }
 
 .background-media {
   position: absolute;
   inset: 0;
-  transform: scale(1.0);
+  transform: scale(1.05);
   transition: opacity 0.8s ease;
+  z-index: 20;
 }
 
 .background-image {
@@ -313,19 +273,19 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 21;
 }
 
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.8s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
 
-/* ===== Stardew living scene ===== */
+/* ===== Full pastoral pixel scene ===== */
 .stardew-scene {
   position: absolute;
   inset: 0;
@@ -333,59 +293,63 @@ onUnmounted(() => {
   image-rendering: pixelated;
 }
 
-.stardew-sky-grad {
-  position: absolute;
-  inset: 0;
-  transition: background 2.5s ease;
-  z-index: 0;
-}
-
-.stardew-bg-sky {
+.stardew-bg-art {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top;
+  object-position: center bottom;
+  image-rendering: pixelated;
   pointer-events: none;
+  z-index: 0;
+  /* keep crisp pixels when scaled */
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+.stardew-time-tint {
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  transition: opacity 2s ease;
+  pointer-events: none;
+  transition: background 2.5s ease, opacity 2s ease;
 }
 
 .stardew-sun {
   position: absolute;
-  width: 72px;
-  height: 72px;
-  margin-left: -36px;
-  margin-top: -36px;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  margin-top: -32px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, #fff6c4 0%, #ffe27a 45%, rgba(255, 180, 60, 0.35) 70%, transparent 100%);
+  background: radial-gradient(circle at 50% 50%, #fff8d0 0%, #ffe27a 40%, rgba(255, 200, 80, 0.35) 65%, transparent 100%);
   box-shadow:
-    0 0 40px 14px rgba(255, 226, 122, 0.55),
-    0 0 80px 28px rgba(255, 200, 80, 0.25);
+    0 0 28px 10px rgba(255, 226, 122, 0.55),
+    0 0 60px 20px rgba(255, 200, 80, 0.22) !important;
   transition: left 2s ease, top 2s ease, opacity 1.5s ease;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
+  image-rendering: auto;
 }
 
 .time-dusk .stardew-sun {
-  background: radial-gradient(circle at 50% 50%, #ffd59a 0%, #ff8c42 50%, rgba(255, 100, 40, 0.3) 75%, transparent 100%);
+  background: radial-gradient(circle at 50% 50%, #ffd59a 0%, #ff8c42 45%, rgba(255, 100, 40, 0.3) 70%, transparent 100%);
   box-shadow:
-    0 0 36px 12px rgba(255, 140, 66, 0.5),
-    0 0 70px 24px rgba(230, 80, 40, 0.2);
+    0 0 28px 10px rgba(255, 140, 66, 0.5),
+    0 0 55px 18px rgba(230, 80, 40, 0.22) !important;
 }
 
 .stardew-moon {
   position: absolute;
-  width: 56px;
-  height: 56px;
-  margin-left: -28px;
-  margin-top: -28px;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%, #fdfbf0 0%, #e7dcc2 55%, rgba(231, 220, 194, 0) 100%);
-  box-shadow: 0 0 30px 10px rgba(200, 210, 255, 0.35);
+  background: radial-gradient(circle at 38% 38%, #fdfbf0 0%, #e7dcc2 55%, transparent 100%);
+  box-shadow: 0 0 24px 8px rgba(200, 210, 255, 0.4) !important;
   transition: left 2s ease, top 2s ease, opacity 1.5s ease;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
 }
 
@@ -395,221 +359,115 @@ onUnmounted(() => {
   z-index: 2;
   pointer-events: none;
 }
-
 .stardew-stars .star {
   position: absolute;
   border-radius: 50%;
   background: #fffef5;
-  box-shadow: 0 0 4px 1px rgba(255, 255, 220, 0.8);
-  animation: star-twinkle 2.8s ease-in-out infinite;
+  box-shadow: 0 0 3px 1px rgba(255, 255, 220, 0.85) !important;
+  animation: star-twinkle 2.6s ease-in-out infinite;
 }
 
 @keyframes star-twinkle {
-  0%, 100% { opacity: 0.35; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.15); }
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
 
 .stardew-clouds {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   pointer-events: none;
-  transition: opacity 1.5s ease;
 }
-
 .stardew-clouds .cloud-img {
   position: absolute;
-  opacity: 0.88;
-  animation: stardew-cloud 70s linear infinite;
-  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.08));
-}
-
-.stardew-clouds.dense .cloud-img {
-  opacity: 0.95;
-  filter: brightness(0.85) saturate(0.7);
-}
-
-.stardew-clouds .c1 { top: 10%; left: -12%; width: 200px; animation-duration: 150s; }
-.stardew-clouds .c2 { top: 20%; left: -28%; width: 160px; transform: scale(0.75); animation-duration: 180s; animation-delay: -25s; }
-.stardew-clouds .c3 { top: 6%; left: -45%; width: 220px; transform: scale(1.05); animation-duration: 210s; animation-delay: -40s; }
-
-.is-night .stardew-clouds { opacity: 0.2; }
-
-.stardew-grass {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 18%;
-  box-shadow: inset 0 8px 0 rgba(255, 255, 255, 0.1);
-  transition: background 2s ease;
-  z-index: 4;
-}
-
-.stardew-grass-front {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 9%;
-  border-top: 3px solid rgba(0, 0, 0, 0.12);
-  transition: background 2s ease;
-  z-index: 6;
-}
-
-.stardew-fence {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 16%;
-  height: 72px;
-  line-height: 0;
-  pointer-events: none;
-  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.12));
-  z-index: 5;
-}
-
-/* Seasonal flora along the fence line */
-.stardew-flora-strip {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 17%;
-  height: 28px;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.flora-item {
-  position: absolute;
-  bottom: 0;
-  width: 12px;
-  height: 16px;
+  opacity: 0.75;
+  animation: stardew-cloud 80s linear infinite;
   image-rendering: pixelated;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.06));
 }
-
-/* Spring: pink/white flowers */
-.season-spring .flora-item {
-  background:
-    radial-gradient(circle at 50% 30%, #ffb7c5 0 3px, transparent 3px),
-    radial-gradient(circle at 30% 50%, #fff 0 2px, transparent 2px),
-    radial-gradient(circle at 70% 50%, #fff 0 2px, transparent 2px),
-    linear-gradient(180deg, transparent 40%, #3d8b37 40% 100%);
-  border-radius: 50% 50% 40% 40%;
+.stardew-clouds.dense .cloud-img {
+  opacity: 0.9;
+  filter: brightness(0.82) saturate(0.65);
 }
+.stardew-clouds .c1 { top: 8%; left: -15%; width: 220px; animation-duration: 85s; }
+.stardew-clouds .c2 { top: 18%; left: -30%; width: 170px; animation-duration: 100s; animation-delay: -30s; }
+.stardew-clouds .c3 { top: 5%; left: -50%; width: 240px; animation-duration: 120s; animation-delay: -50s; }
+.is-night .stardew-clouds { opacity: 0.18; }
 
-/* Summer: bright yellow/red blooms */
-.season-summer .flora-item {
-  background:
-    radial-gradient(circle at 50% 35%, #ffeb3b 0 3px, transparent 3px),
-    radial-gradient(circle at 50% 55%, #ff5722 0 2px, transparent 2px),
-    linear-gradient(180deg, transparent 45%, #2e7d32 45% 100%);
-}
-
-/* Autumn: orange leaves / pumpkin dots */
-.season-autumn .flora-item {
-  background:
-    radial-gradient(ellipse at 50% 60%, #e67e22 0 5px, transparent 5px),
-    linear-gradient(180deg, transparent 55%, #8d6e63 55% 100%);
-  width: 14px;
-  height: 12px;
-}
-
-.season-autumn .flora-item:nth-child(3n) {
-  background: radial-gradient(circle at 50% 50%, #d35400 0 4px, #f39c12 4px 6px, transparent 6px);
-  width: 16px;
-  height: 14px;
-}
-
-/* Winter: snow piles */
-.season-winter .flora-item {
-  background: radial-gradient(ellipse at 50% 80%, #f5f7fa 0 7px, transparent 7px);
-  width: 18px;
-  height: 10px;
-  opacity: 0.95;
-}
-
-/* Weather overlays */
+/* Weather */
 .stardew-weather-rain {
   position: absolute;
   inset: 0;
   z-index: 8;
   pointer-events: none;
   background: repeating-linear-gradient(
-    -12deg,
+    -14deg,
     transparent 0,
-    transparent 6px,
-    rgba(180, 210, 255, 0.35) 6px,
-    rgba(180, 210, 255, 0.35) 8px
+    transparent 7px,
+    rgba(180, 210, 255, 0.38) 7px,
+    rgba(180, 210, 255, 0.38) 9px
   );
-  animation: rain-fall 0.55s linear infinite;
-  opacity: 0.7;
+  animation: rain-fall 0.5s linear infinite;
+  opacity: 0.75;
 }
-
 .stardew-weather-snow {
   position: absolute;
   inset: 0;
   z-index: 8;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.95) 0 2px, transparent 2px),
-    radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.85) 0 3px, transparent 3px),
-    radial-gradient(circle at 55% 15%, rgba(255, 255, 255, 0.9) 0 2px, transparent 2px),
-    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.8) 0 2px, transparent 2px),
-    radial-gradient(circle at 85% 35%, rgba(255, 255, 255, 0.9) 0 3px, transparent 3px),
-    radial-gradient(circle at 45% 80%, rgba(255, 255, 255, 0.75) 0 2px, transparent 2px);
-  background-size: 120px 120px;
-  animation: snow-drift 8s linear infinite;
-  opacity: 0.85;
+    radial-gradient(circle at 12% 18%, #fff 0 2px, transparent 2px),
+    radial-gradient(circle at 38% 48%, #fff 0 3px, transparent 3px),
+    radial-gradient(circle at 62% 12%, #fff 0 2px, transparent 2px),
+    radial-gradient(circle at 78% 55%, #fff 0 2px, transparent 2px),
+    radial-gradient(circle at 88% 30%, #fff 0 3px, transparent 3px),
+    radial-gradient(circle at 48% 78%, #fff 0 2px, transparent 2px);
+  background-size: 140px 140px;
+  animation: snow-drift 9s linear infinite;
+  opacity: 0.88;
 }
-
 .stardew-weather-fog {
   position: absolute;
-  inset: -10%;
+  inset: -8%;
   z-index: 8;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 30% 70%, rgba(255, 255, 255, 0.45) 0 35%, transparent 60%),
-    radial-gradient(ellipse at 75% 60%, rgba(240, 245, 255, 0.4) 0 30%, transparent 55%),
-    linear-gradient(180deg, transparent 40%, rgba(220, 230, 240, 0.35) 100%);
+    radial-gradient(ellipse at 28% 72%, rgba(255, 255, 255, 0.5) 0 32%, transparent 58%),
+    radial-gradient(ellipse at 72% 62%, rgba(240, 245, 255, 0.42) 0 28%, transparent 55%),
+    linear-gradient(180deg, transparent 45%, rgba(220, 230, 240, 0.35) 100%);
   animation: fog-drift 14s ease-in-out infinite;
 }
-
 .stardew-weather-thunder {
   position: absolute;
   inset: 0;
   z-index: 9;
   pointer-events: none;
-  background: rgba(255, 255, 240, 0.2);
-  animation: thunder-flash 3.2s steps(1, end) infinite;
+  background: rgba(255, 255, 240, 0.22);
+  animation: thunder-flash 3.4s steps(1, end) infinite;
 }
 
 @keyframes stardew-cloud {
   0% { transform: translateX(0); }
-  100% { transform: translateX(130vw); }
+  100% { transform: translateX(135vw); }
 }
-
 @keyframes rain-fall {
   from { background-position: 0 0; }
-  to { background-position: 12px 28px; }
+  to { background-position: 14px 32px; }
 }
-
 @keyframes snow-drift {
   from { background-position: 0 0, 20px 10px, 40px 0, 10px 30px, 50px 15px, 30px 40px; }
-  to { background-position: 20px 120px, 40px 130px, 60px 120px, 30px 150px, 70px 135px, 50px 160px; }
+  to { background-position: 24px 140px, 48px 150px, 68px 140px, 34px 170px, 78px 155px, 54px 180px; }
 }
-
 @keyframes fog-drift {
   0%, 100% { transform: translate(-2%, 0); opacity: 0.75; }
   50% { transform: translate(2%, 1%); opacity: 0.95; }
 }
-
 @keyframes thunder-flash {
-  0%, 8%, 12%, 100% { opacity: 0; }
-  9% { opacity: 1; }
-  11% { opacity: 0.4; }
-  40% { opacity: 0; }
-  41% { opacity: 0.7; }
-  43% { opacity: 0; }
+  0%, 9%, 14%, 100% { opacity: 0; }
+  10% { opacity: 1; }
+  12% { opacity: 0.35; }
+  42% { opacity: 0; }
+  43% { opacity: 0.65; }
+  45% { opacity: 0; }
 }
 </style>

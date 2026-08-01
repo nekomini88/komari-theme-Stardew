@@ -553,3 +553,15 @@ html.no-glass body {
 [data-theme="stardew"][data-season="winter"][data-appearance="dark"] {
   --bg-0:#141920; --surface:#1b232d; --surface-elev:#22303d; --border:#7397b8; --border-strong:#8db0cc; --hairline:#3e546a;
 }
+
+
+/* stardew page sky fallback */
+[data-theme="stardew"],
+[data-theme="stardew"] body,
+[data-theme="stardew"] #app {
+  background-color: #4db8f5 !important;
+  background-image: none;
+}
+[data-theme="stardew"] main {
+  background: transparent !important;
+}
