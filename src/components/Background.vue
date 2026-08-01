@@ -156,7 +156,7 @@ onUnmounted(() => clearImageLoader())
     >
       <img
         class="stardew-bg-sky"
-        :src="isNight ? '/images/background/night-panorama.png' : '/images/background/day-panorama-v2.png'"
+        :src="isNight ? '/images/background/night-panorama.png' : '/images/background/bg-sky.png'"
         alt=""
         draggable="false"
       >
