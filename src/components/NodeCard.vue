@@ -100,37 +100,45 @@ const customTags = computed(() => parseTags(props.node.tags).map(t => t.text))
 function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
+
+/* banner color + decoration per server name */
+type Banner = { bg: string; text: string; decor: string }
+const bannerPalette: readonly Banner[] = [
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2' },
+  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
+  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower' },
+  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse' },
+]
+
+const banner = computed<Banner>(() => {
+  const idx = Math.abs((props.node.name?.charCodeAt(0) ?? 0) % bannerPalette.length)
+  return bannerPalette[idx]!
+})
 </script>
 
 <template>
   <CardX
     hoverable
     class="node-card w-full cursor-pointer stardew-wood-card transition-all duration-200 rounded-[10px]"
-    :class="[!props.node.online && '!stardew-wood-card-offline']" @click="emit('click')"
+    :class="[!props.node.online && '!stardew-wood-card-offline']"
+    @click="emit('click')"
   >
     <template #header>
-      <div class="flex gap-2 min-w-0 items-center">
-        <DataTooltip
-          placement="right"
-          :content="formatUptime(props.node.uptime ?? 0)"
-          class="size-2 rounded-full" :class="[props.node.online ? 'bg-green-600' : 'bg-red-600']"
-          content-class="whitespace-nowrap"
-        >
-          <div
-            class="animate-ping absolute inset-0 rounded-full opacity-50"
-            :class="[props.node.online ? 'bg-green-600' : 'bg-red-600']"
-          />
-        </DataTooltip>
-        <span class="text-md font-bold flex-1 min-w-0 truncate">{{ props.node.name }}</span>
-      </div>
-    </template>
-
-    <template #header-extra>
-      <div class="flex gap-2 items-center">
-        <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-4">
+      <div class="relative flex items-center justify-between px-3 py-2 text-white"
+           :style="{ background: (banner as Banner).bg, color: (banner as Banner).text }">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="shrink-0 text-lg leading-none opacity-90">
+            <Icon :icon="(banner as Banner).decor" width="18" height="18" />
+          </span>
+          <span class="text-sm font-bold truncate">{{ props.node.name }}</span>
+        </div>
         <img
-          v-if="hasRegion(props.node.region)" :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-          :alt="getRegionDisplayName(props.node.region)" class="size-5 shrink-0"
+          v-if="hasRegion(props.node.region)"
+          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+          :alt="getRegionDisplayName(props.node.region)"
+          class="size-4 shrink-0"
         >
       </div>
     </template>
@@ -138,18 +146,10 @@ function hasRegion(region: string | null | undefined): boolean {
     <template #default>
       <div class="flex flex-col gap-3">
         <div class="gap-3 grid grid-cols-2">
-          <!-- <div class="flex flex-col gap-1 col-span-2">
-                <div class="flex gap-2 items-center">
-                  <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-4">
-                  <span class="text-xs">{{ getOSName(props.node.os) }}</span>
-                </div>
-              </div> -->
           <!-- CPU -->
           <div class="flex flex-col gap-1">
             <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">
-                CPU
-              </span>
+              <span class="text-muted-foreground">CPU</span>
               <span>{{ (props.node.cpu ?? 0).toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="props.node.cpu ?? 0" :status="cpuStatus" :height="4" />
@@ -162,9 +162,7 @@ function hasRegion(region: string | null | undefined): boolean {
           <!-- 内存 -->
           <div class="flex flex-col gap-1">
             <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">
-                内存
-              </span>
+              <span class="text-muted-foreground">内存</span>
               <span>{{ memPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="memPercentage" :status="memStatus" :height="4" />
@@ -176,9 +174,7 @@ function hasRegion(region: string | null | undefined): boolean {
           <!-- 硬盘 -->
           <div class="flex flex-col gap-1">
             <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">
-                硬盘
-              </span>
+              <span class="text-muted-foreground">硬盘</span>
               <span>{{ diskPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="diskPercentage" :status="diskStatus" :height="4" />
@@ -190,9 +186,7 @@ function hasRegion(region: string | null | undefined): boolean {
           <!-- 流量进度条 -->
           <div class="flex flex-col gap-1">
             <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">
-                流量
-              </span>
+              <span class="text-muted-foreground">流量</span>
               <span>{{ trafficUsedPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="trafficUsedPercentage" status="success" :height="4" />
@@ -201,23 +195,18 @@ function hasRegion(region: string | null | undefined): boolean {
               <template v-if="showTrafficProgress(node)">
                 {{ formatBytes(props.node.traffic_limit) }}
               </template>
-              <template v-else>
-                ∞
-              </template>
+              <template v-else>∞</template>
             </div>
           </div>
         </div>
         <div class="gap-1.5 grid grid-cols-6 relative">
           <div
             v-if="!props.node.online"
-            class="absolute inset-0 flex flex-col gap-1 items-center justify-center z-1 text-center" aria-hidden="true"
+            class="absolute inset-0 flex flex-col gap-1 items-center justify-center z-1 text-center"
+            aria-hidden="true"
           >
-            <div class="text-sm font-medium text-destructive">
-              离线
-            </div>
-            <div class="text-xs text-muted-foreground">
-              {{ offlineTime }}
-            </div>
+            <div class="text-sm font-medium text-destructive">离线</div>
+            <div class="text-xs text-muted-foreground">{{ offlineTime }}</div>
           </div>
           <div
             class="flex flex-col gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 col-span-2"
@@ -266,13 +255,12 @@ function hasRegion(region: string | null | undefined): boolean {
             </div>
           </div>
           <div
-            v-if="priceTags.length" class="col-span-6 flex flex-row gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 justify-center"
+            v-if="priceTags.length"
+            class="col-span-6 flex flex-row gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 justify-center"
             :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
           >
             <div class="text-[11px] text-muted-foreground flex flex-row gap-3">
-              <span v-for="(tag, index) in priceTags" :key="index">
-                {{ tag }}
-              </span>
+              <span v-for="(tag, index) in priceTags" :key="index">{{ tag }}</span>
             </div>
           </div>
           <!-- 在线时长 -->
@@ -287,7 +275,8 @@ function hasRegion(region: string | null | undefined): boolean {
           <!-- 延迟 -->
           <div
             class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']" :title="latencyPanelTooltip"
+            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
+            :title="latencyPanelTooltip"
           >
             <div class="flex items-center justify-between gap-2 text-[11px] leading-none relative">
               <span class="text-muted-foreground">延迟</span>
@@ -308,7 +297,8 @@ function hasRegion(region: string | null | undefined): boolean {
           <!-- 丢包 -->
           <div
             class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']" :title="lossPanelTooltip"
+            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
+            :title="lossPanelTooltip"
           >
             <div class="flex items-center justify-between gap-2 text-[11px] leading-none">
               <span class="text-muted-foreground">丢包</span>
@@ -329,7 +319,9 @@ function hasRegion(region: string | null | undefined): boolean {
         </div>
         <div v-if="customTags.length > 0" class="flex shrink-0 flex-wrap gap-1 items-center">
           <Badge
-            v-for="(tag, index) in customTags" :key="index" variant="outline"
+            v-for="(tag, index) in customTags"
+            :key="index"
+            variant="outline"
             class="!text-[11px] rounded text-muted-foreground border-muted-foreground/10 px-1.5"
           >
             {{ tag }}

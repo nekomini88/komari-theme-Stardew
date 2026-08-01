@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import ShaderBackground from '@/components/ShaderBackground.vue'
 import ShaderBackgroundLiquid from '@/components/ShaderBackgroundLiquid.vue'
 import { useAppStore } from '@/stores/app'
@@ -51,31 +51,20 @@ const showMediaBackground = computed(() =>
 )
 
 const currentTheme = document.documentElement.getAttribute('data-theme')
-import { isNight } from '@/composables/useStardewAtmosphere'
 
 // 宽容检测：stardew 主题 + 空值（部署场景） + 包含 stardew 的变体
 const isStardew = computed(() => {
   const t = currentTheme
   if (t === 'stardew') return true
-  if (t === null || t === '') return false // 空值由 theme.json 判定
+  if (t === null || t === '') return false
   return t && t.toLowerCase().includes('stardew')
 })
 
-// 昼夜：复用 atmosphere
-const isStardewNight = isNight
+// 固定白天，无昼夜切换
+const isStardewNight = computed(() => false)
 
-// 本地 season：部署后立即能看到四季切换（周期 8 秒一个季节）
-const seasonIndex = ref(0) // 0=spring, 1=summer, 2=autumn, 3=winter
-let seasonTimer: ReturnType<typeof setInterval> | null = null
-onMounted(() => {
-  seasonTimer = window.setInterval(() => {
-    seasonIndex.value = (seasonIndex.value + 1) % 4
-  }, 8000)
-})
-const localSeason = computed(() => {
-  const seasons = ['spring', 'summer', 'autumn', 'winter'] as const
-  return seasons[seasonIndex.value]
-})
+// 固定白天春季
+const localSeason = computed(() => 'spring')
 
 // 季节化天空渐变（白天）
 const skyGradientStyle = computed(() => {
