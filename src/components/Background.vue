@@ -192,6 +192,12 @@ onUnmounted(() => clearImageLoader())
         <img class="cloud-img c3" src="/images/background/cloud-1-transparent.png" alt="">
       </div>
 
+      <!-- Bottom decorations -->
+      <img class="stardew-decor stardew-decor--cherry-l" src="/images/bg/cherry-left.png" alt="" draggable="false">
+      <img class="stardew-decor stardew-decor--cherry-r" src="/images/bg/cherry-right.png" alt="" draggable="false">
+      <img class="stardew-decor stardew-decor--house" src="/images/bg/pixel-house-bottom.png" alt="" draggable="false">
+      <img class="stardew-decor stardew-decor--grass" src="/images/bg/grass-flowers.png" alt="" draggable="false">
+
       <!-- Weather overlays -->
       <div v-if="isRain" class="stardew-weather-rain" />
       <div v-if="isSnow" class="stardew-weather-snow" />
@@ -469,5 +475,40 @@ onUnmounted(() => clearImageLoader())
   42% { opacity: 0; }
   43% { opacity: 0.65; }
   45% { opacity: 0; }
+}
+
+/* ===== Bottom scene decorations ===== */
+.stardew-decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  image-rendering: pixelated;
+}
+.stardew-decor--cherry-l {
+  left: -40px;
+  bottom: -20px;
+  width: 260px;
+  height: auto;
+}
+.stardew-decor--cherry-r {
+  right: -40px;
+  bottom: -20px;
+  width: 260px;
+  height: auto;
+}
+.stardew-decor--house {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 420px;
+  height: auto;
+}
+.stardew-decor--grass {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: 6;
 }
 </style>
