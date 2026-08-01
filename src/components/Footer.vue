@@ -12,6 +12,8 @@ const buildVersion = __BUILD_VERSION__
 const buildGitHash = __BUILD_GIT_HASH__
 
 const serverVersion = ref<VersionInfo | null>(null)
+const themeName = ref('Stardew-2')
+const themeUrl = ref('https://github.com/nekomini88/komari-theme-Stardew')
 
 onMounted(async () => {
   try {
@@ -23,7 +25,6 @@ onMounted(async () => {
 })
 
 const formattedServerVersion = computed(() => serverVersion.value?.version ?? null)
-
 const showIcp = computed(() => appStore.icpEnabled && appStore.icpNumber)
 const showPolice = computed(() => appStore.policeEnabled && appStore.policeNumber)
 const showFiling = computed(() => showIcp.value || showPolice.value)
@@ -56,10 +57,12 @@ const showFiling = computed(() => showIcp.value || showPolice.value)
           :content="`v${buildVersion}\n${buildGitHash}`"
         >
           <a
-            href="https://github.com/R1ddle1337/komari-theme-emerald" target="_blank" rel="noopener noreferrer"
+            :href="themeUrl"
+            target="_blank"
+            rel="noopener noreferrer"
             class="transition-opacity hover:opacity-80"
           >
-            <span class="font-medium text-foreground">Komari Emerald</span>
+            <span class="font-medium text-foreground">{{ themeName }}</span>
           </a>
         </DataTooltip>
       </div>
