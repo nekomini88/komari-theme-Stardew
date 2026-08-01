@@ -307,30 +307,25 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
+  background: linear-gradient(to bottom, #4aa3d6 0%, #7ec8f8 55%, #5aa847 55%, #4a9a3a 100%);
 }
 
 .stardew-bg__sky {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  image-rendering: auto;
-  z-index: 0;
+  display: none;
 }
 
 .stardew-bg__cloud {
   position: absolute;
-  width: 220px;
+  width: 200px;
   height: auto;
   image-rendering: pixelated;
-  opacity: 0.9;
+  opacity: 0.92;
   z-index: 1;
-  top: 28px;
-  animation: stardew-cloud 26s linear infinite;
+  top: 26px;
+  animation: stardew-cloud 30s linear infinite;
 }
-.stardew-bg__cloud--1 { left: -240px; animation-duration: 32s; }
-.stardew-bg__cloud--2 { left: -260px; top: 80px; animation-duration: 40s; opacity: 0.7; }
+.stardew-bg__cloud--1 { left: -240px; animation-duration: 36s; }
+.stardew-bg__cloud--2 { left: -260px; top: 78px; animation-duration: 44s; opacity: 0.72; }
 
 @keyframes stardew-cloud {
   from { transform: translateX(0); }
@@ -340,50 +335,41 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 .stardew-bg__globe {
   position: absolute;
   right: 6%;
-  top: 36px;
-  width: 160px;
-  height: 160px;
+  top: 30px;
+  width: 150px;
+  height: 150px;
   image-rendering: pixelated;
   z-index: 1;
-  filter: drop-shadow(0 6px 0 rgba(62, 39, 35, 0.35));
+  filter: drop-shadow(0 6px 0 rgba(62, 39, 35, 0.45));
 }
 
 .stardew-bg__grass {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  image-rendering: auto;
-  z-index: 1;
-  pointer-events: none;
+  display: none;
 }
 
 .stardew-bg__cherry {
   position: absolute;
-  bottom: 20px;
-  width: 220px;
-  height: auto;
-  image-rendering: pixelated;
-  z-index: 2;
-  pointer-events: none;
-}
-.stardew-bg__cherry--left { left: -40px; }
-.stardew-bg__cherry--right { right: -40px; transform: scaleX(-1); }
-
-.stardew-bg__house {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
+  bottom: -18px;
   width: 180px;
   height: auto;
   image-rendering: pixelated;
   z-index: 2;
   pointer-events: none;
-  filter: drop-shadow(0 8px 0 rgba(62, 39, 35, 0.35));
+}
+.stardew-bg__cherry--left { left: -20px; }
+.stardew-bg__cherry--right { right: -20px; transform: scaleX(-1); }
+
+.stardew-bg__house {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  width: 200px;
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 0 rgba(62, 39, 35, 0.4));
 }
 
 .node-card-switch-enter-active {
@@ -407,6 +393,10 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .stardew-bg__cloud {
+    animation: none;
+  }
+
   .node-card-switch-enter-active,
   .node-card-switch-leave-active,
   .node-card-switch-move {
