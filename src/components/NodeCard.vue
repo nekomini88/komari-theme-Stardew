@@ -12,6 +12,7 @@ import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
 import { formatPriceWithCycle, getDaysUntilExpired, getExpireStatus, parseTags } from '@/utils/tagHelper'
 import PixelProgress from '@/components/PixelProgress.vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{ node: NodeData }>()
 const emit = defineEmits<{ click: [] }>()
@@ -37,6 +38,19 @@ const {
   lossPanelTooltip,
   pingStats,
 } = useNodePingDisplay(() => props.node.uuid)
+
+const pingHistory = computed(() => pingStats.history.value)
+const hasPingData = computed(() => pingStats.hasData)
+
+const latencyForDots = computed(() => {
+  if (!hasPingData.value || !pingHistory.value.length) return Array.from({ length: 8 }, () => null)
+  return pingHistory.value.slice(0, 8).map(p => p.latency)
+})
+
+const lossForDots = computed(() => {
+  if (!hasPingData.value || !pingHistory.value.length) return Array.from({ length: 8 }, () => null)
+  return pingHistory.value.slice(0, 8).map(p => p.loss)
+})
 
 const trafficUsedPercentage = computed(() => {
   if (props.node.traffic_limit <= 0) return 0
@@ -64,6 +78,20 @@ const trafficUsed = computed(() => {
     default: return net_total_up + net_total_down
   }
 })
+
+function pingDotClass(value: number | null | undefined): string {
+  if (value === null || value === undefined) return 'ping-dot'
+  if (value <= 60) return 'ping-dot ping-dot--active'
+  if (value <= 160) return 'ping-dot ping-dot--warn'
+  return 'ping-dot ping-dot--bad'
+}
+
+function lossDotClass(value: number | null | undefined): string {
+  if (value === null || value === undefined) return 'ping-dot'
+  if (value <= 1) return 'ping-dot ping-dot--active'
+  if (value <= 6) return 'ping-dot ping-dot--warn'
+  return 'ping-dot ping-dot--bad'
+}
 
 const priceTags = computed(() => {
   const tags: Array<string> = []
@@ -107,7 +135,7 @@ const banner = computed<Banner>(() => {
   <CardX
     hoverable
     class="node-card w-full cursor-pointer transition-all duration-200"
-    :class="[!props.node.online ? '!stardew-wood-card-offline' : 'stardew-node-card']"
+    :class="cn(!props.node.online ? '!stardew-wood-card-offline' : 'stardew-node-card')"
     @click="emit('click')"
   >
     <template #header>
@@ -221,7 +249,7 @@ const banner = computed<Banner>(() => {
               <span
                 v-for="i in 8"
                 :key="i"
-                class="ping-dot ping-dot--active"
+                :class="pingDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, pingStats.history.value.length - 1)]?.latency : undefined)"
               />
             </div>
           </div>
@@ -238,7 +266,7 @@ const banner = computed<Banner>(() => {
               <span
                 v-for="i in 8"
                 :key="'loss-' + i"
-                class="ping-dot ping-dot--active"
+                :class="lossDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, pingStats.history.value.length - 1)]?.loss : undefined)"
               />
             </div>
           </div>
@@ -321,23 +349,33 @@ const banner = computed<Banner>(() => {
 
 .node-title-wrap {
   position: relative;
-  padding-top: 10px;
+  padding-top: 12px;
 }
 
 .nail {
   position: absolute;
-  top: 2px;
-  right: 6px;
+  top: 4px;
+  right: 8px;
   width: 8px;
   height: 8px;
   image-rendering: pixelated;
   z-index: 2;
 }
 
+.node-title {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  image-rendering: auto;
+}
+
 .resource-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .resource-item {
@@ -350,9 +388,10 @@ const banner = computed<Banner>(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.55);
   padding: 8px;
   border-radius: 6px;
+  border: 2px solid #5c3a1e;
 }
 
 .ping-bar {
@@ -371,5 +410,13 @@ const banner = computed<Banner>(() => {
 
 .ping-dot--active {
   background: #67b447;
+}
+
+.ping-dot--warn {
+  background: #e6a23c;
+}
+
+.ping-dot--bad {
+  background: #d14c4c;
 }
 </style>
