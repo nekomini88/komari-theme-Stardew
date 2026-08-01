@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
-import ShaderBackground from '@/components/ShaderBackground.vue'
-import ShaderBackgroundLiquid from '@/components/ShaderBackgroundLiquid.vue'
 import {
   grassGradients,
   isFog,
@@ -184,19 +182,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="background-container" :style="backgroundContainerStyle">
-    <Transition name="fade" mode="out-in">
-      <div
-        v-if="showDefaultBackground"
-        :key="appStore.shaderType"
-        class="absolute inset-0 overflow-hidden"
-      >
-        <ShaderBackgroundLiquid v-if="appStore.shaderType === 'liquid'" />
-        <ShaderBackground v-else-if="appStore.shaderType === 'bubbles'" />
-        <div class="absolute inset-0 pointer-events-none bg-white/25 dark:bg-black/20" />
-      </div>
-    </Transition>
-
+    <div class="background-container" :style="backgroundContainerStyle">
     <!-- Living Stardew world: time / season / weather -->
     <Transition name="fade">
       <div
@@ -211,14 +197,6 @@ onUnmounted(() => {
       >
         <!-- Dynamic sky gradient (PDF day/dusk/night) -->
         <div class="stardew-sky-grad" :style="skyStyle" />
-
-        <!-- Optional photo sky soft-blend under gradient for texture -->
-        <img
-          class="stardew-bg-sky"
-          src="/images/background/bg-sky.png"
-          alt=""
-          :style="{ opacity: isNight ? 0.15 : 0.35, mixBlendMode: isNight ? 'soft-light' : 'overlay' }"
-        >
 
         <!-- Sun follows real time arc -->
         <div v-show="showSun" class="stardew-sun" :style="sunStyle" />
@@ -259,7 +237,6 @@ onUnmounted(() => {
         <!-- Weather layers -->
         <div v-if="isRain" class="stardew-weather-rain" />
         <div v-if="isSnow" class="stardew-weather-snow" />
-        <div v-if="isFog" class="stardew-weather-fog" />
         <div v-if="isThunder" class="stardew-weather-thunder" />
       </div>
     </Transition>
@@ -452,9 +429,9 @@ onUnmounted(() => {
   filter: brightness(0.85) saturate(0.7);
 }
 
-.stardew-clouds .c1 { top: 10%; left: -12%; width: 200px; animation-duration: 75s; }
-.stardew-clouds .c2 { top: 20%; left: -28%; width: 160px; transform: scale(0.75); animation-duration: 95s; animation-delay: -25s; }
-.stardew-clouds .c3 { top: 6%; left: -45%; width: 220px; transform: scale(1.05); animation-duration: 110s; animation-delay: -40s; }
+.stardew-clouds .c1 { top: 10%; left: -12%; width: 200px; animation-duration: 150s; }
+.stardew-clouds .c2 { top: 20%; left: -28%; width: 160px; transform: scale(0.75); animation-duration: 180s; animation-delay: -25s; }
+.stardew-clouds .c3 { top: 6%; left: -45%; width: 220px; transform: scale(1.05); animation-duration: 210s; animation-delay: -40s; }
 
 .is-night .stardew-clouds { opacity: 0.2; }
 
