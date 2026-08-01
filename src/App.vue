@@ -9,6 +9,7 @@ import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import LoadingCover from './components/LoadingCover.vue'
 import Provider from './components/Provider.vue'
+import { startAtmosphere, stopAtmosphere } from '@/composables/useStardewAtmosphere'
 
 const appStore = useAppStore()
 
@@ -22,16 +23,19 @@ onMounted(async () => {
   try {
     await initApp()
     await nextTick()
+    startAtmosphere()
     isReady.value = true
   }
   catch (error) {
     console.error('[App] Initialization failed:', error)
+    startAtmosphere()
     isReady.value = true
   }
 })
 
 onUnmounted(() => {
   destroyInitManager()
+  stopAtmosphere()
 })
 </script>
 

@@ -1,92 +1,152 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
-import { season, isNight, isThunder, isRain, isSnow, isFog } from '@/composables/useStardewAtmosphere'
+import { isFog, isNight, isRain, isSnow, isThunder, season } from '@/composables/useStardewAtmosphere'
 
-const items = ref<Array<{ id: number; x: number; y: number; type: string; life: number }>>([])
-let nextId = 0
-const MAX = 22
-let raf: number | null = null
-let last = 0
-const SPAWN_INTERVAL = 900
-
-const SPRITES: Record<string, string> = {
-  firefly: '/src/assets/sprites/firefly.svg',
-  butterfly: '/src/assets/sprites/butterfly.svg',
-  flower: '/src/assets/sprites/flower.svg',
-  leaf: '/src/assets/sprites/leaf.svg',
-  bird: '/src/assets/sprites/bird.svg',
-  bunny: '/src/assets/sprites/bunny.svg',
-  raindrop: '/src/assets/sprites/rain-snow.svg',
-  snowflake: '/src/assets/sprites/rain-snow.svg',
-  ice: '/src/assets/sprites/ice.svg',
-  fogwisp: '/src/assets/sprites/fogwisp.svg',
-  lightning: '/src/assets/sprites/fogwisp.svg',
-  star: '/src/assets/sprites/star.svg',
-  cloud: '/src/assets/sprites/cloud.svg',
+interface LifeItem {
+  id: number
+  x: number
+  y: number
+  type: string
+  life: number
+  vx: number
+  vy: number
 }
 
-function pickType() {
+const items = ref<LifeItem[]>([])
+let nextId = 0
+const MAX = 18
+let raf: number | null = null
+let spawnAcc = 0
+const SPAWN_EVERY_MS = 1100
+let lastTs = 0
+
+// Use public-compatible paths via import so Vite bundles them
+import fireflyUrl from '@/assets/sprites/firefly.svg?url'
+import butterflyUrl from '@/assets/sprites/butterfly.svg?url'
+import flowerUrl from '@/assets/sprites/flower.svg?url'
+import leafUrl from '@/assets/sprites/leaf.svg?url'
+import birdUrl from '@/assets/sprites/bird.svg?url'
+import bunnyUrl from '@/assets/sprites/bunny.svg?url'
+import rainSnowUrl from '@/assets/sprites/rain-snow.svg?url'
+import iceUrl from '@/assets/sprites/ice.svg?url'
+import fogwispUrl from '@/assets/sprites/fogwisp.svg?url'
+import starUrl from '@/assets/sprites/star.svg?url'
+import cloudUrl from '@/assets/sprites/cloud.svg?url'
+
+const SPRITES: Record<string, string> = {
+  firefly: fireflyUrl,
+  butterfly: butterflyUrl,
+  flower: flowerUrl,
+  leaf: leafUrl,
+  bird: birdUrl,
+  bunny: bunnyUrl,
+  raindrop: rainSnowUrl,
+  snowflake: rainSnowUrl,
+  ice: iceUrl,
+  fogwisp: fogwispUrl,
+  lightning: fogwispUrl,
+  star: starUrl,
+  cloud: cloudUrl,
+}
+
+function pickType(): string {
   const s = season.value
   if (isThunder.value) {
     const p = Math.random()
-    if (p < 0.25) return 'lightning'
-    if (p < 0.45) return 'cloud'
+    if (p < 0.2)
+      return 'lightning'
+    if (p < 0.4)
+      return 'cloud'
     return 'raindrop'
   }
-  if (s === 'winter') {
+  if (isSnow.value || s === 'winter') {
     const p = Math.random()
-    if (p < 0.12) return 'star'
-    if (p < 0.22) return 'cloud'
-    if (isSnow.value) return Math.random() < 0.7 ? 'snowflake' : 'ice'
+    if (p < 0.12)
+      return 'star'
+    if (p < 0.22)
+      return 'cloud'
+    if (isSnow.value)
+      return Math.random() < 0.7 ? 'snowflake' : 'ice'
     return Math.random() < 0.5 ? 'snowflake' : 'cloud'
   }
   if (isRain.value) {
-    const p = Math.random()
-    if (p < 0.18) return 'cloud'
-    return 'raindrop'
+    return Math.random() < 0.18 ? 'cloud' : 'raindrop'
   }
   if (isFog.value) {
     const p = Math.random()
-    if (p < 0.35) return 'fogwisp'
-    if (p < 0.55) return 'cloud'
+    if (p < 0.4)
+      return 'fogwisp'
+    if (p < 0.6)
+      return 'cloud'
     return 'leaf'
   }
-  const p = Math.random()
-  if (p < 0.18) return 'cloud'
-  if (isNight.value && p < 0.35) return 'star'
-  const pool = ['firefly', 'butterfly', 'flower', 'leaf', 'bunny', 'bird'] as const
-  if (s === 'spring') return Math.random() < 0.5 ? 'flower' : 'butterfly'
-  if (s === 'summer') return Math.random() < 0.5 ? 'butterfly' : 'firefly'
-  if (s === 'autumn') return Math.random() < 0.7 ? 'leaf' : 'bird'
+  if (isNight.value) {
+    const p = Math.random()
+    if (p < 0.45)
+      return 'star'
+    if (p < 0.7)
+      return 'firefly'
+    return 'cloud'
+  }
+  // Clear daytime animals / plants
+  if (s === 'spring')
+    return Math.random() < 0.55 ? 'flower' : (Math.random() < 0.6 ? 'butterfly' : 'bunny')
+  if (s === 'summer')
+    return Math.random() < 0.45 ? 'butterfly' : (Math.random() < 0.5 ? 'firefly' : 'bird')
+  if (s === 'autumn')
+    return Math.random() < 0.65 ? 'leaf' : 'bird'
   return 'firefly'
 }
 
 function spawn() {
-  if (items.value.length >= MAX) return
+  if (items.value.length >= MAX)
+    return
   const type = pickType()
+  const fromTop = type === 'raindrop' || type === 'snowflake' || type === 'ice' || type === 'leaf'
   items.value.push({
     id: nextId++,
     x: Math.random() * 100,
-    y: Math.random() * 100,
+    y: fromTop ? Math.random() * 25 : 55 + Math.random() * 35,
     type,
     life: 1,
+    vx: (Math.random() - 0.5) * 0.04,
+    vy: fromTop ? 0.04 + Math.random() * 0.06 : (Math.random() - 0.5) * 0.02,
   })
 }
 
-function tick() {
-  for (const it of items.value) it.life -= 0.0008
-  items.value = items.value.filter((it) => it.life > 0)
+function tick(dt: number) {
+  for (const it of items.value) {
+    it.life -= dt * 0.00012
+    it.x += it.vx * dt
+    it.y += it.vy * dt
+    if (it.type === 'butterfly' || it.type === 'bird' || it.type === 'firefly') {
+      it.vx += (Math.random() - 0.5) * 0.002
+      it.vy += (Math.random() - 0.5) * 0.001
+    }
+  }
+  items.value = items.value.filter(it => it.life > 0 && it.y < 110 && it.x > -5 && it.x < 105)
 }
 
-function loop() {
-  tick()
+function loop(ts: number) {
+  if (!lastTs)
+    lastTs = ts
+  const dt = Math.min(ts - lastTs, 64)
+  lastTs = ts
+  spawnAcc += dt
+  while (spawnAcc >= SPAWN_EVERY_MS) {
+    spawn()
+    spawnAcc -= SPAWN_EVERY_MS
+  }
+  tick(dt)
   raf = requestAnimationFrame(loop)
 }
 
 onMounted(() => {
-  spawn()
+  for (let i = 0; i < 6; i++)
+    spawn()
   raf = requestAnimationFrame(loop)
 })
+
 onUnmounted(() => {
   if (raf !== null) {
     cancelAnimationFrame(raf)
@@ -105,11 +165,8 @@ onUnmounted(() => {
       :style="{
         left: it.x + '%',
         top: it.y + '%',
-        opacity: it.life,
-        backgroundImage: 'url(' + (SPRITES[it.type] || '/src/assets/sprites/fogwisp.svg') + ')',
-        backgroundSize: 'contain',
-        backgroundRepeat: 'no-repeat',
-        transform: 'translate(-50%,-50%)',
+        opacity: Math.max(0, it.life),
+        backgroundImage: 'url(' + (SPRITES[it.type] || SPRITES.fogwisp) + ')',
       }"
     />
     <div v-if="isThunder" class="stardew-lightning" />
@@ -126,105 +183,95 @@ onUnmounted(() => {
 }
 .stardew-life {
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   image-rendering: pixelated;
-  transform-origin: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
 }
 .stardew-life.flower,
-.stardew-life.bird,
-.stardew-life.bunny,
-.stardew-life.firefly {
-  animation: stardew-drift 7s linear infinite;
+.stardew-life.bunny {
+  width: 18px;
+  height: 18px;
 }
 .stardew-life.butterfly {
+  width: 20px;
+  height: 16px;
   animation: stardew-wobble 2.2s ease-in-out infinite;
 }
+.stardew-life.bird {
+  width: 22px;
+  height: 16px;
+}
+.stardew-life.firefly {
+  width: 12px;
+  height: 12px;
+  filter: drop-shadow(0 0 4px rgba(255, 230, 120, 0.8));
+  animation: stardew-twinkle 1.8s ease-in-out infinite;
+}
 .stardew-life.leaf {
-  transform: rotate(25deg);
-  animation: stardew-leaf 8s linear infinite;
+  width: 14px;
+  height: 14px;
+  animation: stardew-leaf-spin 6s linear infinite;
 }
 .stardew-life.raindrop {
-  animation: stardew-rain 0.8s linear infinite;
+  width: 8px;
+  height: 14px;
+  opacity: 0.7 !important;
 }
 .stardew-life.snowflake,
 .stardew-life.ice {
-  animation: stardew-snow 5s linear infinite;
-}
-.stardew-life.lightning {
-  width: 24px;
-  height: 24px;
-  animation: stardew-drift 2s linear infinite;
+  width: 12px;
+  height: 12px;
 }
 .stardew-life.fogwisp {
-  width: 40px;
-  height: 16px;
-  animation: stardew-fogdrift 10s ease-in-out infinite;
+  width: 48px;
+  height: 20px;
+  opacity: 0.5 !important;
 }
 .stardew-life.star {
   width: 10px;
   height: 10px;
-  animation: stardew-twinkle 2.4s ease-in-out infinite, stardew-drift 9s linear infinite;
+  animation: stardew-twinkle 2.4s ease-in-out infinite;
 }
 .stardew-life.cloud {
+  width: 36px;
+  height: 16px;
+  opacity: 0.8 !important;
+}
+.stardew-life.lightning {
   width: 28px;
-  height: 12px;
-  animation: stardew-cloud-drift 22s linear infinite;
-  opacity: 0.85;
+  height: 28px;
 }
 .stardew-lightning {
   position: fixed;
   inset: 0;
   pointer-events: none;
   background: rgba(255, 255, 240, 0.18);
-  animation: stardew-flash-thunder 1s steps(2, end) infinite;
+  animation: stardew-flash-thunder 2.8s steps(2, end) infinite;
 }
 
 @keyframes stardew-twinkle {
-  0%, 100% { opacity: 0.55; transform: translate(-50%,-50%) scale(1); }
-  50% { opacity: 1; transform: translate(-50%,-50%) scale(1.35); }
-}
-@keyframes stardew-cloud-drift {
-  0% { transform: translate(-60px, 0); opacity: 0.75; }
-  50% { opacity: 0.95; }
-  100% { transform: translate(60px, -14px); opacity: 0.75; }
-}
-
-@keyframes stardew-drift {
-  0% { transform: translate(-50%,-50%) translate(0,0); }
-  25% { transform: translate(-50%,-50%) translate(28px,-18px); }
-  50% { transform: translate(-50%,-50%) translate(-16px,12px); }
-  75% { transform: translate(-50%,-50%) translate(10px,20px); }
-  100% { transform: translate(-50%,-50%) translate(0,0); }
+  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.9); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); }
 }
 @keyframes stardew-wobble {
-  0% { transform: translate(-50%,-50%) rotate(0deg); }
-  50% { transform: translate(-50%,-50%) rotate(18deg); }
-  100% { transform: translate(-50%,-50%) rotate(0deg); }
+  0% { transform: translate(-50%, -50%) rotate(-8deg); }
+  50% { transform: translate(-50%, -50%) rotate(12deg); }
+  100% { transform: translate(-50%, -50%) rotate(-8deg); }
 }
-@keyframes stardew-leaf {
-  0% { transform: translate(-50%,-50%) translate(-20px,-10px) rotate(0deg); opacity: 0.7; }
-  100% { transform: translate(-50%,-50%) translate(60px,110px) rotate(240deg); opacity: 0.05; }
-}
-@keyframes stardew-rain {
-  0% { transform: translate(-50%,-50%) translate(0,0); opacity: 0.9; }
-  100% { transform: translate(-50%,-50%) translate(-6px,110px); opacity: 0; }
-}
-@keyframes stardew-snow {
-  0% { transform: translate(-50%,-50%) translate(0,0); opacity: 0.9; }
-  100% { transform: translate(-50%,-50%) translate(10px,110px); opacity: 0; }
-}
-@keyframes stardew-fogdrift {
-  0% { transform: translate(-3%,-1%); }
-  50% { transform: translate(3%,1%); }
-  100% { transform: translate(-3%,-1%); }
+@keyframes stardew-leaf-spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 @keyframes stardew-flash-thunder {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  20% { opacity: 0; }
-  35% { opacity: 0.7; }
-  50% { opacity: 0; }
-  100% { opacity: 0; }
+  0%, 100% { opacity: 0; }
+  8% { opacity: 1; }
+  12% { opacity: 0; }
+  18% { opacity: 0.6; }
+  22% { opacity: 0; }
 }
 </style>
