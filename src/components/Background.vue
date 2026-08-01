@@ -331,13 +331,13 @@ onUnmounted(() => clearImageLoader())
 
 .stardew-moon {
   position: absolute;
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  margin-top: -22px;
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
   border-radius: 50%;
-  background: #fdfbf0;
-  box-shadow: inset -14px -10px 0 0 rgba(10, 20, 40, 0.38), 0 0 20px 6px rgba(200, 210, 255, 0.35) !important;
+  background: radial-gradient(circle at 68% 32%, #fdfbf0 48%, transparent 52%);
+  box-shadow: 0 0 20px 6px rgba(200, 210, 255, 0.35) !important;
   transition: left 2s ease, top 2s ease, opacity 1.5s ease;
   z-index: 3;
   pointer-events: none;
