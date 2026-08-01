@@ -28,30 +28,32 @@ const formattedServerVersion = computed(() => serverVersion.value?.version ?? nu
 const showIcp = computed(() => appStore.icpEnabled && appStore.icpNumber)
 const showPolice = computed(() => appStore.policeEnabled && appStore.policeNumber)
 const showFiling = computed(() => showIcp.value || showPolice.value)
+
+const openLink = (url: string) => {
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
 </script>
 <template>
   <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4">
     <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Powered by
-      <a
-        href="https://github.com/komari-monitor/komari"
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        type="button"
+        @click="openLink('https://github.com/komari-monitor/komari')"
         class="transition-opacity hover:opacity-80"
       >
         <span class="font-medium text-foreground">Komari Monitor</span>
-      </a>
+      </button>
     </div>
     <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Theme by
-      <a
-        :href="themeUrl"
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        type="button"
+        @click="openLink(themeUrl)"
         class="transition-opacity hover:opacity-80"
       >
         <span class="font-medium text-foreground">{{ themeName }}</span>
-      </a>
+      </button>
     </div>
 
     <div v-if="showFiling" class="flex flex-wrap gap-2 items-center justify-center sm:flex-shrink-0">
