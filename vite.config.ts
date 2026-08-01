@@ -36,11 +36,13 @@ function komariThemeZip(): Plugin {
     apply: 'build',
     closeBundle: async () => {
       const commitHash = getCommitHash()
-      const zipFileName = `komari-theme-stardew-build-${commitHash}.zip`
+      const packageJson = require(resolve(__dirname, 'package.json'))
+      const version = packageJson.version || '0.0.0'
+      const zipFileName = `komari-theme-Komari-Stardew-v${version}-${commitHash}.zip`
       const distDir = resolve(__dirname, 'dist')
       const themeJsonPath = resolve(__dirname, 'komari-theme.json')
-      const previewPath = resolve(__dirname, 'docs/preview.png')
-      const outputPath = resolve(__dirname, zipFileName)
+      const previewPath = resolve(__dirname, 'preview.png')
+      const outputPath = resolve(__dirname, 'release', zipFileName)
 
       if (!existsSync(distDir)) {
         console.log('[komari-theme-zip] dist directory not found, skipping zip creation')
@@ -87,11 +89,11 @@ export default defineConfig({
     __BUILD_VERSION__: JSON.stringify(packageJson.version),
     __BUILD_GIT_HASH__: JSON.stringify(getCommitHash()),
   },
+  base: '/',
   plugins: [
     vue(),
     vueDevTools(),
     tailwindcss(),
-    komariThemeZip(),
   ],
   resolve: {
     alias: {

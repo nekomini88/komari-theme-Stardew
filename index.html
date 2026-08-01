@@ -1,48 +1,13 @@
-<!doctype html>
-<html lang="">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <title>Komari Monitor</title>
     <meta name="description" content="A simple server monitor tool." />
-    <script src="/komari-sw-override.js"></script>
-    <script>
-      // Ultra-early visual style default before paint to avoid flash.
-      (function() {
-        var KEY = 'komaritheme:theme';
-        var KEY_DEFAULT = 'komaritheme:theme-default';
-        var ALLOWED = ['stardew', 'baseline'];
-        function parse(raw) {
-          if (!raw) return 'stardew';
-          var v = raw.trim();
-          return ALLOWED.indexOf(v) !== -1 ? v : 'stardew';
-        }
-        try {
-          var saved = parse(localStorage.getItem(KEY));
-          var fallback = parse(localStorage.getItem(KEY_DEFAULT));
-          document.documentElement.setAttribute('data-theme', saved);
-        } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'stardew');
-        }
-      })();
-    </script>
-    <script>
-      // Force-clear stale Komari Service Worker so theme updates are not hidden behind a precache.
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          registrations.forEach(function(registration) {
-            try { registration.unregister(); } catch (e) {}
-          });
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage && navigator.serviceWorker.controller.postMessage('skipWaiting');
-          }
-        }).catch(function(){});
-      }
-    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
   </head>
-
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>

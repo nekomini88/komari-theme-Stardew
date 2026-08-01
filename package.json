@@ -11,10 +11,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --build && vite build",
-    "preview": "vite preview",
+    "build": "vue-tsc --build && vite build && bun scripts/package-theme.ts",
     "build-only": "vite build",
+    "package": "bun scripts/package-theme.ts",
     "type-check": "vue-tsc --build",
+    "preview": "vite preview",
     "publish": "bun scripts/publish.ts",
     "lint": "eslint . --fix --cache",
     "lint:eslint": "eslint . --fix --cache",
