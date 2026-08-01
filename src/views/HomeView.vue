@@ -162,6 +162,16 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 
 <template>
   <div class="home-view">
+    <div class="stardew-bg">
+      <img class="stardew-bg__sky" src="/images/background/bg-sky.png" alt="">
+      <img class="stardew-bg__cloud stardew-bg__cloud--1" src="/images/background/cloud-1.png" alt="">
+      <img class="stardew-bg__cloud stardew-bg__cloud--2" src="/images/background/cloud-2.png" alt="">
+      <img class="stardew-bg__globe" src="/images/bg/globe.png" alt="">
+      <img class="stardew-bg__grass" src="/images/background/bg-grass.png" alt="">
+      <img class="stardew-bg__cherry stardew-bg__cherry--left" src="/images/bg/cherry-left.png" alt="">
+      <img class="stardew-bg__cherry stardew-bg__cherry--right" src="/images/bg/cherry-right.png" alt="">
+      <img class="stardew-bg__house" src="/images/bg/pixel-house-bottom.png" alt="">
+    </div>
     <div v-if="appStore.connectionError" class="alert px-4">
       <Alert variant="destructive" class="border-none backdrop-blur-xl backdrop-saturate-150 bg-red-400/10 rounded-lg ring-1 ring-red-500/[0.1]">
         <AlertTitle>RPC 服务错误</AlertTitle>
@@ -280,8 +290,96 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 .node-card-switch-leave-active {
   transition:
     opacity 180ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 180ms ease;
+    transform 180ms ease;
+}
+
+.home-view {
+  position: relative;
+}
+
+.stardew-bg {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.stardew-bg__sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: auto;
+  z-index: 0;
+}
+
+.stardew-bg__cloud {
+  position: absolute;
+  width: 220px;
+  height: auto;
+  image-rendering: pixelated;
+  opacity: 0.9;
+  z-index: 1;
+  top: 28px;
+  animation: stardew-cloud 26s linear infinite;
+}
+.stardew-bg__cloud--1 { left: -240px; animation-duration: 32s; }
+.stardew-bg__cloud--2 { left: -260px; top: 80px; animation-duration: 40s; opacity: 0.7; }
+
+@keyframes stardew-cloud {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 300px)); }
+}
+
+.stardew-bg__globe {
+  position: absolute;
+  right: 6%;
+  top: 36px;
+  width: 160px;
+  height: 160px;
+  image-rendering: pixelated;
+  z-index: 1;
+  filter: drop-shadow(0 6px 0 rgba(62, 39, 35, 0.35));
+}
+
+.stardew-bg__grass {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  image-rendering: auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stardew-bg__cherry {
+  position: absolute;
+  bottom: 20px;
+  width: 220px;
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 2;
+  pointer-events: none;
+}
+.stardew-bg__cherry--left { left: -40px; }
+.stardew-bg__cherry--right { right: -40px; transform: scaleX(-1); }
+
+.stardew-bg__house {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: 180px;
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 0 rgba(62, 39, 35, 0.35));
 }
 
 .node-card-switch-enter-active {
