@@ -63,17 +63,17 @@ const showStardewBackground = computed(() => true)
 /** Time-of-day color wash over the pixel sky art (PDF day/dusk/night) */
 const timeTint = computed(() => {
   if (timeOfDay.value === 'dawn')
-    return 'linear-gradient(180deg, rgba(255,180,120,0.35) 0%, rgba(255,220,160,0.15) 40%, transparent 70%)'
+    return 'linear-gradient(180deg, rgba(255,180,120,0.08) 0%, rgba(255,220,160,0.05) 40%, transparent 70%)'
   if (timeOfDay.value === 'dusk')
-    return 'linear-gradient(180deg, rgba(255,100,40,0.4) 0%, rgba(230,80,60,0.25) 35%, rgba(40,20,60,0.2) 100%)'
+    return 'linear-gradient(180deg, rgba(255,100,40,0.12) 0%, rgba(230,80,60,0.08) 35%, rgba(40,20,60,0.12) 100%)'
   if (timeOfDay.value === 'night')
-    return 'linear-gradient(180deg, rgba(10,20,50,0.72) 0%, rgba(15,30,60,0.55) 50%, rgba(10,25,40,0.45) 100%)'
+    return 'linear-gradient(180deg, rgba(10,20,50,0.35) 0%, rgba(15,30,60,0.25) 50%, rgba(10,25,40,0.25) 100%)'
   // day — slight warm lift matching PDF spring/summer brightness
   if (season.value === 'autumn')
-    return 'linear-gradient(180deg, rgba(255,180,60,0.22) 0%, rgba(200,120,40,0.12) 50%, transparent 100%)'
+    return 'linear-gradient(180deg, rgba(255,180,60,0.08) 0%, rgba(200,120,40,0.05) 50%, transparent 100%)'
   if (season.value === 'winter')
-    return 'linear-gradient(180deg, rgba(200,220,240,0.28) 0%, rgba(180,200,220,0.15) 50%, transparent 100%)'
-  return 'linear-gradient(180deg, rgba(135,206,250,0.08) 0%, transparent 50%)'
+    return 'linear-gradient(180deg, rgba(200,220,240,0.1) 0%, rgba(180,200,220,0.06) 50%, transparent 100%)'
+  return 'linear-gradient(180deg, rgba(135,206,250,0.04) 0%, transparent 50%)'
 })
 
 const sunStyle = computed(() => ({
