@@ -115,17 +115,17 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-center px-3 py-2 text-white overflow-hidden" :style="{ backgroundColor: banner.bg }">
-        <div class="relative flex items-center justify-center w-full gap-1.5">
-          <span class="shrink-0 text-base leading-none opacity-90 drop-shadow-md">
-            <Icon :icon="banner.decor" width="16" height="16" />
+      <div class="relative flex items-center justify-center px-2 py-1.5 text-white overflow-hidden" :style="{ backgroundColor: banner.bg }">
+        <div class="relative flex items-center justify-center w-full gap-1">
+          <span class="shrink-0 text-sm leading-none drop-shadow-sm">
+            <Icon :icon="banner.decor" width="14" height="14" />
           </span>
           <span class="text-xs font-bold truncate drop-shadow-md" style="text-shadow: 0 1px 2px rgba(0,0,0,0.45), 0 0 4px rgba(0,0,0,0.3);">{{ props.node.name }}</span>
           <img
             v-if="hasRegion(props.node.region)"
             :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
             :alt="getRegionDisplayName(props.node.region)"
-            class="h-3.5 w-auto max-w-[22px] shrink-0 relative object-contain"
+            class="h-3 w-auto max-w-[20px] shrink-0 relative object-contain"
             style="image-rendering: auto;"
           >
         </div>
@@ -283,10 +283,10 @@ const banner = computed<Banner>(() => {
 }
 
 .stardew-wood-card {
-  background: linear-gradient(180deg, #f3e2bd 0%, #e8d5a8 100%) !important;
+  background: #f3e2bd !important;
   border: 4px solid #5c3a1e !important;
+  border-radius: 4px !important;
   box-shadow: 4px 4px 0 #3E2723 !important;
-  border-radius: 10px !important;
   image-rendering: auto;
 }
 
