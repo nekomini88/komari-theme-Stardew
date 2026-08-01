@@ -67,7 +67,7 @@ const timeTint = computed(() => {
   if (timeOfDay.value === 'dusk')
     return 'linear-gradient(180deg, rgba(255,100,40,0.2) 0%, rgba(40,20,60,0.08) 100%)'
   if (timeOfDay.value === 'night')
-    return 'linear-gradient(180deg, rgba(10,20,50,0.42) 0%, rgba(10,25,40,0.22) 100%)'
+    return 'transparent'
   if (season.value === 'autumn')
     return 'linear-gradient(180deg, rgba(255,180,60,0.08) 0%, transparent 60%)'
   if (season.value === 'winter')
@@ -88,8 +88,9 @@ const moonStyle = computed(() => ({
 }))
 
 const showSun = computed(() => !isNight.value)
-const showMoon = computed(() => isNight.value)
-const showStars = computed(() => isNight.value)
+/* 夜晚全景图已内含月亮与星空，不再叠加 CSS 月亮/星星，避免重影 */
+const showMoon = computed(() => false)
+const showStars = computed(() => false)
 const seasonAccentClass = computed(() => `season-${season.value}`)
 
 const showLoadingBackground = computed(() =>
