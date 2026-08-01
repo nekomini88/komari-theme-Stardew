@@ -89,12 +89,12 @@ function hasRegion(region: string | null | undefined): boolean {
 
 type Banner = { bg: string; text: string; decor: string }
 const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2' },
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:scarecrow' },
   { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
   { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower' },
   { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:birdhouse' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:windmill' },
 ]
 
 const banner = computed<Banner>(() => {
@@ -273,6 +273,11 @@ const banner = computed<Banner>(() => {
   box-shadow: 6px 6px 0 #3E2723 !important;
   image-rendering: auto;
   filter: drop-shadow(0 5px 0 #76502b);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.stardew-node-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 #3E2723 !important;
 }
 
 .stardew-wood-card-offline {
