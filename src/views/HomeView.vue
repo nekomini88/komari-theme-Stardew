@@ -73,13 +73,19 @@ const regionGroups = computed(() => {
   // 按节点数量降序排列
   return Array.from(regionMap.entries())
     .sort((a, b) => b[1].count - a[1].count)
-    .map(([code, info]) => ({ tab: `${info.emoji} ${info.name}`, name: `region:${code}`, code, emoji: info.emoji }))
+    .map(([code, info]) => ({
+      tab: `${info.emoji} ${info.name}`,
+      name: `region:${code}`,
+      code,
+      emoji: info.emoji,
+      label: info.name,
+    }))
 })
 
 const allTabs = computed(() => [
   ...groups.value,
   ...regionGroups.value,
-] as Array<{ tab: string, name: string, code?: string, emoji?: string }>)
+] as Array<{ tab: string, name: string, code?: string, emoji?: string, label?: string }>)
 
 watch(
   () => [nodesStore.groups, regionGroups.value] as const,
@@ -195,8 +201,8 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                     <span v-if="g.code" class="flag-icon">
                       <img :src="'/images/flags/' + g.code + '.svg'" :alt="g.tab" class="flag-img">
                     </span>
-                    <span class="flag-emoji" v-if="!g.code && g.emoji">{{ g.emoji }}</span>
-                    <span>{{ g.name.startsWith('region:') && g.emoji ? g.tab.replace(g.emoji + ' ', '') : g.tab }}</span>
+                    <span v-else-if="g.emoji" class="flag-emoji">{{ g.emoji }}</span>
+                    <span class="flag-text">{{ g.label ?? g.tab }}</span>
                   </span>
                 </TabsTrigger>
               </TabsList>
@@ -317,22 +323,24 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  line-height: 1.2;
+  line-height: 1;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .tab-label .flag-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 11px;
+  width: 18px;
+  height: 12px;
   border-radius: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
   line-height: 0;
   flex-shrink: 0;
+  vertical-align: middle;
 }
 
 .tab-label .flag-img {
@@ -344,22 +352,16 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 }
 
 .tab-label .flag-emoji {
-  font-size: 0.9em;
-  line-height: 1;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
-  flex-shrink: 0;
-}
-
-.tab-label :deep(.emoji-flag) {
   font-size: 0.85em;
   line-height: 1;
-  opacity: 0.95;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.1));
   flex-shrink: 0;
+  vertical-align: middle;
 }
 
-.tab-label :deep(.emoji-flag),
-.tab-label :deep(.emoji-flag) ~ span {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.12);
+.tab-label .flag-text {
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
 }
 </style>
