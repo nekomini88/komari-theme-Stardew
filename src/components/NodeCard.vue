@@ -106,14 +106,14 @@ const banner = computed<Banner>(() => {
 <template>
   <CardX
     hoverable
-    class="node-card w-full cursor-pointer stardew-node-card transition-all duration-200"
-    :class="[!props.node.online && '!stardew-wood-card-offline']"
+    class="node-card w-full cursor-pointer transition-all duration-200"
+    :class="[!props.node.online ? '!stardew-wood-card-offline' : 'stardew-node-card']"
     @click="emit('click')"
   >
     <template #header>
       <div class="node-title-wrap">
         <img class="nail" src="/images/icons/nail.png" alt="nail" />
-        <div class="node-title" :style="{ backgroundColor: banner.bg }">
+        <div class="node-title" :style="{ backgroundImage: 'url(/images/card/' + (banner.bg === '#4caf50' || banner.bg === '#9c27b0' ? 'title-green' : 'title-blue') + '.png)', backgroundSize: '100% 100%' }">
           <span class="shrink-0 mr-1">
             <Icon :icon="banner.decor" width="14" height="14" />
           </span>
