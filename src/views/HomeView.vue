@@ -195,6 +195,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                     <span v-if="g.code" class="flag-icon">
                       <img :src="'/images/flags/' + g.code + '.svg'" :alt="g.tab" class="flag-img">
                     </span>
+                    <span class="flag-emoji" v-if="!g.code && g.emoji">{{ g.emoji }}</span>
                     <span>{{ g.name.startsWith('region:') && g.emoji ? g.tab.replace(g.emoji + ' ', '') : g.tab }}</span>
                   </span>
                 </TabsTrigger>
@@ -315,7 +316,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -324,13 +325,14 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 10px;
+  width: 16px;
+  height: 11px;
   border-radius: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   line-height: 0;
+  flex-shrink: 0;
 }
 
 .tab-label .flag-img {
@@ -341,16 +343,23 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   image-rendering: auto;
 }
 
-.tab-label :deep(.emoji-flag),
-.tab-label :deep(.emoji-flag) ~ span {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.12);
+.tab-label .flag-emoji {
+  font-size: 0.9em;
+  line-height: 1;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
+  flex-shrink: 0;
 }
 
-/* Keep emoji fallback style if any other component uses it */
-:deep(.emoji-flag) {
+.tab-label :deep(.emoji-flag) {
   font-size: 0.85em;
   line-height: 1;
   opacity: 0.95;
   filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
+  flex-shrink: 0;
+}
+
+.tab-label :deep(.emoji-flag),
+.tab-label :deep(.emoji-flag) ~ span {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
 </style>
