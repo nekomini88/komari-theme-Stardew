@@ -1,6 +1,6 @@
-<h3 align="center"> Komari Stardew </h3>
+<h3 align="center"> Komari Stardew-2 </h3>
 <p align="center">
-星露谷物语主题 · 基于 <a href="https://github.com/nekomini88/komari-theme-Neko">komari-theme-Neko</a> UI 定制
+星露谷物语主题 2 代 · 基于 <a href="https://github.com/nekomini88/komari-theme-Neko">komari-theme-Neko</a> UI 定制
 </p>
 
 ![preview](/docs/preview.png)
