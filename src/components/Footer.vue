@@ -34,23 +34,23 @@ const openLink = (url: string) => {
 }
 </script>
 <template>
-  <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4">
-    <div class="flex gap-1 items-center text-xs text-muted-foreground">
+  <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4 relative z-50 pointer-events-auto">
+    <div class="flex gap-1 items-center text-xs text-muted-foreground pointer-events-auto">
       Powered by
       <button
         type="button"
         @click="openLink('https://github.com/komari-monitor/komari')"
-        class="transition-opacity hover:opacity-80"
+        class="transition-opacity hover:opacity-80 pointer-events-auto underline"
       >
         <span class="font-medium text-foreground">Komari Monitor</span>
       </button>
     </div>
-    <div class="flex gap-1 items-center text-xs text-muted-foreground">
+    <div class="flex gap-1 items-center text-xs text-muted-foreground pointer-events-auto">
       Theme by
       <button
         type="button"
         @click="openLink(themeUrl)"
-        class="transition-opacity hover:opacity-80"
+        class="transition-opacity hover:opacity-80 pointer-events-auto underline"
       >
         <span class="font-medium text-foreground">{{ themeName }}</span>
       </button>
