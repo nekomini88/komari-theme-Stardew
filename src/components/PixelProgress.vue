@@ -44,11 +44,20 @@ const activeColor = computed(() => {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  gap: 2px;
   image-rendering: pixelated;
+  height: 10px;
 }
 
 .pixel-block {
   display: inline-block;
+  height: 100%;
+  border-radius: 1px;
   transition: background 150ms ease;
+  border: 1px solid #5c3a1e;
+}
+
+.pixel-block--active {
+  background: repeating-linear-gradient(90deg, #4a9c2a 0 3px, #5cb838 3px 5px);
 }
 </style>
