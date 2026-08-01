@@ -91,14 +91,14 @@ function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
 
-type Banner = { bg: string; text: string; decor: string; flag?: string }
+type Banner = { bg: string; text: string; decor: string; image: string }
 const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2' },
-  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
-  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower' },
-  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse' },
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2', image: 'title-green.png' },
+  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', image: 'title-blue.png' },
+  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', image: 'title-purple.png' },
+  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', image: 'title-pink.png' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow', image: 'title-orange.png' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse', image: 'title-teal.png' },
 ]
 
 const banner = computed<Banner>(() => {
@@ -115,20 +115,22 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-between px-3 py-2 text-white"
-           :style="{ background: banner.bg, color: banner.text }">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="shrink-0 text-lg leading-none opacity-90">
-            <Icon :icon="banner.decor" width="18" height="18" />
-          </span>
-          <span class="text-sm font-bold truncate">{{ props.node.name }}</span>
+      <div class="relative flex items-center justify-between px-3 py-2 text-white overflow-hidden">
+        <img :src="`/images/title/${banner.image}`" class="absolute inset-0 w-full h-full object-cover" alt="">
+        <div class="relative flex items-center justify-between w-full">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="shrink-0 text-lg leading-none opacity-90">
+              <Icon :icon="banner.decor" width="18" height="18" />
+            </span>
+            <span class="text-sm font-bold truncate drop-shadow">{{ props.node.name }}</span>
+          </div>
+          <img
+            v-if="hasRegion(props.node.region)"
+            :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+            :alt="getRegionDisplayName(props.node.region)"
+            class="size-4 shrink-0 relative"
+          >
         </div>
-        <img
-          v-if="hasRegion(props.node.region)"
-          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-          :alt="getRegionDisplayName(props.node.region)"
-          class="size-4 shrink-0"
-        >
       </div>
     </template>
 

@@ -209,7 +209,9 @@ onUnmounted(() => {
         <div class="stardew-sun" />
         <div class="stardew-moon" />
         <div class="stardew-clouds">
-          <span class="cloud c1" /><span class="cloud c2" /><span class="cloud c3" /><span class="cloud c4" />
+          <img class="cloud-img c1" src="/images/background/cloud-1.png" alt="">
+          <img class="cloud-img c2" src="/images/background/cloud-2.png" alt="">
+          <img class="cloud-img c3" src="/images/background/cloud-1.png" alt="">
         </div>
         <div class="stardew-grass" :style="grassStyle" />
         <div class="stardew-fence" v-html="fenceSvg" />
@@ -334,19 +336,14 @@ onUnmounted(() => {
   transition: opacity 0.8s ease;
 }
 .stardew-scene.is-night .stardew-moon { opacity: 0.9; }
-.stardew-clouds .cloud {
+.stardew-clouds .cloud-img {
   position: absolute;
-  width: 90px; height: 34px;
-  background: #ffffff;
-  border-radius: 40px;
-  opacity: 0.85;
-  filter: drop-shadow(0 6px 0 rgba(0,0,0,0.04));
+  opacity: 0.9;
   animation: stardew-cloud 60s linear infinite;
 }
-.stardew-clouds .c1 { top: 12%; left: -10%; animation-duration: 70s; }
-.stardew-clouds .c2 { top: 22%; left: -30%; transform: scale(0.7); animation-duration: 90s; animation-delay: -20s; }
-.stardew-clouds .c3 { top: 6%; left: -50%; transform: scale(1.2); animation-duration: 110s; animation-delay: -40s; }
-.stardew-clouds .c4 { top: 30%; left: -70%; transform: scale(0.85); animation-duration: 85s; animation-delay: -10s; }
+.stardew-clouds .c1 { top: 12%; left: -10%; animation-duration: 70s; width: 180px; height: auto; }
+.stardew-clouds .c2 { top: 22%; left: -30%; transform: scale(0.7); animation-duration: 90s; animation-delay: -20s; width: 160px; height: auto; }
+.stardew-clouds .c3 { top: 8%; left: -50%; transform: scale(1.1); animation-duration: 100s; animation-delay: -35s; width: 200px; height: auto; }
 .stardew-scene.is-night .stardew-clouds { opacity: 0.15; }
 .stardew-grass {
   position: absolute;
