@@ -33,37 +33,25 @@ const showFiling = computed(() => showIcp.value || showPolice.value)
   <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4">
     <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Powered by
-      <DataTooltip
-        as="span"
-        placement="top"
-        :content="formattedServerVersion ?? ''"
+      <a
+        href="https://github.com/komari-monitor/komari"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="transition-opacity hover:opacity-80"
       >
-        <a
-          href="https://github.com/komari-monitor/komari"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="transition-opacity hover:opacity-80"
-        >
-          <span class="font-medium text-foreground">Komari Monitor</span>
-        </a>
-      </DataTooltip>
+        <span class="font-medium text-foreground">Komari Monitor</span>
+      </a>
     </div>
     <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Theme by
-      <DataTooltip
-        as="span"
-        placement="top"
-        :content="`v${buildVersion}\n${buildGitHash}`"
+      <a
+        :href="themeUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="transition-opacity hover:opacity-80"
       >
-        <a
-          :href="themeUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="transition-opacity hover:opacity-80"
-        >
-          <span class="font-medium text-foreground">{{ themeName }}</span>
-        </a>
-      </DataTooltip>
+        <span class="font-medium text-foreground">{{ themeName }}</span>
+      </a>
     </div>
 
     <div v-if="showFiling" class="flex flex-wrap gap-2 items-center justify-center sm:flex-shrink-0">
