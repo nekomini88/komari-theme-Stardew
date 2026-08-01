@@ -115,14 +115,14 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-between px-3 py-2 text-white overflow-hidden">
+      <div class="relative flex items-center px-3 py-2 text-white overflow-hidden">
         <img :src="`/images/title/${banner.image}`" class="absolute inset-0 w-full h-full object-cover" alt="">
         <div class="relative flex items-center justify-between w-full">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="shrink-0 text-lg leading-none opacity-90">
-              <Icon :icon="banner.decor" width="18" height="18" />
+          <div class="flex items-center gap-1.5 min-w-0 flex-1 justify-center">
+            <span class="shrink-0 text-base leading-none opacity-90">
+              <Icon :icon="banner.decor" width="16" height="16" />
             </span>
-            <span class="text-sm font-bold truncate drop-shadow text-center">{{ props.node.name }}</span>
+            <span class="text-xs font-bold truncate text-center drop-shadow">{{ props.node.name }}</span>
           </div>
           <img
             v-if="hasRegion(props.node.region)"

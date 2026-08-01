@@ -74,7 +74,7 @@ const regionGroups = computed(() => {
   return Array.from(regionMap.entries())
     .sort((a, b) => b[1].count - a[1].count)
     .map(([code, info]) => ({
-      tab: `${info.emoji} ${info.name}`,
+      tab: info.name,
       name: `region:${code}`,
       code,
       emoji: info.emoji,
