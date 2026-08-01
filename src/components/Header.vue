@@ -184,13 +184,7 @@ const activeVisualStyle = computed<'stardew' | 'baseline'>(() => {
 })
 
 const actionButtons = computed(() => {
-  const buttons = [
-    {
-      title: appStore.themeMode === 'auto' ? '自动主题' : appStore.themeMode === 'light' ? '浅色主题' : '深色主题',
-      icon: appStore.themeMode === 'auto' ? 'icon-park-outline:dark-mode' : appStore.themeMode === 'light' ? 'icon-park-outline:sun-one' : 'icon-park-outline:moon',
-      action: 'toggleTheme',
-    },
-  ]
+  const buttons: { title: string, icon: string, action: string }[] = []
 
   if (appStore.isLoggedIn || !appStore.hideAdminEntryWhenLoggedOut) {
     buttons.push({
