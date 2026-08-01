@@ -275,22 +275,23 @@ const banner = computed<Banner>(() => {
 .stardew-node-card {
   background: #f3e2bd url('/images/card/node-bg.png') !important;
   background-size: 100% 100% !important;
-  border: 4px solid #5c3a1e !important;
-  border-radius: 8px !important;
-  box-shadow: 6px 6px 0 #3E2723 !important;
+  border: 3px solid #5c3a1e !important;
+  border-radius: 6px !important;
+  box-shadow: 4px 4px 0 #3E2723 !important;
   image-rendering: auto;
-  filter: drop-shadow(0 5px 0 #76502b);
+  filter: drop-shadow(0 4px 0 #76502b);
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .stardew-node-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 #3E2723 !important;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #3E2723 !important;
 }
 
 .stardew-wood-card-offline {
   background: linear-gradient(180deg, #d4a5a5, #c08080) !important;
   border-color: #7f1d1d !important;
-  box-shadow: 6px 6px 0 #5c1a1a !important;
+  border-radius: 6px !important;
+  box-shadow: 4px 4px 0 #5c1a1a !important;
 }
 
 .decor {
