@@ -93,12 +93,12 @@ function hasRegion(region: string | null | undefined): boolean {
 
 type Banner = { bg: string; text: string; decor: string; image: string }
 const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2', image: 'title-green.png' },
-  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', image: 'title-blue.png' },
-  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', image: 'title-purple.png' },
-  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', image: 'title-pink.png' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow', image: 'title-orange.png' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse', image: 'title-teal.png' },
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2', image: 'title-green-crop.png' },
+  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', image: 'title-blue-crop.png' },
+  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', image: 'title-purple-crop.png' },
+  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', image: 'title-pink-crop.png' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow', image: 'title-orange-crop.png' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse', image: 'title-teal-crop.png' },
 ]
 
 const banner = computed<Banner>(() => {

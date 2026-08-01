@@ -213,7 +213,9 @@ onUnmounted(() => {
           <img class="cloud-img c2" src="/images/background/cloud-2.png" alt="">
           <img class="cloud-img c3" src="/images/background/cloud-1.png" alt="">
         </div>
+        <img class="stardew-bg-sky" src="/images/background/bg-sky.png" alt="">
         <div class="stardew-grass" :style="grassStyle" />
+        <img class="stardew-bg-grass" src="/images/background/bg-grass.png" alt="">
         <div class="stardew-fence" v-html="fenceSvg" />
         <div class="stardew-grass-front" :style="grassFrontStyle" />
       </div>
@@ -313,6 +315,29 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   transition: background 1.2s ease;
+}
+.stardew-bg-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+.stardew-bg-grass {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: auto;
+  max-height: 45%;
+  object-fit: cover;
+  object-position: bottom;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+  z-index: 3;
 }
 .stardew-sun {
   position: absolute;
