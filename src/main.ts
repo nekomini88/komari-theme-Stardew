@@ -7,6 +7,25 @@ import router from './router'
 
 import './styles/main.css'
 
+// Stardew-2: force data-theme before any render to avoid flash and ensure theme loads.
+;(function() {
+  try {
+    var KEY = 'komaritheme:theme'
+    var KEY_DEFAULT = 'komaritheme:theme-default'
+    var ALLOWED = ['stardew', 'baseline']
+    function parse(raw: string | null) {
+      if (!raw) return 'stardew'
+      var v = raw.trim()
+      return ALLOWED.indexOf(v) !== -1 ? v : 'stardew'
+    }
+    var saved = parse(localStorage.getItem(KEY))
+    var fallback = parse(localStorage.getItem(KEY_DEFAULT))
+    document.documentElement.setAttribute('data-theme', saved || fallback || 'stardew')
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'stardew')
+  }
+})()
+
 window.$message = message
 
 setupIconify().catch((err) => {
