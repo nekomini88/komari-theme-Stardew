@@ -50,7 +50,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
 <template>
   <div class="stardew-stats-grid">
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/memory.svg" class="stardew-stat__icon" alt="">
+      <img src="/images/icons/memory.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">内存</div>
         <div class="stardew-stat__value good">{{ memPct }}%</div>
@@ -59,7 +59,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/disk.svg" class="stardew-stat__icon" alt="">
+      <img src="/images/icons/disk.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">硬盘</div>
         <div class="stardew-stat__value good">{{ diskPct }}%</div>
@@ -76,7 +76,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/traffic.svg" class="stardew-stat__icon" alt="">
+      <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">累计流量</div>
         <div class="stardew-stat__value">{{ fmt(totalTraffic).value }} {{ fmt(totalTraffic).unit }}</div>
@@ -84,7 +84,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/traffic.svg" class="stardew-stat__icon" alt="">
+      <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">实时上行</div>
         <div class="stardew-stat__value">{{ fmtSpeed(totalSpeedUp).value }}{{ fmtSpeed(totalSpeedUp).unit }}/s</div>
@@ -92,7 +92,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/download.svg" class="stardew-stat__icon" alt="">
+      <img src="/images/icons/download.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">实时下行</div>
         <div class="stardew-stat__value">{{ fmtSpeed(totalSpeedDown).value }}{{ fmtSpeed(totalSpeedDown).unit }}/s</div>
