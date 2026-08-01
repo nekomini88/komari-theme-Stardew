@@ -75,7 +75,23 @@ const label = computed(() => {
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between text-xs">
       <div class="flex items-center gap-1.5">
-        <Icon :icon="icon" width="14" height="14" class="opacity-70" />
+        <img
+          v-if="type === 'cpu'"
+          src="/images/icons/cpu.svg"
+          width="14"
+          height="14"
+          class="opacity-80 shrink-0"
+          alt="CPU"
+        >
+        <img
+          v-else-if="type === 'memory'"
+          src="/images/icons/memory.svg"
+          width="14"
+          height="14"
+          class="opacity-80 shrink-0"
+          alt="Memory"
+        >
+        <Icon v-else :icon="icon" width="14" height="14" class="opacity-70 shrink-0" />
         <span class="text-muted-foreground">{{ label }}</span>
       </div>
       <span class="font-medium tabular-nums">{{ percent.toFixed(1) }}%</span>

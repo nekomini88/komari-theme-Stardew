@@ -34,26 +34,24 @@ const openLink = (url: string) => {
 }
 </script>
 <template>
-  <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4 relative z-50 pointer-events-auto">
-    <div class="flex gap-1 items-center text-xs text-muted-foreground pointer-events-auto">
+  <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4">
+    <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Powered by
-      <button
-        type="button"
-        @click="openLink('https://github.com/komari-monitor/komari')"
-        class="transition-opacity hover:opacity-80 pointer-events-auto underline"
-      >
-        <span class="font-medium text-foreground">Komari Monitor</span>
-      </button>
+      <a
+        href="https://github.com/komari-monitor/komari"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="font-medium text-foreground underline decoration-foreground/30 underline-offset-2 hover:decoration-foreground transition-opacity hover:opacity-80"
+      >Komari Monitor</a>
     </div>
-    <div class="flex gap-1 items-center text-xs text-muted-foreground pointer-events-auto">
+    <div class="flex gap-1 items-center text-xs text-muted-foreground">
       Theme by
-      <button
-        type="button"
-        @click="openLink(themeUrl)"
-        class="transition-opacity hover:opacity-80 pointer-events-auto underline"
-      >
-        <span class="font-medium text-foreground">{{ themeName }}</span>
-      </button>
+      <a
+        :href="themeUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="font-medium text-foreground underline decoration-foreground/30 underline-offset-2 hover:decoration-foreground transition-opacity hover:opacity-80"
+      >{{ themeName }}</a>
     </div>
 
     <div v-if="showFiling" class="flex flex-wrap gap-2 items-center justify-center sm:flex-shrink-0">

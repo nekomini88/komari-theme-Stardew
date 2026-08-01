@@ -128,7 +128,8 @@ const banner = computed<Banner>(() => {
             v-if="hasRegion(props.node.region)"
             :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
             :alt="getRegionDisplayName(props.node.region)"
-            class="size-4 shrink-0 relative"
+            class="h-3.5 w-auto max-w-[22px] shrink-0 relative object-contain"
+            style="image-rendering: auto;"
           >
         </div>
       </div>

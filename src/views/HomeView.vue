@@ -73,13 +73,13 @@ const regionGroups = computed(() => {
   // 按节点数量降序排列
   return Array.from(regionMap.entries())
     .sort((a, b) => b[1].count - a[1].count)
-    .map(([code, info]) => ({ tab: `${info.emoji} ${info.name}`, name: `region:${code}`, code }))
+    .map(([code, info]) => ({ tab: `${info.emoji} ${info.name}`, name: `region:${code}`, code, emoji: info.emoji }))
 })
 
 const allTabs = computed(() => [
   ...groups.value,
   ...regionGroups.value,
-])
+] as Array<{ tab: string, name: string, code?: string, emoji?: string }>)
 
 watch(
   () => [nodesStore.groups, regionGroups.value] as const,
@@ -191,7 +191,12 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                   v-for="g in allTabs" :key="g.name" :value="g.name"
                   class="h-6.5 flex-none shrink-0 text-xs border-none data-[state=active]:text-green-600 shadow-none rounded-sm"
                 >
-                  {{ g.tab }}
+                  <span class="tab-label">
+                    <span v-if="g.code" class="flag-icon">
+                      <img :src="'/images/flags/' + g.code + '.svg'" :alt="g.tab" class="flag-img">
+                    </span>
+                    <span>{{ g.name.startsWith('region:') && g.emoji ? g.tab.replace(g.emoji + ' ', '') : g.tab }}</span>
+                  </span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -304,5 +309,48 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
     transform: none;
     filter: none;
   }
+}
+
+.tab-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.tab-label .flag-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  line-height: 0;
+}
+
+.tab-label .flag-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  image-rendering: auto;
+}
+
+.tab-label :deep(.emoji-flag),
+.tab-label :deep(.emoji-flag) ~ span {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+/* Keep emoji fallback style if any other component uses it */
+:deep(.emoji-flag) {
+  font-size: 0.85em;
+  line-height: 1;
+  opacity: 0.95;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
 }
 </style>

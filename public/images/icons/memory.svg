@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges">
+  <!-- RAM icon: green background with two black RAM sticks and gold contacts -->
+  <rect x="4" y="4" width="12" height="12" fill="#2e7d32"/>
+  <rect x="5" y="5" width="10" height="10" fill="#4caf50"/>
+  <!-- RAM stick 1 -->
+  <rect x="7" y="6" width="2" height="8" fill="#1b1b1b"/>
+  <rect x="7" y="6" width="2" height="1" fill="#f5c842"/>
+  <rect x="7" y="9" width="2" height="1" fill="#f5c842"/>
+  <rect x="7" y="12" width="2" height="1" fill="#f5c842"/>
+  <!-- RAM stick 2 -->
+  <rect x="11" y="6" width="2" height="8" fill="#1b1b1b"/>
+  <rect x="11" y="6" width="2" height="1" fill="#f5c842"/>
+  <rect x="11" y="9" width="2" height="1" fill="#f5c842"/>
+  <rect x="11" y="12" width="2" height="1" fill="#f5c842"/>
+  <!-- notch detail -->
+  <rect x="15" y="9" width="1" height="2" fill="#1b1b1b"/>
+</svg>
