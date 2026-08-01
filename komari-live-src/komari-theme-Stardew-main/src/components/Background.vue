@@ -143,7 +143,7 @@ onUnmounted(() => clearImageLoader())
 
 <template>
   <div class="background-container" :style="backgroundContainerStyle">
-    <!-- 主题核心：白天/夜晚全景图全屏铺满，绝不替换 -->
+    <!-- 主题核心：bg-sky.png 全屏铺满，绝不替换 -->
     <div
       v-if="showStardewBackground"
       class="stardew-scene"
@@ -156,7 +156,7 @@ onUnmounted(() => clearImageLoader())
     >
       <img
         class="stardew-bg-sky"
-        :src="isNight ? '/images/background/night-panorama.png' : '/images/background/day-panorama-v2.png'"
+        src="/images/background/bg-sky.png"
         alt=""
         draggable="false"
       >
@@ -184,6 +184,53 @@ onUnmounted(() => clearImageLoader())
         <img class="cloud-img c1" src="/images/background/cloud-1-transparent.png" alt="">
         <img class="cloud-img c2" src="/images/background/cloud-2-transparent.png" alt="">
         <img class="cloud-img c3" src="/images/background/cloud-1-transparent.png" alt="">
+      </div>
+
+      <!-- PDF 风格装饰层：左右花树（不遮挡中心内容） -->
+      <img class="stardew-side-tree stardew-side-tree--left" src="/images/bg/cherry-left.png" alt="" draggable="false">
+      <img class="stardew-side-tree stardew-side-tree--right" src="/images/bg/cherry-right.png" alt="" draggable="false">
+
+      <!-- 底部白栅栏（对齐 PDF 白天/春季截图） -->
+      <div class="stardew-fence" aria-hidden="true">
+        <svg viewBox="0 0 1200 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <g fill="#f5f0e6" stroke="#c4b89a" stroke-width="2">
+            <rect x="20" y="8" width="12" height="56" rx="1"/>
+            <rect x="70" y="8" width="12" height="56" rx="1"/>
+            <rect x="120" y="8" width="12" height="56" rx="1"/>
+            <rect x="170" y="8" width="12" height="56" rx="1"/>
+            <rect x="220" y="8" width="12" height="56" rx="1"/>
+            <rect x="270" y="8" width="12" height="56" rx="1"/>
+            <rect x="320" y="8" width="12" height="56" rx="1"/>
+            <rect x="370" y="8" width="12" height="56" rx="1"/>
+            <rect x="420" y="8" width="12" height="56" rx="1"/>
+            <rect x="470" y="8" width="12" height="56" rx="1"/>
+            <rect x="520" y="8" width="12" height="56" rx="1"/>
+            <rect x="570" y="8" width="12" height="56" rx="1"/>
+            <rect x="620" y="8" width="12" height="56" rx="1"/>
+            <rect x="670" y="8" width="12" height="56" rx="1"/>
+            <rect x="720" y="8" width="12" height="56" rx="1"/>
+            <rect x="770" y="8" width="12" height="56" rx="1"/>
+            <rect x="820" y="8" width="12" height="56" rx="1"/>
+            <rect x="870" y="8" width="12" height="56" rx="1"/>
+            <rect x="920" y="8" width="12" height="56" rx="1"/>
+            <rect x="970" y="8" width="12" height="56" rx="1"/>
+            <rect x="1020" y="8" width="12" height="56" rx="1"/>
+            <rect x="1070" y="8" width="12" height="56" rx="1"/>
+            <rect x="1120" y="8" width="12" height="56" rx="1"/>
+            <rect x="1170" y="8" width="12" height="56" rx="1"/>
+            <rect x="10" y="22" width="1180" height="10" rx="2"/>
+            <rect x="10" y="42" width="1180" height="10" rx="2"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 季节花草 / 南瓜 / 雪堆（贴栅栏线） -->
+      <div class="stardew-ground-decor" aria-hidden="true">
+        <span v-for="i in 16" :key="'f'+i" class="ground-flora" :style="{ left: (i * 6.2 - 3) + '%' }" />
+        <img class="ground-prop ground-prop--scarecrow" src="/images/card/scarecrow.png" alt="">
+        <img class="ground-prop ground-prop--birdhouse" src="/images/card/birdhouse.png" alt="">
+        <img class="ground-prop ground-prop--flower" src="/images/card/flower.png" alt="">
+        <img class="ground-prop ground-prop--house" src="/images/card/house.png" alt="">
       </div>
 
       <div v-if="isRain" class="stardew-weather-rain" />
@@ -286,7 +333,7 @@ onUnmounted(() => clearImageLoader())
   image-rendering: pixelated;
 }
 
-/* ===== 核心：白天/夜晚全景图全视口铺满 ===== */
+/* ===== 核心：bg-sky.png 全视口铺满 ===== */
 .stardew-bg-sky {
   position: absolute;
   inset: 0;
@@ -456,4 +503,124 @@ onUnmounted(() => clearImageLoader())
   43% { opacity: 0.5; }
   45% { opacity: 0; }
 }
+
+/* ===== PDF 装饰层：不替换 bg-sky，只叠加 ===== */
+.stardew-side-tree {
+  position: absolute;
+  bottom: 0;
+  width: min(28vw, 360px);
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  object-position: bottom;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.92;
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12));
+}
+.stardew-side-tree--left {
+  left: -2%;
+  object-position: left bottom;
+}
+.stardew-side-tree--right {
+  right: -2%;
+  object-position: right bottom;
+}
+.is-night .stardew-side-tree {
+  filter: brightness(0.55) saturate(0.7) drop-shadow(0 4px 0 rgba(0,0,0,0.2));
+}
+.time-dusk .stardew-side-tree {
+  filter: brightness(0.85) sepia(0.25) drop-shadow(0 4px 0 rgba(0,0,0,0.15));
+}
+
+.stardew-fence {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4%;
+  height: 56px;
+  z-index: 6;
+  pointer-events: none;
+  line-height: 0;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,0.12));
+}
+.stardew-fence svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.season-winter .stardew-fence svg g {
+  fill: #eef2f6;
+  stroke: #b0bec5;
+}
+.season-autumn .stardew-fence svg g {
+  fill: #f0e0c0;
+  stroke: #c4a574;
+}
+
+.stardew-ground-decor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5%;
+  height: 48px;
+  z-index: 7;
+  pointer-events: none;
+}
+.ground-flora {
+  position: absolute;
+  bottom: 8px;
+  width: 14px;
+  height: 18px;
+  image-rendering: pixelated;
+}
+.season-spring .ground-flora {
+  background:
+    radial-gradient(circle at 50% 28%, #ffb7c5 0 3px, transparent 3px),
+    radial-gradient(circle at 28% 48%, #fff 0 2px, transparent 2px),
+    radial-gradient(circle at 72% 48%, #fff 0 2px, transparent 2px),
+    linear-gradient(180deg, transparent 42%, #3d8b37 42% 100%);
+}
+.season-summer .ground-flora {
+  background:
+    radial-gradient(circle at 50% 30%, #ffeb3b 0 3px, transparent 3px),
+    radial-gradient(circle at 50% 52%, #ff5722 0 2px, transparent 2px),
+    linear-gradient(180deg, transparent 45%, #2e7d32 45% 100%);
+}
+.season-autumn .ground-flora {
+  background:
+    radial-gradient(ellipse at 50% 60%, #e67e22 0 5px, transparent 5px),
+    linear-gradient(180deg, transparent 55%, #8d6e63 55% 100%);
+  width: 16px;
+  height: 12px;
+}
+.season-autumn .ground-flora:nth-child(3n) {
+  background: radial-gradient(circle at 50% 50%, #d35400 0 4px, #f39c12 4px 6px, transparent 6px);
+  width: 18px;
+  height: 14px;
+}
+.season-winter .ground-flora {
+  background: radial-gradient(ellipse at 50% 80%, #f5f7fa 0 8px, transparent 8px);
+  width: 20px;
+  height: 10px;
+  opacity: 0.95;
+}
+
+.ground-prop {
+  position: absolute;
+  bottom: 14px;
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.15));
+}
+.ground-prop--scarecrow { left: 12%; width: 32px; height: 32px; }
+.ground-prop--birdhouse { left: 28%; }
+.ground-prop--flower { right: 30%; }
+.ground-prop--house { right: 12%; width: 30px; height: 30px; }
+.season-winter .ground-prop { filter: brightness(0.9) drop-shadow(0 2px 0 rgba(0,0,0,0.1)); }
+.season-autumn .ground-prop--flower { display: none; }
+
 </style>

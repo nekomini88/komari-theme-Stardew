@@ -555,7 +555,7 @@ html.no-glass body {
 }
 
 
-/* stardew: 页面透明，让 Background 里的 bg-sky.png 全屏可见 */
+/* stardew: 页面透明，让 Background 里的白天/夜晚全景图全屏可见 */
 [data-theme="stardew"],
 [data-theme="stardew"] html,
 [data-theme="stardew"] body,
