@@ -21,7 +21,7 @@ const NodeCard = defineAsyncComponent(() => import('@/components/NodeCard.vue'))
 const NodeGeneralCards = defineAsyncComponent(() => import('@/components/NodeGeneralCards.vue'))
 const NodeList = defineAsyncComponent(() => import('@/components/NodeList.vue'))
 const VisitorInfoCard = defineAsyncComponent(() => import('@/components/VisitorInfoCard.vue'))
-const StatsBar = defineAsyncComponent(() => import('@/components/StatsBar.vue'))
+const TopStatsGrid = defineAsyncComponent(() => import('@/components/TopStatsGrid.vue'))
 
 const nodeItemStaggerMs = 35
 const nodeItemStaggerLimit = 12
@@ -198,7 +198,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
       class="hidden"
     />
 
-    <StatsBar />
+    <TopStatsGrid />
 
     <VisitorInfoCard v-if="appStore.visitorInfoCardEnabled" />
 
