@@ -115,26 +115,31 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-center px-2 py-1.5 text-white overflow-hidden" :style="{ backgroundColor: banner.bg }">
-        <div class="relative flex items-center justify-center w-full gap-1">
-          <span class="shrink-0 text-sm leading-none drop-shadow-sm">
-            <Icon :icon="banner.decor" width="14" height="14" />
-          </span>
-          <span class="text-xs font-bold truncate drop-shadow-md" style="text-shadow: 0 1px 2px rgba(0,0,0,0.45), 0 0 4px rgba(0,0,0,0.3);">{{ props.node.name }}</span>
+      <div class="relative flex items-center justify-between px-2 py-1 overflow-hidden" style="background:#f3e2bd; border-bottom:3px solid #5c3a1e;">
+        <span class="shrink-0 mr-1">
+          <Icon :icon="banner.decor" width="14" height="14" />
+        </span>
+
+        <div class="relative flex items-center justify-center flex-1 h-5 rounded-sm overflow-hidden" :style="{ backgroundColor: banner.bg }">
+          <span class="relative text-[11px] font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
           <img
             v-if="hasRegion(props.node.region)"
             :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
             :alt="getRegionDisplayName(props.node.region)"
-            class="h-3 w-auto max-w-[20px] shrink-0 relative object-contain"
+            class="absolute right-1 top-1/2 -translate-y-1/2 h-2.5 w-auto max-w-[18px] object-contain"
             style="image-rendering: auto;"
           >
         </div>
+
+        <span class="ml-1.5 shrink-0 w-2 h-2 rounded-full bg-lime-400"></span>
+
+        <span class="absolute top-1 right-1.5 w-1.5 h-1.5 rounded-full bg-[#5c3a1e]"></span>
       </div>
     </template>
 
     <template #default>
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-xs text-[#5c3a1e]">
           <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-3.5 shrink-0">
           <span class="truncate">{{ getOSName(props.node.os) }} · {{ props.node.arch }} · {{ props.node.virtualization }}</span>
         </div>
