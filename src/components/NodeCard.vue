@@ -115,13 +115,12 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-center px-3 py-2 text-white overflow-hidden">
-        <img :src="`/images/title/${banner.image}`" class="absolute inset-0 w-full h-full object-cover" alt="">
+      <div class="relative flex items-center justify-center px-3 py-2 text-white overflow-hidden" :style="{ backgroundColor: banner.bg }">
         <div class="relative flex items-center justify-center w-full gap-1.5">
           <span class="shrink-0 text-base leading-none opacity-90 drop-shadow-md">
             <Icon :icon="banner.decor" width="16" height="16" />
           </span>
-          <span class="text-xs font-bold truncate drop-shadow-md" style="text-shadow: 0 1px 2px rgba(0,0,0,0.35), 0 0 4px rgba(0,0,0,0.25);">{{ props.node.name }}</span>
+          <span class="text-xs font-bold truncate drop-shadow-md" style="text-shadow: 0 1px 2px rgba(0,0,0,0.45), 0 0 4px rgba(0,0,0,0.3);">{{ props.node.name }}</span>
           <img
             v-if="hasRegion(props.node.region)"
             :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
@@ -286,9 +285,9 @@ const banner = computed<Banner>(() => {
 .stardew-wood-card {
   background: linear-gradient(180deg, #f3e2bd 0%, #e8d5a8 100%) !important;
   border: 4px solid #5c3a1e !important;
-  box-shadow: 6px 6px 0 #3E2723 !important;
+  box-shadow: 4px 4px 0 #3E2723 !important;
   border-radius: 10px !important;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .stardew-wood-card-offline {
