@@ -12,7 +12,6 @@ import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
 import { formatPriceWithCycle, getDaysUntilExpired, getExpireStatus, parseTags } from '@/utils/tagHelper'
 import PixelProgress from '@/components/PixelProgress.vue'
-import Metric from '@/components/Metric.vue'
 
 const props = defineProps<{ node: NodeData }>()
 const emit = defineEmits<{ click: [] }>()
@@ -36,11 +35,8 @@ const {
   lossDisplay,
   latencyPanelTooltip,
   lossPanelTooltip,
+  pingStats,
 } = useNodePingDisplay(() => props.node.uuid)
-
-function showTrafficProgress(node: NodeData): boolean {
-  return node.traffic_limit > 0
-}
 
 const trafficUsedPercentage = computed(() => {
   if (props.node.traffic_limit <= 0) return 0
@@ -91,14 +87,14 @@ function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
 
-type Banner = { bg: string; text: string; decor: string; image: string }
+type Banner = { bg: string; text: string; decor: string }
 const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2', image: 'title-green-crop.png' },
-  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', image: 'title-blue-crop.png' },
-  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', image: 'title-purple-crop.png' },
-  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', image: 'title-pink-crop.png' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow', image: 'title-orange-crop.png' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse', image: 'title-teal-crop.png' },
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2' },
+  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
+  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower' },
+  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:scarecrow' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:birdhouse' },
 ]
 
 const banner = computed<Banner>(() => {
@@ -110,30 +106,23 @@ const banner = computed<Banner>(() => {
 <template>
   <CardX
     hoverable
-    class="node-card w-full cursor-pointer stardew-wood-card transition-all duration-200 rounded-[6px]"
+    class="node-card w-full cursor-pointer stardew-node-card transition-all duration-200"
     :class="[!props.node.online && '!stardew-wood-card-offline']"
     @click="emit('click')"
   >
     <template #header>
-      <div class="relative flex items-center justify-between px-2 py-1 overflow-hidden" style="background:#f3e2bd; border-bottom:3px solid #5c3a1e;">
+      <div class="node-title" :style="{ backgroundColor: banner.bg }">
         <span class="shrink-0 mr-1">
           <Icon :icon="banner.decor" width="14" height="14" />
         </span>
-
-        <div class="relative flex items-center justify-center flex-1 h-5 rounded-sm overflow-hidden" :style="{ backgroundColor: banner.bg }">
-          <span class="relative text-[11px] font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
-          <img
-            v-if="hasRegion(props.node.region)"
-            :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-            :alt="getRegionDisplayName(props.node.region)"
-            class="absolute right-1 top-1/2 -translate-y-1/2 h-2.5 w-auto max-w-[18px] object-contain"
-            style="image-rendering: auto;"
-          >
-        </div>
-
-        <span class="ml-1.5 shrink-0 w-2 h-2 rounded-full bg-lime-400"></span>
-
-        <span class="absolute top-1 right-1.5 w-1.5 h-1.5 rounded-full bg-[#5c3a1e]"></span>
+        <span class="text-xs font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
+        <img
+          v-if="hasRegion(props.node.region)"
+          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+          :alt="getRegionDisplayName(props.node.region)"
+          class="h-2.5 w-auto max-w-[18px] shrink-0 object-contain"
+          style="image-rendering: auto;"
+        >
       </div>
     </template>
 
@@ -144,134 +133,121 @@ const banner = computed<Banner>(() => {
           <span class="truncate">{{ getOSName(props.node.os) }} · {{ props.node.arch }} · {{ props.node.virtualization }}</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <Metric :node="props.node" type="cpu" icon="solar:cpu-bolt-bold" />
-          <Metric :node="props.node" type="memory" icon="solar:ram-bold" />
-          <Metric :node="props.node" type="disk" icon="solar:disk-bold" />
-          <Metric :node="props.node" type="traffic" icon="solar:cloud-upload-bold" />
+        <div class="resource-grid">
+          <div class="resource-item">
+            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
+              <div class="flex items-center gap-1">
+                <img src="/images/icons/cpu.svg" width="14" height="14" alt="CPU" class="opacity-80 shrink-0">
+                <span>CPU</span>
+              </div>
+              <b class="tabular-nums">{{ (props.node.cpu ?? 0).toFixed(1) }}%</b>
+            </div>
+            <PixelProgress :percentage="props.node.cpu ?? 0" type="cpu" />
+          </div>
+
+          <div class="resource-item">
+            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
+              <div class="flex items-center gap-1">
+                <img src="/images/icons/memory.svg" width="14" height="14" alt="Memory" class="opacity-80 shrink-0">
+                <span>内存</span>
+              </div>
+              <b class="tabular-nums">{{ memPercentage.toFixed(1) }}%</b>
+            </div>
+            <PixelProgress :percentage="memPercentage" type="memory" />
+          </div>
+
+          <div class="resource-item">
+            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
+              <div class="flex items-center gap-1">
+                <Icon icon="solar:disk-bold" width="14" height="14" class="opacity-70 shrink-0" />
+                <span>硬盘</span>
+              </div>
+              <b class="tabular-nums">{{ diskPercentage.toFixed(1) }}%</b>
+            </div>
+            <PixelProgress :percentage="diskPercentage" type="disk" />
+          </div>
+
+          <div class="resource-item">
+            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
+              <div class="flex items-center gap-1">
+                <Icon icon="solar:cloud-upload-bold" width="14" height="14" class="opacity-70 shrink-0" />
+                <span>Load</span>
+              </div>
+              <b class="tabular-nums">{{ (props.node.load ?? 0).toFixed(2) }}</b>
+            </div>
+            <div class="text-[11px] text-[#5c3a1e]/80 truncate">
+              {{ (props.node.load5 ?? 0).toFixed(2) }}, {{ (props.node.load15 ?? 0).toFixed(2) }} ({{ props.node.cpu_cores ?? 1 }}c)
+            </div>
+          </div>
         </div>
 
-        <div class="gap-1.5 grid grid-cols-6 relative">
-          <div
-            v-if="!props.node.online"
-            class="absolute inset-0 flex flex-col gap-1 items-center justify-center z-1 text-center"
-            aria-hidden="true"
-          >
-            <div class="text-sm font-medium text-destructive">离线</div>
-            <div class="text-xs text-muted-foreground">{{ offlineTime }}</div>
-          </div>
-          <div
-            class="flex flex-col gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 col-span-2"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-          >
-            <div class="text-[11px] flex flex-col">
-              <div class="text-green-600 flex flex-row items-center gap-1">
-                <Icon icon="tabler:chevron-up" width="12" height="12" />
-                {{ formatBytesPerSecond(props.node.net_out ?? 0) }}
-              </div>
-              <div class="text-blue-600 flex flex-row items-center gap-1">
-                <Icon icon="tabler:chevron-down" width="12" height="12" />
-                {{ formatBytesPerSecond(props.node.net_in ?? 0) }}
-              </div>
+        <div class="traffic">
+          <div>
+            <div class="text-[11px] text-[#5c3a1e] flex items-center gap-1">
+              <Icon icon="tabler:chevron-up" width="12" height="12" />
+              <span>Upload</span>
             </div>
+            <div class="text-xs font-medium tabular-nums">{{ formatBytesPerSecond(props.node.net_out ?? 0) }}</div>
           </div>
-          <div
-            class="flex flex-col gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5"
-            :class="[appStore.showNodeConnections ? 'col-span-2' : 'col-span-4', !props.node.online ? 'blur-xs opacity-60' : '']"
-          >
-            <div class="text-[11px] text-muted-foreground flex flex-col">
-              <div class="flex flex-row items-center gap-1">
-                <Icon icon="tabler:upload" width="12" height="12" />
-                {{ formatBytes(props.node.net_total_up ?? 0) }}
-              </div>
-              <div class="flex flex-row items-center gap-1">
-                <Icon icon="tabler:download" width="12" height="12" />
-                {{ formatBytes(props.node.net_total_down ?? 0) }}
-              </div>
+          <div>
+            <div class="text-[11px] text-[#5c3a1e] flex items-center gap-1">
+              <Icon icon="tabler:chevron-down" width="12" height="12" />
+              <span>Download</span>
             </div>
+            <div class="text-xs font-medium tabular-nums">{{ formatBytesPerSecond(props.node.net_in ?? 0) }}</div>
           </div>
+        </div>
+
+        <div class="flex gap-2">
           <div
-            v-if="appStore.showNodeConnections"
-            class="flex flex-col gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 col-span-2"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-          >
-            <div class="text-[11px] text-muted-foreground flex flex-col">
-              <div class="flex flex-row items-center gap-1">
-                <span class="text-[10px] font-medium text-muted-foreground/70">TCP</span>
-                {{ (props.node.connections ?? 0).toLocaleString() }}
-              </div>
-              <div class="flex flex-row items-center gap-1">
-                <span class="text-[10px] font-medium text-muted-foreground/70">UDP</span>
-                {{ (props.node.connections_udp ?? 0).toLocaleString() }}
-              </div>
-            </div>
-          </div>
-          <div
-            v-if="priceTags.length"
-            class="col-span-6 flex flex-row gap-0.5 p-1 pl-2 rounded-sm bg-slate-500/5 justify-center"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-          >
-            <div class="text-[11px] text-muted-foreground flex flex-row gap-3">
-              <span v-for="(tag, index) in priceTags" :key="index">{{ tag }}</span>
-            </div>
-          </div>
-          <div
-            v-if="appStore.showNodeUptime"
-            class="col-span-6 flex flex-row gap-2 items-center p-1 rounded-sm bg-slate-500/5 justify-center text-[11px] text-muted-foreground"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-          >
-            <Icon icon="tabler:clock-hour-4" width="12" height="12" />
-            <span>{{ formatUptime(props.node.uptime ?? 0) }}</span>
-          </div>
-          <div
-            class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
+            class="group/panel relative flex-1 flex flex-col gap-1 p-1.5 rounded-sm bg-[#5c3a1e]/[0.06]"
             :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
             :title="latencyPanelTooltip"
           >
-            <div class="flex items-center justify-between gap-2 text-[11px] leading-none relative">
-              <span class="text-muted-foreground">延迟</span>
-              <span class="font-medium text-foreground/85">{{ latencyDisplay }}</span>
+            <div class="flex items-center justify-between gap-2 text-[11px] leading-none text-[#5c3a1e]">
+              <span>延迟</span>
+              <span class="font-medium">{{ latencyDisplay }}</span>
             </div>
-            <div
-              class="grid h-full items-end gap-[1px] opacity-80 group-hover/panel:opacity-100 cursor-auto"
-              :style="{ gridTemplateColumns: `repeat(${latencyRenderBars.length}, minmax(0, 1fr))` }"
-            >
-              <DataTooltip v-for="bar in latencyRenderBars" :key="bar.key" placement="top" :content="bar.tooltip" class="h-full w-full">
-                <span
-                  class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
-                  :class="bar.className"
-                />
-              </DataTooltip>
+            <div class="ping-bar">
+              <span
+                v-for="i in 8"
+                :key="i"
+                class="ping-dot ping-dot--active"
+              />
             </div>
           </div>
           <div
-            class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
+            class="group/panel relative flex-1 flex flex-col gap-1 p-1.5 rounded-sm bg-[#5c3a1e]/[0.06]"
             :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
             :title="lossPanelTooltip"
           >
-            <div class="flex items-center justify-between gap-2 text-[11px] leading-none">
-              <span class="text-muted-foreground">丢包</span>
-              <span class="font-medium text-foreground/85">{{ lossDisplay }}</span>
+            <div class="flex items-center justify-between gap-2 text-[11px] leading-none text-[#5c3a1e]">
+              <span>丢包</span>
+              <span class="font-medium">{{ lossDisplay }}</span>
             </div>
-            <div
-              class="grid h-full items-end gap-[1px] opacity-80 group-hover/panel:opacity-100 cursor-auto"
-              :style="{ gridTemplateColumns: `repeat(${lossRenderBars.length}, minmax(0, 1fr))` }"
-            >
-              <DataTooltip v-for="bar in lossRenderBars" :key="bar.key" placement="top" :content="bar.tooltip" class="h-full w-full">
-                <span
-                  class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
-                  :class="bar.className"
-                />
-              </DataTooltip>
+            <div class="ping-bar">
+              <span
+                v-for="i in 8"
+                :key="'loss-' + i"
+                class="ping-dot ping-dot--active"
+              />
             </div>
           </div>
         </div>
-        <div v-if="customTags.length > 0" class="flex shrink-0 flex-wrap gap-1 items-center">
+
+        <div v-if="priceTags.length" class="flex shrink-0 flex-row gap-2 items-center justify-center text-[11px] text-[#5c3a1e]" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
+          <span v-for="(tag, idx) in priceTags" :key="idx">{{ tag }}</span>
+        </div>
+        <div v-if="appStore.showNodeUptime" class="flex flex-row gap-1 items-center justify-center text-[11px] text-[#5c3a1e]" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
+          <Icon icon="tabler:clock-hour-4" width="12" height="12" />
+          <span>{{ formatUptime(props.node.uptime ?? 0) }}</span>
+        </div>
+        <div v-if="customTags.length > 0" class="flex shrink-0 flex-wrap gap-1 items-center" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
           <Badge
-            v-for="(tag, index) in customTags"
-            :key="index"
+            v-for="(tag, idx) in customTags"
+            :key="idx"
             variant="outline"
-            class="!text-[11px] rounded text-muted-foreground border-muted-foreground/10 px-1.5"
+            class="!text-[11px] rounded text-[#5c3a1e] border-[#5c3a1e]/20 px-1.5"
           >
             {{ tag }}
           </Badge>
@@ -287,58 +263,67 @@ const banner = computed<Banner>(() => {
   overflow: hidden;
 }
 
-.stardew-wood-card {
+.stardew-node-card {
   background: #f3e2bd !important;
   border: 4px solid #5c3a1e !important;
   border-radius: 8px !important;
-  box-shadow: 4px 4px 0 #3E2723 !important;
+  box-shadow: 6px 6px 0 #3E2723 !important;
   image-rendering: auto;
+  filter: drop-shadow(0 5px 0 #76502b);
 }
 
 .stardew-wood-card-offline {
-  background: linear-gradient(180deg, #d4a5a5 0%, #c08080 100%) !important;
+  background: linear-gradient(180deg, #d4a5a5, #c08080) !important;
   border-color: #7f1d1d !important;
   box-shadow: 6px 6px 0 #5c1a1a !important;
 }
 
-.stardew-wood-card :deep(.progress-thin) {
-  border-radius: 999px !important;
-  height: 6px !important;
-  background: rgba(62, 39, 35, 0.18) !important;
-}
-
-.stardew-wood-card :deep(.progress-thin-fill) {
-  border-radius: 999px !important;
-}
-
-.node-offline-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+.node-title {
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  pointer-events: none;
-  border-radius: inherit;
-  background-color: var(--card);
-  transition: opacity 200ms ease;
-}
-
-.node-card:hover .node-offline-overlay {
-  opacity: 0;
-}
-
-.node-offline-overlay__content {
-  display: flex;
-  max-width: 100%;
-  flex-direction: column;
   gap: 6px;
-  align-items: center;
+  padding: 0 8px;
+  image-rendering: auto;
 }
 
-.node-offline-overlay__header,
-.node-offline-overlay__tags {
-  max-width: 100%;
+.resource-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.resource-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.traffic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.ping-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 10px;
+}
+
+.ping-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(62, 39, 35, 0.15);
+  border-radius: 2px;
+}
+
+.ping-dot--active {
+  background: #67b447;
 }
 </style>
