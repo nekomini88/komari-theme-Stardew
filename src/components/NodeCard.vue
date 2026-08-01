@@ -122,7 +122,7 @@ const banner = computed<Banner>(() => {
             <span class="shrink-0 text-lg leading-none opacity-90">
               <Icon :icon="banner.decor" width="18" height="18" />
             </span>
-            <span class="text-sm font-bold truncate drop-shadow">{{ props.node.name }}</span>
+            <span class="text-sm font-bold truncate drop-shadow text-center">{{ props.node.name }}</span>
           </div>
           <img
             v-if="hasRegion(props.node.region)"

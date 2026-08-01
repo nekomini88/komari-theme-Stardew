@@ -79,6 +79,7 @@ const regionGroups = computed(() => {
       code,
       emoji: info.emoji,
       label: info.name,
+      plain: info.name,
     }))
 })
 
