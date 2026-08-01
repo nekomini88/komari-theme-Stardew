@@ -198,12 +198,13 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
       class="hidden"
     />
 
-    <TopStatsGrid />
+    <div class="stardew-content">
+      <TopStatsGrid />
 
-    <VisitorInfoCard v-if="appStore.visitorInfoCardEnabled" />
+      <VisitorInfoCard v-if="appStore.visitorInfoCardEnabled" />
 
-    <div class="node-info p-4 pt-0 flex flex-col gap-4 relative z-1 pointer-events-none" :class="!!appStore.hideGeneralCard && 'pt-4'">
-      <div class="nodes">
+      <div class="node-info p-4 pt-0 flex flex-col gap-4 relative z-1 pointer-events-none" :class="!!appStore.hideGeneralCard && 'pt-4'">
+        <div class="nodes">
         <Tabs v-model="appStore.nodeSelectedGroup" class="w-full flex-col gap-4">
           <div class="flex gap-2 items-center flex-nowrap">
             <div class="min-w-0 flex-1 overflow-x-auto rounded-sm pointer-events-none">
@@ -284,6 +285,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
@@ -304,6 +306,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   height: 420px;
   overflow: hidden;
   z-index: 0;
+  pointer-events: none;
 }
 
 .stardew-bg__sky {
