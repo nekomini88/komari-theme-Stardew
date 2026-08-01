@@ -5,18 +5,17 @@ import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { CardX } from '@/components/ui/card-x'
 import { DataTooltip } from '@/components/ui/data-tooltip'
-import { ProgressThin } from '@/components/ui/progress-thin'
 import { useNodePingDisplay } from '@/composables/useNodePingDisplay'
 import { useAppStore } from '@/stores/app'
 import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatDateTime, formatUptimeWithFormat, getStatus } from '@/utils/helper'
 import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
 import { formatPriceWithCycle, getDaysUntilExpired, getExpireStatus, parseTags } from '@/utils/tagHelper'
+import PixelProgress from '@/components/PixelProgress.vue'
+import Metric from '@/components/Metric.vue'
 
 const props = defineProps<{ node: NodeData }>()
-
 const emit = defineEmits<{ click: [] }>()
-
 const appStore = useAppStore()
 
 const formatBytes = (bytes: number) => formatBytesWithConfig(bytes, appStore.byteDecimals)
@@ -44,23 +43,16 @@ function showTrafficProgress(node: NodeData): boolean {
 }
 
 const trafficUsedPercentage = computed(() => {
-  if (props.node.traffic_limit <= 0)
-    return 0
+  if (props.node.traffic_limit <= 0) return 0
   const { net_total_up = 0, net_total_down = 0, traffic_limit_type } = props.node
   let used = 0
   switch (traffic_limit_type) {
-    case 'up': used = net_total_up
-      break
-    case 'down': used = net_total_down
-      break
-    case 'min': used = Math.min(net_total_up, net_total_down)
-      break
-    case 'max': used = Math.max(net_total_up, net_total_down)
-      break
+    case 'up': used = net_total_up; break
+    case 'down': used = net_total_down; break
+    case 'min': used = Math.min(net_total_up, net_total_down); break
+    case 'max': used = Math.max(net_total_up, net_total_down); break
     case 'sum':
-    default:
-      used = net_total_up + net_total_down
-      break
+    default: used = net_total_up + net_total_down; break
   }
   return Math.min((used / props.node.traffic_limit) * 100, 100)
 })
@@ -84,10 +76,8 @@ const priceTags = computed(() => {
   if (node.price !== 0) {
     const days = getDaysUntilExpired(node.expired_at)
     const status = getExpireStatus(node.expired_at)
-    if (status === 'expired')
-      tags.push(lang === 'zh-CN' ? '已过期' : 'Expired')
-    else if (status === 'long_term')
-      tags.push(lang === 'zh-CN' ? '长期' : 'Long-term')
+    if (status === 'expired') tags.push(lang === 'zh-CN' ? '已过期' : 'Expired')
+    else if (status === 'long_term') tags.push(lang === 'zh-CN' ? '长期' : 'Long-term')
     else tags.push(lang === 'zh-CN' ? `剩余 ${days} 天` : `${days} days left`)
     const priceText = formatPriceWithCycle(node.price, node.billing_cycle, node.currency, lang)
     tags.push(priceText)
@@ -101,8 +91,7 @@ function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
 
-/* banner color + decoration per server name */
-type Banner = { bg: string; text: string; decor: string }
+type Banner = { bg: string; text: string; decor: string; flag?: string }
 const bannerPalette: readonly Banner[] = [
   { bg: '#4caf50', text: '#ffffff', decor: 'solar:plant-2' },
   { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
@@ -127,10 +116,10 @@ const banner = computed<Banner>(() => {
   >
     <template #header>
       <div class="relative flex items-center justify-between px-3 py-2 text-white"
-           :style="{ background: (banner as Banner).bg, color: (banner as Banner).text }">
+           :style="{ background: banner.bg, color: banner.text }">
         <div class="flex items-center gap-2 min-w-0">
           <span class="shrink-0 text-lg leading-none opacity-90">
-            <Icon :icon="(banner as Banner).decor" width="18" height="18" />
+            <Icon :icon="banner.decor" width="18" height="18" />
           </span>
           <span class="text-sm font-bold truncate">{{ props.node.name }}</span>
         </div>
@@ -145,60 +134,18 @@ const banner = computed<Banner>(() => {
 
     <template #default>
       <div class="flex flex-col gap-3">
-        <div class="gap-3 grid grid-cols-2">
-          <!-- CPU -->
-          <div class="flex flex-col gap-1">
-            <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">CPU</span>
-              <span>{{ (props.node.cpu ?? 0).toFixed(1) }}%</span>
-            </div>
-            <ProgressThin :percentage="props.node.cpu ?? 0" :status="cpuStatus" :height="4" />
-            <div class="text-[11px] text-muted-foreground truncate">
-              {{ props.node.load.toFixed(2) ?? 0 }}, {{ props.node.load5.toFixed(2) ?? 0 }}, {{
-                props.node.load15.toFixed(2) ?? 0 }} ({{ props.node.cpu_cores }}c)
-            </div>
-          </div>
-
-          <!-- 内存 -->
-          <div class="flex flex-col gap-1">
-            <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">内存</span>
-              <span>{{ memPercentage.toFixed(1) }}%</span>
-            </div>
-            <ProgressThin :percentage="memPercentage" :status="memStatus" :height="4" />
-            <div class="text-[11px] text-muted-foreground truncate">
-              {{ formatBytes(props.node.ram ?? 0) }} / {{ formatBytes(props.node.mem_total ?? 0) }}
-            </div>
-          </div>
-
-          <!-- 硬盘 -->
-          <div class="flex flex-col gap-1">
-            <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">硬盘</span>
-              <span>{{ diskPercentage.toFixed(1) }}%</span>
-            </div>
-            <ProgressThin :percentage="diskPercentage" :status="diskStatus" :height="4" />
-            <div class="text-[11px] text-muted-foreground truncate">
-              {{ formatBytes(props.node.disk ?? 0) }} / {{ formatBytes(props.node.disk_total ?? 0) }}
-            </div>
-          </div>
-
-          <!-- 流量进度条 -->
-          <div class="flex flex-col gap-1">
-            <div class="w-full text-xs flex flex-row justify-between">
-              <span class="text-muted-foreground">流量</span>
-              <span>{{ trafficUsedPercentage.toFixed(1) }}%</span>
-            </div>
-            <ProgressThin :percentage="trafficUsedPercentage" status="success" :height="4" />
-            <div class="text-[11px] text-muted-foreground truncate">
-              {{ formatBytes(trafficUsed) }} /
-              <template v-if="showTrafficProgress(node)">
-                {{ formatBytes(props.node.traffic_limit) }}
-              </template>
-              <template v-else>∞</template>
-            </div>
-          </div>
+        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+          <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-3.5 shrink-0">
+          <span class="truncate">{{ getOSName(props.node.os) }} · {{ props.node.arch }} · {{ props.node.virtualization }}</span>
         </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <Metric :node="props.node" type="cpu" icon="solar:cpu-bolt-bold" />
+          <Metric :node="props.node" type="memory" icon="solar:ram-bold" />
+          <Metric :node="props.node" type="disk" icon="solar:disk-bold" />
+          <Metric :node="props.node" type="traffic" icon="solar:cloud-upload-bold" />
+        </div>
+
         <div class="gap-1.5 grid grid-cols-6 relative">
           <div
             v-if="!props.node.online"
@@ -263,7 +210,6 @@ const banner = computed<Banner>(() => {
               <span v-for="(tag, index) in priceTags" :key="index">{{ tag }}</span>
             </div>
           </div>
-          <!-- 在线时长 -->
           <div
             v-if="appStore.showNodeUptime"
             class="col-span-6 flex flex-row gap-2 items-center p-1 rounded-sm bg-slate-500/5 justify-center text-[11px] text-muted-foreground"
@@ -272,7 +218,6 @@ const banner = computed<Banner>(() => {
             <Icon icon="tabler:clock-hour-4" width="12" height="12" />
             <span>{{ formatUptime(props.node.uptime ?? 0) }}</span>
           </div>
-          <!-- 延迟 -->
           <div
             class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
             :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
@@ -294,7 +239,6 @@ const banner = computed<Banner>(() => {
               </DataTooltip>
             </div>
           </div>
-          <!-- 丢包 -->
           <div
             class="group/panel relative col-span-3 flex flex-col gap-1.5 p-1.5 h-10 rounded-sm bg-slate-500/5"
             :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
@@ -352,19 +296,14 @@ const banner = computed<Banner>(() => {
   box-shadow: 6px 6px 0 #5c1a1a !important;
 }
 
-/* 木牌卡片内部像素化 */
-.stardew-wood-card :deep(.node-card) {
-  border-radius: 8px !important;
-}
-
 .stardew-wood-card :deep(.progress-thin) {
-  border-radius: 0 !important;
-  height: 12px !important;
-  background: repeating-linear-gradient(90deg, #0000002e 0px, #0000002e 2px, transparent 2px, transparent 6px), var(--progress-bg, #d9b96e) !important;
+  border-radius: 999px !important;
+  height: 6px !important;
+  background: rgba(62, 39, 35, 0.18) !important;
 }
 
 .stardew-wood-card :deep(.progress-thin-fill) {
-  border-radius: 0 !important;
+  border-radius: 999px !important;
 }
 
 .node-offline-overlay {
