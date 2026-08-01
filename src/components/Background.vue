@@ -331,16 +331,17 @@ onUnmounted(() => clearImageLoader())
 
 .stardew-moon {
   position: absolute;
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
   border-radius: 50%;
-  background: radial-gradient(circle at 68% 32%, #fdfbf0 48%, transparent 52%);
-  box-shadow: 0 0 20px 6px rgba(200, 210, 255, 0.35) !important;
+  background: url("/images/stardew/moon-crescent.png") center/contain no-repeat;
+  box-shadow: 0 0 24px 8px rgba(255, 235, 170, 0.35), 0 0 56px 18px rgba(200, 210, 255, 0.18) !important;
   transition: left 2s ease, top 2s ease, opacity 1.5s ease;
   z-index: 3;
   pointer-events: none;
+  image-rendering: pixelated;
 }
 
 .stardew-stars {
