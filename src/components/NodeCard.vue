@@ -130,7 +130,12 @@ const banner = computed<Banner>(() => {
     </template>
 
     <template #default>
-      <div class="flex flex-col gap-2">
+      <div class="relative flex flex-col gap-2" style="z-index:1">
+        <img class="decor decor-tl" src="/images/card/house.png" alt="decor" />
+        <img class="decor decor-tr" src="/images/card/flower.png" alt="decor" />
+        <img class="decor decor-bl" src="/images/card/scarecrow.png" alt="decor" />
+        <img class="decor decor-br" src="/images/card/birdhouse.png" alt="decor" />
+
         <div class="flex items-center gap-2 text-xs text-[#5c3a1e]">
           <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-3.5 shrink-0">
           <span class="truncate">{{ getOSName(props.node.os) }} · {{ props.node.arch }} · {{ props.node.virtualization }}</span>
@@ -267,7 +272,8 @@ const banner = computed<Banner>(() => {
 }
 
 .stardew-node-card {
-  background: #f3e2bd !important;
+  background: #f3e2bd url('/images/card/node-bg.png') !important;
+  background-size: 100% 100% !important;
   border: 4px solid #5c3a1e !important;
   border-radius: 8px !important;
   box-shadow: 6px 6px 0 #3E2723 !important;
@@ -285,6 +291,19 @@ const banner = computed<Banner>(() => {
   border-color: #7f1d1d !important;
   box-shadow: 6px 6px 0 #5c1a1a !important;
 }
+
+.decor {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.decor-tl { top: 6px; left: 6px; }
+.decor-tr { top: 6px; right: 6px; }
+.decor-bl { bottom: 6px; left: 6px; }
+.decor-br { bottom: 6px; right: 6px; }
 
 .node-title-wrap {
   position: relative;
