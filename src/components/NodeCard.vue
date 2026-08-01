@@ -111,18 +111,21 @@ const banner = computed<Banner>(() => {
     @click="emit('click')"
   >
     <template #header>
-      <div class="node-title" :style="{ backgroundColor: banner.bg }">
-        <span class="shrink-0 mr-1">
-          <Icon :icon="banner.decor" width="14" height="14" />
-        </span>
-        <span class="text-xs font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
-        <img
-          v-if="hasRegion(props.node.region)"
-          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-          :alt="getRegionDisplayName(props.node.region)"
-          class="h-2.5 w-auto max-w-[18px] shrink-0 object-contain"
-          style="image-rendering: auto;"
-        >
+      <div class="node-title-wrap">
+        <img class="nail" src="/images/icons/nail.png" alt="nail" />
+        <div class="node-title" :style="{ backgroundColor: banner.bg }">
+          <span class="shrink-0 mr-1">
+            <Icon :icon="banner.decor" width="14" height="14" />
+          </span>
+          <span class="text-xs font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
+          <img
+            v-if="hasRegion(props.node.region)"
+            :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+            :alt="getRegionDisplayName(props.node.region)"
+            class="h-2.5 w-auto max-w-[18px] shrink-0 object-contain"
+            style="image-rendering: auto;"
+          >
+        </div>
       </div>
     </template>
 
@@ -278,14 +281,19 @@ const banner = computed<Banner>(() => {
   box-shadow: 6px 6px 0 #5c1a1a !important;
 }
 
-.node-title {
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 8px;
-  image-rendering: auto;
+.node-title-wrap {
+  position: relative;
+  padding-top: 10px;
+}
+
+.nail {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  image-rendering: pixelated;
+  z-index: 2;
 }
 
 .resource-grid {
