@@ -1,0 +1,106 @@
+/* pdf-stardew-glass.css
+ * PDF 对齐层：半透明深色玻璃卡片 + 细圆进度条 + 无像素字体强制
+ */
+[data-theme="stardew"] {
+  --pdf-card-bg: rgba(18, 18, 28, 0.88);
+  --pdf-card-border: rgba(255, 255, 255, 0.08);
+  --pdf-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --pdf-text-primary: #ffffff;
+  --pdf-text-secondary: rgba(255, 255, 255, 0.65);
+  --pdf-progress-track: rgba(255, 255, 255, 0.12);
+  --pdf-progress-cpu: #4ade80;
+  --pdf-progress-memory: #c084fc;
+  --pdf-progress-disk: #fbbf24;
+  --pdf-progress-network: #38bdf8;
+  --pdf-progress-load: #f87171;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  letter-spacing: normal !important;
+}
+[data-theme="stardew"] h1,
+[data-theme="stardew"] h2,
+[data-theme="stardew"] h3,
+[data-theme="stardew"] h4,
+[data-theme="stardew"] h5,
+[data-theme="stardew"] h6,
+[data-theme="stardew"] .font-display {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* 卡片：半透明深色玻璃 */
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] .card,
+[data-theme="stardew"] .server-card,
+[data-theme="stardew"] [class*="card"]:not(.stardew-wood-card) {
+  background: var(--pdf-card-bg) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  border: 1px solid var(--pdf-card-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--pdf-card-shadow) !important;
+  color: var(--pdf-text-primary) !important;
+  overflow: hidden;
+}
+
+/* 卡片内文字 */
+[data-theme="stardew"] .node-card *,
+[data-theme="stardew"] .node-card .text-foreground,
+[data-theme="stardew"] .node-card .font-medium,
+[data-theme="stardew"] .node-card .font-semibold,
+[data-theme="stardew"] .node-card .font-bold {
+  color: var(--pdf-text-primary) !important;
+}
+
+[data-theme="stardew"] .node-card .text-muted-foreground,
+[data-theme="stardew"] .node-card .text-gray-400,
+[data-theme="stardew"] .node-card .text-gray-500 {
+  color: var(--pdf-text-secondary) !important;
+}
+
+/* 细圆进度条 */
+[data-theme="stardew"] .node-card [class*="progress"],
+[data-theme="stardew"] .node-card [class*="bar"],
+[data-theme="stardew"] .node-card [role="progressbar"],
+[data-theme="stardew"] .node-card .progress-thin {
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: var(--pdf-progress-track) !important;
+  border: none !important;
+  box-shadow: none !important;
+  image-rendering: auto !important;
+  overflow: hidden;
+}
+
+[data-theme="stardew"] .node-card [class*="progress"] > *,
+[data-theme="stardew"] .node-card [class*="bar"] > *,
+[data-theme="stardew"] .node-card [role="progressbar"] > * {
+  border-radius: 999px !important;
+  image-rendering: auto !important;
+}
+
+/* 颜色编码 */
+[data-theme="stardew"] .node-card .progress-cpu,
+[data-theme="stardew"] .node-card [class*="cpu"] > *,
+[data-theme="stardew"] .node-card [class*="CPU"] {
+  background: var(--pdf-progress-cpu) !important;
+}
+
+[data-theme="stardew"] .node-card .progress-memory,
+[data-theme="stardew"] .node-card [class*="memory"] > *,
+[data-theme="stardew"] .node-card [class*="Memory"] {
+  background: var(--pdf-progress-memory) !important;
+}
+
+[data-theme="stardew"] .node-card .progress-disk,
+[data-theme="stardew"] .node-card [class*="disk"] > *,
+[data-theme="stardew"] .node-card [class*="Disk"] {
+  background: var(--pdf-progress-disk) !important;
+}
+
+/* 关闭硬阴影 */
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] .card,
+[data-theme="stardew"] .server-card {
+  box-shadow: var(--pdf-card-shadow) !important;
+}
