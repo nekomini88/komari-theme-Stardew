@@ -2,15 +2,12 @@
 import type { NodeData } from '@/stores/nodes'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-import { Badge } from '@/components/ui/badge'
-import { CardX } from '@/components/ui/card-x'
-import { DataTooltip } from '@/components/ui/data-tooltip'
 import { useNodePingDisplay } from '@/composables/useNodePingDisplay'
 import { useAppStore } from '@/stores/app'
-import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatDateTime, formatUptimeWithFormat, getStatus } from '@/utils/helper'
+import { formatBytesPerSecondWithConfig, formatBytesWithConfig } from '@/utils/helper'
 import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
-import { formatPriceWithCycle, getDaysUntilExpired, getExpireStatus, parseTags } from '@/utils/tagHelper'
+import { getDaysUntilExpired, getExpireStatus } from '@/utils/tagHelper'
 import PixelProgress from '@/components/PixelProgress.vue'
 import { cn } from '@/lib/utils'
 
@@ -20,18 +17,16 @@ const appStore = useAppStore()
 
 const formatBytes = (bytes: number) => formatBytesWithConfig(bytes, appStore.byteDecimals)
 const formatBytesPerSecond = (bytes: number) => formatBytesPerSecondWithConfig(bytes, appStore.byteDecimals)
-const formatUptime = (seconds: number) => formatUptimeWithFormat(seconds, 'hour')
-const offlineTime = computed(() => formatDateTime(props.node.time))
 
-const cpuStatus = computed(() => getStatus(props.node.cpu ?? 0))
 const memPercentage = computed(() => (props.node.ram ?? 0) / (props.node.mem_total || 1) * 100)
-const memStatus = computed(() => getStatus(memPercentage.value))
 const diskPercentage = computed(() => (props.node.disk ?? 0) / (props.node.disk_total || 1) * 100)
-const diskStatus = computed(() => getStatus(diskPercentage.value))
+
+const loadPct = computed(() => {
+  const cores = Math.max(props.node.cpu_cores ?? 1, 1)
+  return Math.min(((props.node.load ?? 0) / cores) * 100, 100)
+})
 
 const {
-  latencyRenderBars,
-  lossRenderBars,
   latencyDisplay,
   lossDisplay,
   latencyPanelTooltip,
@@ -39,384 +34,560 @@ const {
   pingStats,
 } = useNodePingDisplay(() => props.node.uuid)
 
-const pingHistory = computed(() => pingStats.history.value)
-const hasPingData = computed(() => pingStats.hasData)
-
-const latencyForDots = computed(() => {
-  if (!hasPingData.value || !pingHistory.value.length) return Array.from({ length: 8 }, () => null)
-  return pingHistory.value.slice(0, 8).map(p => p.latency)
-})
-
-const lossForDots = computed(() => {
-  if (!hasPingData.value || !pingHistory.value.length) return Array.from({ length: 8 }, () => null)
-  return pingHistory.value.slice(0, 8).map(p => p.loss)
-})
-
-const trafficUsedPercentage = computed(() => {
-  if (props.node.traffic_limit <= 0) return 0
-  const { net_total_up = 0, net_total_down = 0, traffic_limit_type } = props.node
-  let used = 0
-  switch (traffic_limit_type) {
-    case 'up': used = net_total_up; break
-    case 'down': used = net_total_down; break
-    case 'min': used = Math.min(net_total_up, net_total_down); break
-    case 'max': used = Math.max(net_total_up, net_total_down); break
-    case 'sum':
-    default: used = net_total_up + net_total_down; break
-  }
-  return Math.min((used / props.node.traffic_limit) * 100, 100)
-})
-
-const trafficUsed = computed(() => {
-  const { net_total_up = 0, net_total_down = 0, traffic_limit_type } = props.node
-  switch (traffic_limit_type) {
-    case 'up': return net_total_up
-    case 'down': return net_total_down
-    case 'min': return Math.min(net_total_up, net_total_down)
-    case 'max': return Math.max(net_total_up, net_total_down)
-    case 'sum':
-    default: return net_total_up + net_total_down
-  }
-})
-
 function pingDotClass(value: number | null | undefined): string {
-  if (value === null || value === undefined) return 'ping-dot'
-  if (value <= 60) return 'ping-dot ping-dot--active'
-  if (value <= 160) return 'ping-dot ping-dot--warn'
+  if (value === null || value === undefined)
+    return 'ping-dot'
+  if (value <= 60)
+    return 'ping-dot ping-dot--active'
+  if (value <= 160)
+    return 'ping-dot ping-dot--warn'
   return 'ping-dot ping-dot--bad'
 }
 
 function lossDotClass(value: number | null | undefined): string {
-  if (value === null || value === undefined) return 'ping-dot'
-  if (value <= 1) return 'ping-dot ping-dot--active'
-  if (value <= 6) return 'ping-dot ping-dot--warn'
+  if (value === null || value === undefined)
+    return 'ping-dot'
+  if (value <= 1)
+    return 'ping-dot ping-dot--active'
+  if (value <= 6)
+    return 'ping-dot ping-dot--warn'
   return 'ping-dot ping-dot--bad'
 }
 
-const priceTags = computed(() => {
-  const tags: Array<string> = []
-  const lang = appStore.lang
-  const node = props.node
-  if (node.price !== 0) {
-    const days = getDaysUntilExpired(node.expired_at)
-    const status = getExpireStatus(node.expired_at)
-    if (status === 'expired') tags.push(lang === 'zh-CN' ? '已过期' : 'Expired')
-    else if (status === 'long_term') tags.push(lang === 'zh-CN' ? '长期' : 'Long-term')
-    else tags.push(lang === 'zh-CN' ? `剩余 ${days} 天` : `${days} days left`)
-    const priceText = formatPriceWithCycle(node.price, node.billing_cycle, node.currency, lang)
-    tags.push(priceText)
-  }
-  return tags
+const expiresDays = computed(() => {
+  if (!props.node.expired_at)
+    return null
+  const status = getExpireStatus(props.node.expired_at)
+  if (status === 'long_term')
+    return null
+  if (status === 'expired')
+    return 0
+  return getDaysUntilExpired(props.node.expired_at)
 })
 
-const customTags = computed(() => parseTags(props.node.tags).map(t => t.text))
+const uptimeDays = computed(() => {
+  const sec = props.node.uptime ?? 0
+  return Math.floor(sec / 86400)
+})
+
+const osLabel = computed(() => {
+  const os = getOSName(props.node.os) || props.node.os || '-'
+  const arch = props.node.arch || ''
+  const virt = props.node.virtualization || ''
+  return [os, arch, virt].filter(Boolean).join(' · ')
+})
+
+type BannerTheme = {
+  key: string
+  banner: string
+  accent: string
+  barCpu: string
+  barMem: string
+  barDisk: string
+  barLoad: string
+  decor: string
+}
+
+const themes: readonly BannerTheme[] = [
+  {
+    key: 'green',
+    banner: '#4caf50',
+    accent: '#2e7d32',
+    barCpu: '#66bb6a',
+    barMem: '#81c784',
+    barDisk: '#a5d6a7',
+    barLoad: '#ffb74d',
+    decor: 'mdi:sprout',
+  },
+  {
+    key: 'blue',
+    banner: '#42a5f5',
+    accent: '#1565c0',
+    barCpu: '#42a5f5',
+    barMem: '#64b5f6',
+    barDisk: '#90caf9',
+    barLoad: '#ffb74d',
+    decor: 'mdi:home-variant',
+  },
+  {
+    key: 'purple',
+    banner: '#7e57c2',
+    accent: '#4527a0',
+    barCpu: '#ab47bc',
+    barMem: '#ba68c8',
+    barDisk: '#ce93d8',
+    barLoad: '#ffb74d',
+    decor: 'mdi:flower',
+  },
+  {
+    key: 'pink',
+    banner: '#ec407a',
+    accent: '#ad1457',
+    barCpu: '#ec407a',
+    barMem: '#f06292',
+    barDisk: '#f48fb1',
+    barLoad: '#ffb74d',
+    decor: 'mdi:tree',
+  },
+  {
+    key: 'orange',
+    banner: '#ff9800',
+    accent: '#e65100',
+    barCpu: '#ffa726',
+    barMem: '#66bb6a',
+    barDisk: '#ffb74d',
+    barLoad: '#ffb74d',
+    decor: 'mdi:account-cowboy-hat',
+  },
+  {
+    key: 'teal',
+    banner: '#26a69a',
+    accent: '#00695c',
+    barCpu: '#26a69a',
+    barMem: '#4db6ac',
+    barDisk: '#80cbc4',
+    barLoad: '#ffb74d',
+    decor: 'mdi:bird',
+  },
+]
+
+const theme = computed<BannerTheme>(() => {
+  const name = props.node.name || ''
+  let hash = 0
+  for (let i = 0; i < name.length; i++)
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0
+  return themes[hash % themes.length]!
+})
 
 function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
 
-type Banner = { bg: string; text: string; decor: string; frame?: string }
-const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:scarecrow', frame: 'house' },
-  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', frame: 'flower' },
-  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', frame: 'scarecrow' },
-  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', frame: 'birdhouse' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:birdhouse', frame: 'house' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:windmill', frame: 'flower' },
-]
-
-const banner = computed<Banner>(() => {
-  const idx = Math.abs((props.node.name?.charCodeAt(0) ?? 0) % bannerPalette.length)
-  return bannerPalette[idx]!
-})
+const offline = computed(() => !props.node.online)
 </script>
 
 <template>
-  <CardX
-    hoverable
-    class="node-card w-full cursor-pointer transition-all duration-200"
-    :class="cn(!props.node.online ? '!stardew-wood-card-offline' : 'stardew-node-card')"
+  <div
+    class="sd-card"
+    :class="cn(offline && 'sd-card--offline')"
     @click="emit('click')"
   >
-    <template #header>
-      <div class="node-title-wrap">
-        <img class="nail" src="/images/icons/nail.png" alt="nail" />
-        <div class="node-title" :style="{ backgroundImage: 'url(/images/card/' + (banner.bg === '#4caf50' || banner.bg === '#9c27b0' ? 'title-green' : 'title-blue') + '.png)', backgroundSize: '100% 100%' }">
-          <span class="shrink-0 mr-1">
-            <Icon :icon="banner.decor" width="14" height="14" />
+    <!-- corner plant / character -->
+    <div class="sd-plant" :style="{ color: theme.accent }">
+      <Icon :icon="theme.decor" width="28" height="28" />
+    </div>
+
+    <!-- online status dot -->
+    <span class="sd-status" :class="offline ? 'sd-status--off' : 'sd-status--on'" />
+
+    <!-- title banner -->
+    <div class="sd-banner" :style="{ background: theme.banner }">
+      <span class="sd-banner__name">{{ props.node.name }}</span>
+      <img
+        v-if="hasRegion(props.node.region)"
+        :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+        :alt="getRegionDisplayName(props.node.region)"
+        class="sd-banner__flag"
+      >
+    </div>
+
+    <!-- OS line -->
+    <div class="sd-os">
+      <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="sd-os__icon">
+      <span class="sd-os__text">{{ osLabel }}</span>
+    </div>
+
+    <!-- resource 2x2 -->
+    <div class="sd-grid">
+      <div class="sd-metric">
+        <div class="sd-metric__head">
+          <span class="sd-metric__label">
+            <Icon icon="mdi:chip" width="14" height="14" />
+            CPU
           </span>
-          <span class="text-xs font-bold text-white drop-shadow-sm" style="text-shadow: 0 1px 0 rgba(0,0,0,0.35);">{{ props.node.name }}</span>
-          <img
-            v-if="hasRegion(props.node.region)"
-            :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-            :alt="getRegionDisplayName(props.node.region)"
-            class="h-2.5 w-auto max-w-[18px] shrink-0 object-contain"
-            style="image-rendering: auto;"
-          >
+          <b class="sd-metric__val" :style="{ color: theme.barCpu }">{{ (props.node.cpu ?? 0).toFixed(0) }}%</b>
+        </div>
+        <PixelProgress :percentage="props.node.cpu ?? 0" :color="theme.barCpu" />
+      </div>
+
+      <div class="sd-metric">
+        <div class="sd-metric__head">
+          <span class="sd-metric__label">
+            <Icon icon="mdi:memory" width="14" height="14" />
+            Memory
+          </span>
+          <b class="sd-metric__val" :style="{ color: theme.barMem }">{{ memPercentage.toFixed(1) }}%</b>
+        </div>
+        <PixelProgress :percentage="memPercentage" :color="theme.barMem" />
+      </div>
+
+      <div class="sd-metric">
+        <div class="sd-metric__head">
+          <span class="sd-metric__label">
+            <Icon icon="mdi:harddisk" width="14" height="14" />
+            Disk
+          </span>
+          <b class="sd-metric__val" :style="{ color: theme.barDisk }">{{ diskPercentage.toFixed(1) }}%</b>
+        </div>
+        <PixelProgress :percentage="diskPercentage" :color="theme.barDisk" />
+      </div>
+
+      <div class="sd-metric">
+        <div class="sd-metric__head">
+          <span class="sd-metric__label">
+            <Icon icon="mdi:chart-bar" width="14" height="14" />
+            Load
+          </span>
+          <b class="sd-metric__val" :style="{ color: theme.barLoad }">{{ (props.node.load ?? 0).toFixed(2) }}</b>
+        </div>
+        <PixelProgress :percentage="loadPct" :color="theme.barLoad" />
+      </div>
+    </div>
+
+    <!-- upload / download -->
+    <div class="sd-row sd-row--speed">
+      <div class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:arrow-up-bold" width="12" height="12" class="c-sky" />
+          Upload
+        </span>
+        <span class="sd-pair__val c-sky">{{ formatBytesPerSecond(props.node.net_out ?? 0) }}</span>
+      </div>
+      <div class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:arrow-down-bold" width="12" height="12" class="c-em" />
+          Download
+        </span>
+        <span class="sd-pair__val c-em">{{ formatBytesPerSecond(props.node.net_in ?? 0) }}</span>
+      </div>
+    </div>
+
+    <!-- outbound / inbound totals -->
+    <div class="sd-row sd-row--traffic">
+      <div class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:earth" width="12" height="12" class="c-sky" />
+          Outbound
+        </span>
+        <span class="sd-pair__val c-sky">{{ formatBytes(props.node.net_total_up ?? 0) }}</span>
+      </div>
+      <div class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:earth" width="12" height="12" class="c-em" />
+          Inbound
+        </span>
+        <span class="sd-pair__val c-em">{{ formatBytes(props.node.net_total_down ?? 0) }}</span>
+      </div>
+    </div>
+
+    <!-- latency / packet loss -->
+    <div class="sd-row sd-row--ping" :class="offline && 'is-dim'">
+      <div class="sd-ping" :title="latencyPanelTooltip">
+        <div class="sd-ping__head">
+          <span class="sd-pair__label">
+            <Icon icon="mdi:clock-outline" width="12" height="12" />
+            Latency
+          </span>
+          <b class="sd-metric__val c-rose">{{ latencyDisplay }}</b>
+        </div>
+        <div class="ping-bar">
+          <span
+            v-for="i in 8"
+            :key="'lat-' + i"
+            :class="pingDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.latency : undefined)"
+          />
         </div>
       </div>
-    </template>
-
-    <template #default>
-      <div class="relative flex flex-col gap-2" style="z-index:1">
-        <img class="decor decor-tl" :src="`/images/card/${banner.frame || 'house'}.png`" alt="decor" />
-        <img class="decor decor-tr" :src="`/images/card/${banner.frame === 'house' ? 'flower' : banner.frame === 'flower' ? 'scarecrow' : 'house'}.png`" alt="decor" />
-        <img class="decor decor-bl" :src="`/images/card/${banner.frame === 'house' ? 'scarecrow' : 'birdhouse'}.png`" alt="decor" />
-        <img class="decor decor-br" :src="`/images/card/${banner.frame === 'house' ? 'birdhouse' : 'birdhouse'}.png`" alt="decor" />
-        <img class="node-frame-overlay" src="/images/card/node-frame.png" alt="frame" />
-
-        <div class="flex items-center gap-2 text-xs text-[#5c3a1e]">
-          <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-3.5 shrink-0">
-          <span class="truncate">{{ getOSName(props.node.os) }} · {{ props.node.arch }} · {{ props.node.virtualization }}</span>
+      <div class="sd-ping" :title="lossPanelTooltip">
+        <div class="sd-ping__head">
+          <span class="sd-pair__label">
+            <Icon icon="mdi:shield-check" width="12" height="12" class="c-em" />
+            Packet Loss
+          </span>
+          <b class="sd-metric__val c-em">{{ lossDisplay }}</b>
         </div>
-
-        <div class="resource-grid">
-          <div class="resource-item">
-            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
-              <div class="flex items-center gap-1">
-                <img src="/images/icons/cpu.svg" width="14" height="14" alt="CPU" class="opacity-80 shrink-0">
-                <span>CPU</span>
-              </div>
-              <b class="tabular-nums">{{ (props.node.cpu ?? 0).toFixed(1) }}%</b>
-            </div>
-            <PixelProgress :percentage="props.node.cpu ?? 0" type="cpu" />
-          </div>
-
-          <div class="resource-item">
-            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
-              <div class="flex items-center gap-1">
-                <img src="/images/icons/memory.svg" width="14" height="14" alt="Memory" class="opacity-80 shrink-0">
-                <span>内存</span>
-              </div>
-              <b class="tabular-nums">{{ memPercentage.toFixed(1) }}%</b>
-            </div>
-            <PixelProgress :percentage="memPercentage" type="memory" />
-          </div>
-
-          <div class="resource-item">
-            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
-              <div class="flex items-center gap-1">
-                <Icon icon="solar:disk-bold" width="14" height="14" class="opacity-70 shrink-0" />
-                <span>硬盘</span>
-              </div>
-              <b class="tabular-nums">{{ diskPercentage.toFixed(1) }}%</b>
-            </div>
-            <PixelProgress :percentage="diskPercentage" type="disk" />
-          </div>
-
-          <div class="resource-item">
-            <div class="flex items-center justify-between text-xs text-[#5c3a1e]">
-              <div class="flex items-center gap-1">
-                <Icon icon="solar:cloud-upload-bold" width="14" height="14" class="opacity-70 shrink-0" />
-                <span>Load</span>
-              </div>
-              <b class="tabular-nums">{{ (props.node.load ?? 0).toFixed(2) }}</b>
-            </div>
-            <div class="text-[11px] text-[#5c3a1e]/80 truncate">
-              {{ (props.node.load5 ?? 0).toFixed(2) }}, {{ (props.node.load15 ?? 0).toFixed(2) }} ({{ props.node.cpu_cores ?? 1 }}c)
-            </div>
-          </div>
-        </div>
-
-        <div class="traffic">
-          <div>
-            <div class="text-[11px] text-[#5c3a1e] flex items-center gap-1">
-              <Icon icon="tabler:chevron-up" width="12" height="12" />
-              <span>Upload</span>
-            </div>
-            <div class="text-xs font-medium tabular-nums">{{ formatBytesPerSecond(props.node.net_out ?? 0) }}</div>
-          </div>
-          <div>
-            <div class="text-[11px] text-[#5c3a1e] flex items-center gap-1">
-              <Icon icon="tabler:chevron-down" width="12" height="12" />
-              <span>Download</span>
-            </div>
-            <div class="text-xs font-medium tabular-nums">{{ formatBytesPerSecond(props.node.net_in ?? 0) }}</div>
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <div
-            class="group/panel relative flex-1 flex flex-col gap-1 p-1.5 rounded-sm bg-[#5c3a1e]/[0.06]"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-            :title="latencyPanelTooltip"
-          >
-            <div class="flex items-center justify-between gap-2 text-[11px] leading-none text-[#5c3a1e]">
-              <span>延迟</span>
-              <span class="font-medium">{{ latencyDisplay }}</span>
-            </div>
-            <div class="ping-bar">
-              <span
-                v-for="i in 8"
-                :key="i"
-                :class="pingDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, pingStats.history.value.length - 1)]?.latency : undefined)"
-              />
-            </div>
-          </div>
-          <div
-            class="group/panel relative flex-1 flex flex-col gap-1 p-1.5 rounded-sm bg-[#5c3a1e]/[0.06]"
-            :class="[!props.node.online ? 'blur-xs opacity-60' : '']"
-            :title="lossPanelTooltip"
-          >
-            <div class="flex items-center justify-between gap-2 text-[11px] leading-none text-[#5c3a1e]">
-              <span>丢包</span>
-              <span class="font-medium">{{ lossDisplay }}</span>
-            </div>
-            <div class="ping-bar">
-              <span
-                v-for="i in 8"
-                :key="'loss-' + i"
-                :class="lossDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, pingStats.history.value.length - 1)]?.loss : undefined)"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div v-if="priceTags.length" class="flex shrink-0 flex-row gap-2 items-center justify-center text-[11px] text-[#5c3a1e]" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
-          <span v-for="(tag, idx) in priceTags" :key="idx">{{ tag }}</span>
-        </div>
-        <div v-if="appStore.showNodeUptime" class="flex flex-row gap-1 items-center justify-center text-[11px] text-[#5c3a1e]" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
-          <Icon icon="tabler:clock-hour-4" width="12" height="12" />
-          <span>{{ formatUptime(props.node.uptime ?? 0) }}</span>
-        </div>
-        <div v-if="customTags.length > 0" class="flex shrink-0 flex-wrap gap-1 items-center" :class="[!props.node.online ? 'blur-xs opacity-60' : '']">
-          <Badge
-            v-for="(tag, idx) in customTags"
-            :key="idx"
-            variant="outline"
-            class="!text-[11px] rounded text-[#5c3a1e] border-[#5c3a1e]/20 px-1.5"
-          >
-            {{ tag }}
-          </Badge>
+        <div class="ping-bar">
+          <span
+            v-for="i in 8"
+            :key="'loss-' + i"
+            :class="lossDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.loss : undefined)"
+          />
         </div>
       </div>
-    </template>
-  </CardX>
+    </div>
+
+    <!-- expires / uptime -->
+    <div class="sd-row sd-row--footer">
+      <div class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:calendar" width="12" height="12" class="c-rose" />
+          Expires
+        </span>
+        <span class="sd-pair__val c-rose">
+          <template v-if="expiresDays === null">∞</template>
+          <template v-else>{{ expiresDays }} days</template>
+        </span>
+      </div>
+      <div v-if="appStore.showNodeUptime" class="sd-pair">
+        <span class="sd-pair__label">
+          <Icon icon="mdi:timer-sand" width="12" height="12" class="c-em" />
+          Uptime
+        </span>
+        <span class="sd-pair__val c-em">{{ uptimeDays }} days</span>
+      </div>
+    </div>
+
+    <!-- bottom-right flower -->
+    <div class="sd-flower">
+      <Icon icon="mdi:flower-tulip" width="18" height="18" :style="{ color: theme.banner }" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.node-card {
+.sd-card {
   position: relative;
-  overflow: hidden;
-}
-
-.stardew-node-card {
-  background: #f3e2bd url('/images/card/node-bg.png') !important;
-  background-size: 100% 100% !important;
-  border: 3px solid #5c3a1e !important;
-  border-radius: 6px !important;
-  box-shadow: 4px 4px 0 #3E2723 !important;
-  image-rendering: auto;
-  filter: drop-shadow(0 4px 0 #76502b);
-  transition: transform 120ms ease, box-shadow 120ms ease;
-}
-.stardew-node-card:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 #3E2723 !important;
-}
-
-.stardew-wood-card-offline {
-  background: linear-gradient(180deg, #d4a5a5, #c08080) !important;
-  border-color: #7f1d1d !important;
-  border-radius: 6px !important;
-  box-shadow: 4px 4px 0 #5c1a1a !important;
-  filter: grayscale(0.35) brightness(0.92) drop-shadow(0 4px 0 #76502b);
-}
-
-.decor {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  image-rendering: pixelated;
-  pointer-events: none;
-  opacity: 0.85;
-}
-.decor-tl { top: 6px; left: 6px; }
-.decor-tr { top: 6px; right: 6px; }
-.decor-bl { bottom: 6px; left: 6px; }
-.decor-br { bottom: 6px; right: 6px; }
-
-.node-frame-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
-  pointer-events: none;
-  z-index: 0;
-  object-fit: fill;
-}
-
-.node-title-wrap {
-  position: relative;
-  padding-top: 12px;
-}
-
-.nail {
-  position: absolute;
-  top: 4px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  image-rendering: pixelated;
-  z-index: 2;
-}
-
-.node-title {
-  height: 36px;
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 280px;
+  padding: 14px 14px 12px;
+  cursor: pointer;
+  background: linear-gradient(180deg, #fbf3dc 0%, #f3e2bd 55%, #ecd7a6 100%);
+  border: 3px solid #6b4423;
+  border-radius: 12px;
+  box-shadow:
+    4px 4px 0 #3e2723,
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  color: #3a2a1a;
+  font-family: 'VT323', 'Press Start 2P', 'Nunito', system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  overflow: visible;
+  image-rendering: auto;
+}
+
+.sd-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    6px 6px 0 #3e2723,
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.sd-card--offline {
+  filter: grayscale(0.35) brightness(0.95);
+  border-color: #7a3b2a;
+  box-shadow: 4px 4px 0 #5a2417;
+}
+
+.sd-plant {
+  position: absolute;
+  top: -10px;
+  left: -8px;
+  z-index: 3;
+  filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.25));
+  pointer-events: none;
+}
+
+.sd-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #3e2723;
+  z-index: 3;
+}
+.sd-status--on {
+  background: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.35);
+}
+.sd-status--off {
+  background: #e53935;
+}
+
+.sd-banner {
+  align-self: center;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 0 10px;
+  min-width: 56%;
+  max-width: 88%;
+  padding: 4px 14px;
+  margin-top: 2px;
+  border-radius: 8px;
+  border: 2px solid rgba(62, 39, 35, 0.35);
+  box-shadow:
+    0 2px 0 rgba(62, 39, 35, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #fff;
+  z-index: 2;
+}
+
+.sd-banner__name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  letter-spacing: 0.04em;
+}
+
+.sd-banner__flag {
+  height: 12px;
+  width: auto;
+  max-width: 18px;
+  object-fit: contain;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
   image-rendering: auto;
 }
 
-.resource-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.sd-os {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #5c3a1e;
+  opacity: 0.9;
+  min-width: 0;
+}
+.sd-os__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.sd-os__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.resource-item {
+.sd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.sd-metric {
   display: flex;
   flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.sd-metric__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 4px;
 }
+.sd-metric__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: #5c3a1e;
+  opacity: 0.9;
+}
+.sd-metric__val {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
 
-.traffic {
+.sd-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.55);
-  padding: 8px;
-  border-radius: 6px;
-  border: 2px solid #5c3a1e;
+  gap: 8px 12px;
+}
+
+.sd-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.sd-pair__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #5c3a1e;
+  opacity: 0.85;
+}
+.sd-pair__val {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.sd-ping {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.sd-ping__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .ping-bar {
   display: flex;
   align-items: center;
   gap: 2px;
-  height: 10px;
+  height: 8px;
 }
-
 .ping-dot {
   width: 8px;
   height: 8px;
-  background: rgba(62, 39, 35, 0.15);
-  border-radius: 2px;
+  border-radius: 1px;
+  background: rgba(62, 39, 35, 0.12);
+  border: 1px solid rgba(62, 39, 35, 0.2);
 }
-
 .ping-dot--active {
   background: #67b447;
+  border-color: #4a8c2e;
 }
-
 .ping-dot--warn {
   background: #e6a23c;
+  border-color: #c4841c;
 }
-
 .ping-dot--bad {
   background: #d14c4c;
+  border-color: #a83232;
 }
+
+.sd-row--footer {
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(107, 68, 35, 0.35);
+}
+
+.sd-flower {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  opacity: 0.85;
+  pointer-events: none;
+  filter: drop-shadow(1px 1px 0 rgba(62, 39, 35, 0.2));
+}
+
+.is-dim {
+  opacity: 0.5;
+}
+
+.c-sky { color: #0288d1; }
+.c-em { color: #2e7d32; }
+.c-rose { color: #c62828; }
 </style>
