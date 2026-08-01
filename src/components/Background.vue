@@ -206,11 +206,6 @@ onUnmounted(() => {
     <Transition name="fade">
       <div v-if="showStardewBackground" class="stardew-scene" :class="{ 'is-night': isStardewNight }">
         <img class="stardew-bg-sky" src="/images/background/bg-sky.png" alt="">
-        <div class="stardew-clouds">
-          <img class="cloud-img c1" src="/images/background/cloud-1.png" alt="">
-          <img class="cloud-img c2" src="/images/background/cloud-2.png" alt="">
-          <img class="cloud-img c3" src="/images/background/cloud-1.png" alt="">
-        </div>
       </div>
     </Transition>
     <Transition name="fade">
