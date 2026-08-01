@@ -1,0 +1,50 @@
+
+/*
+ * PDF style enhancement
+ * Farm scene / wood sign / pixel dashboard
+ */
+:root {
+  --stardew-wood-dark:#5a351c;
+  --stardew-wood:#9a6334;
+  --stardew-grass:#8bc34a;
+}
+
+body {
+  image-rendering: pixelated;
+}
+
+[data-theme="stardew"] .node-card,
+[data-theme="stardew"] [class*="card"] {
+  border: 3px solid var(--stardew-wood-dark) !important;
+  box-shadow:
+    0 4px 0 #3d2412,
+    0 8px 18px rgba(0,0,0,.25) !important;
+  backdrop-filter: none !important;
+  border-radius: 10px !important;
+}
+
+[data-theme="stardew"] .node-card:hover {
+  transform: translateY(-4px);
+  transition: transform .18s steps(4);
+}
+
+[data-theme="stardew"] .progress-thin,
+[data-theme="stardew"] progress {
+  border-radius:0!important;
+  border:2px solid #4b2d16;
+}
+
+[data-theme="stardew"] h1,
+[data-theme="stardew"] h2,
+[data-theme="stardew"] h3 {
+  text-shadow:2px 2px 0 rgba(0,0,0,.25);
+}
+
+/* pixel scrollbar */
+::-webkit-scrollbar {
+ width:12px;
+}
+::-webkit-scrollbar-thumb {
+ background:#8b5a2b;
+ border:3px solid #d8b56b;
+}

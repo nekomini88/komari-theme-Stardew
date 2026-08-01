@@ -10,6 +10,7 @@
 @import './traffic-cost-metric.css';
 @import './metric-polish.css';
 @import './page-spacing-footer.css';
+@import './pdf-stardew-enhancement.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
