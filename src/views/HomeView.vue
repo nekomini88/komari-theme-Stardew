@@ -195,6 +195,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
       :nodes="groupNodeList"
       :globe-nodes="groupNodeList"
       :transition-key="appStore.nodeSelectedGroup"
+      class="hidden"
     />
 
     <StatsBar />
