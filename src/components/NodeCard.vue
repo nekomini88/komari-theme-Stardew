@@ -292,6 +292,7 @@ const banner = computed<Banner>(() => {
   border-color: #7f1d1d !important;
   border-radius: 6px !important;
   box-shadow: 4px 4px 0 #5c1a1a !important;
+  filter: grayscale(0.35) brightness(0.92) drop-shadow(0 4px 0 #76502b);
 }
 
 .decor {
