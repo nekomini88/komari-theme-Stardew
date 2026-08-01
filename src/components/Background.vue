@@ -303,6 +303,7 @@ onUnmounted(() => {
   inset: 0;
   overflow: hidden;
   image-rendering: pixelated;
+  background: none;
 }
 .stardew-bg-sky {
   position: absolute;
@@ -315,6 +316,13 @@ onUnmounted(() => {
   pointer-events: none;
   z-index: 0;
 }
+.stardew-sky-grad { display: none; }
+.stardew-sun { display: none; }
+.stardew-moon { display: none; }
+.stardew-grass { display: none; }
+.stardew-fence { display: none; }
+.stardew-grass-front { display: none; }
+.stardew-bg-grass { display: none; }
 .stardew-bg-grass {
   position: absolute;
   left: 0; right: 0; bottom: 0;
