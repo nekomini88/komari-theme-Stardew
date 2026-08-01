@@ -86,7 +86,7 @@ const regionGroups = computed(() => {
 const allTabs = computed(() => [
   ...groups.value,
   ...regionGroups.value,
-] as Array<{ tab: string, name: string, code?: string, emoji?: string, label?: string }>)
+] as Array<{ tab: string, name: string, code?: string, emoji?: string, label?: string, plain?: string }>)
 
 watch(
   () => [nodesStore.groups, regionGroups.value] as const,
@@ -202,8 +202,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                     <span v-if="g.code" class="flag-icon">
                       <img :src="'/images/flags/' + g.code + '.svg'" :alt="g.tab" class="flag-img">
                     </span>
-                    <span v-else-if="g.emoji" class="flag-emoji">{{ g.emoji }}</span>
-                    <span class="flag-text">{{ g.label ?? g.tab }}</span>
+                    <span class="flag-text">{{ g.plain ?? g.tab }}</span>
                   </span>
                 </TabsTrigger>
               </TabsList>

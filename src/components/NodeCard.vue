@@ -110,7 +110,7 @@ const banner = computed<Banner>(() => {
 <template>
   <CardX
     hoverable
-    class="node-card w-full cursor-pointer stardew-wood-card transition-all duration-200 rounded-[10px]"
+    class="node-card w-full cursor-pointer stardew-wood-card transition-all duration-200 rounded-[6px]"
     :class="[!props.node.online && '!stardew-wood-card-offline']"
     @click="emit('click')"
   >
@@ -285,7 +285,7 @@ const banner = computed<Banner>(() => {
 .stardew-wood-card {
   background: #f3e2bd !important;
   border: 4px solid #5c3a1e !important;
-  border-radius: 4px !important;
+  border-radius: 8px !important;
   box-shadow: 4px 4px 0 #3E2723 !important;
   image-rendering: auto;
 }
