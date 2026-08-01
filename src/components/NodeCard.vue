@@ -87,14 +87,14 @@ function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
 }
 
-type Banner = { bg: string; text: string; decor: string }
+type Banner = { bg: string; text: string; decor: string; frame?: string }
 const bannerPalette: readonly Banner[] = [
-  { bg: '#4caf50', text: '#ffffff', decor: 'solar:scarecrow' },
-  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile' },
-  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower' },
-  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart' },
-  { bg: '#ff9800', text: '#ffffff', decor: 'solar:birdhouse' },
-  { bg: '#009688', text: '#ffffff', decor: 'solar:windmill' },
+  { bg: '#4caf50', text: '#ffffff', decor: 'solar:scarecrow', frame: 'house' },
+  { bg: '#2196f3', text: '#ffffff', decor: 'solar:home-smile', frame: 'flower' },
+  { bg: '#9c27b0', text: '#ffffff', decor: 'solar:flower', frame: 'scarecrow' },
+  { bg: '#e91e63', text: '#ffffff', decor: 'solar:heart', frame: 'birdhouse' },
+  { bg: '#ff9800', text: '#ffffff', decor: 'solar:birdhouse', frame: 'house' },
+  { bg: '#009688', text: '#ffffff', decor: 'solar:windmill', frame: 'flower' },
 ]
 
 const banner = computed<Banner>(() => {
@@ -131,10 +131,11 @@ const banner = computed<Banner>(() => {
 
     <template #default>
       <div class="relative flex flex-col gap-2" style="z-index:1">
-        <img class="decor decor-tl" src="/images/card/house.png" alt="decor" />
-        <img class="decor decor-tr" src="/images/card/flower.png" alt="decor" />
-        <img class="decor decor-bl" src="/images/card/scarecrow.png" alt="decor" />
-        <img class="decor decor-br" src="/images/card/birdhouse.png" alt="decor" />
+        <img class="decor decor-tl" :src="`/images/card/${banner.frame || 'house'}.png`" alt="decor" />
+        <img class="decor decor-tr" :src="`/images/card/${banner.frame === 'house' ? 'flower' : banner.frame === 'flower' ? 'scarecrow' : 'house'}.png`" alt="decor" />
+        <img class="decor decor-bl" :src="`/images/card/${banner.frame === 'house' ? 'scarecrow' : 'birdhouse'}.png`" alt="decor" />
+        <img class="decor decor-br" :src="`/images/card/${banner.frame === 'house' ? 'birdhouse' : 'birdhouse'}.png`" alt="decor" />
+        <img class="node-frame-overlay" src="/images/card/node-frame.png" alt="frame" />
 
         <div class="flex items-center gap-2 text-xs text-[#5c3a1e]">
           <img :src="getOSImage(props.node.os)" :alt="getOSName(props.node.os)" class="size-3.5 shrink-0">
@@ -304,6 +305,17 @@ const banner = computed<Banner>(() => {
 .decor-tr { top: 6px; right: 6px; }
 .decor-bl { bottom: 6px; left: 6px; }
 .decor-br { bottom: 6px; right: 6px; }
+
+.node-frame-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 0;
+  object-fit: fill;
+}
 
 .node-title-wrap {
   position: relative;
