@@ -245,8 +245,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
               :css="!appStore.disablePageAnimation"
               name="node-card-switch"
               tag="div"
-              class="gap-3 grid grid-cols-1"
-              :style="{ gridTemplateColumns: `repeat(auto-fill, minmax(min(${appStore.nodeCardMinWidth}px, 100%), 1fr))` }"
+              class="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
             >
               <div
                 v-for="(node, index) in nodeList"
