@@ -31,6 +31,7 @@ bun run build
 ```
 
 产物：
+
 - `dist/` — 构建后的静态站点
 - `release/komari-theme-Komari-Stardew-v<version>-<hash>.zip` — 可直接上传到 Komari 的主题包
 
@@ -44,18 +45,18 @@ bun run package
 
 ## 技术栈
 
-| 类别 | 技术 |
-| --- | --- |
-| 框架 | Vue 3 |
-| 构建工具 | Vite 7 |
-| UI 组件 | reka-ui（shadcn-vue 风格组件） |
+| 类别     | 技术                             |
+| -------- | -------------------------------- |
+| 框架     | Vue 3                            |
+| 构建工具 | Vite 7                           |
+| UI 组件  | reka-ui（shadcn-vue 风格组件）   |
 | 样式方案 | Tailwind CSS v4 + tw-animate-css |
-| 状态管理 | Pinia 3 |
-| 路由 | Vue Router 5 |
-| 提示系统 | vue-sonner（Toaster） |
-| 图标 | @iconify/vue |
-| 图表 | vue-echarts |
-| 3D 地球 | cobe |
+| 状态管理 | Pinia 3                          |
+| 路由     | Vue Router 5                     |
+| 提示系统 | vue-sonner（Toaster）            |
+| 图标     | @iconify/vue                     |
+| 图表     | vue-echarts                      |
+| 3D 地球  | cobe                             |
 
 ## License
 

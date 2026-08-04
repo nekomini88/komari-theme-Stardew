@@ -287,7 +287,8 @@ const useNodesStore = defineStore('nodes', () => {
   function sortNodesByWeight(): void {
     nodes.value.sort((a, b) => {
       // 离线节点排到最后
-      if (a.online !== b.online) return a.online ? -1 : 1
+      if (a.online !== b.online)
+        return a.online ? -1 : 1
       // 同状态按 weight 升序
       return a.weight - b.weight
     })

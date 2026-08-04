@@ -1,5 +1,18 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
+import birdUrl from '@/assets/sprites/bird.svg?url'
+
+import bunnyUrl from '@/assets/sprites/bunny.svg?url'
+import butterflyUrl from '@/assets/sprites/butterfly.svg?url'
+import cloudUrl from '@/assets/sprites/cloud.svg?url'
+// Use public-compatible paths via import so Vite bundles them
+import fireflyUrl from '@/assets/sprites/firefly.svg?url'
+import flowerUrl from '@/assets/sprites/flower.svg?url'
+import fogwispUrl from '@/assets/sprites/fogwisp.svg?url'
+import iceUrl from '@/assets/sprites/ice.svg?url'
+import leafUrl from '@/assets/sprites/leaf.svg?url'
+import rainSnowUrl from '@/assets/sprites/rain-snow.svg?url'
+import starUrl from '@/assets/sprites/star.svg?url'
 import { isFog, isNight, isRain, isSnow, isThunder, season } from '@/composables/useStardewAtmosphere'
 
 interface LifeItem {
@@ -19,19 +32,6 @@ let raf: number | null = null
 let spawnAcc = 0
 const SPAWN_EVERY_MS = 1100
 let lastTs = 0
-
-// Use public-compatible paths via import so Vite bundles them
-import fireflyUrl from '@/assets/sprites/firefly.svg?url'
-import butterflyUrl from '@/assets/sprites/butterfly.svg?url'
-import flowerUrl from '@/assets/sprites/flower.svg?url'
-import leafUrl from '@/assets/sprites/leaf.svg?url'
-import birdUrl from '@/assets/sprites/bird.svg?url'
-import bunnyUrl from '@/assets/sprites/bunny.svg?url'
-import rainSnowUrl from '@/assets/sprites/rain-snow.svg?url'
-import iceUrl from '@/assets/sprites/ice.svg?url'
-import fogwispUrl from '@/assets/sprites/fogwisp.svg?url'
-import starUrl from '@/assets/sprites/star.svg?url'
-import cloudUrl from '@/assets/sprites/cloud.svg?url'
 
 const SPRITES: Record<string, string> = {
   firefly: fireflyUrl,
@@ -163,10 +163,10 @@ onUnmounted(() => {
       class="stardew-life"
       :class="it.type"
       :style="{
-        left: it.x + '%',
-        top: it.y + '%',
+        left: `${it.x}%`,
+        top: `${it.y}%`,
         opacity: Math.max(0, it.life),
-        backgroundImage: 'url(' + (SPRITES[it.type] || SPRITES.fogwisp) + ')',
+        backgroundImage: `url(${SPRITES[it.type] || SPRITES.fogwisp})`,
       }"
     />
     <div v-if="isThunder" class="stardew-lightning" />
@@ -255,23 +255,51 @@ onUnmounted(() => {
 }
 
 @keyframes stardew-twinkle {
-  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.9); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); }
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
 }
 @keyframes stardew-wobble {
-  0% { transform: translate(-50%, -50%) rotate(-8deg); }
-  50% { transform: translate(-50%, -50%) rotate(12deg); }
-  100% { transform: translate(-50%, -50%) rotate(-8deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(-8deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(12deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-8deg);
+  }
 }
 @keyframes stardew-leaf-spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 @keyframes stardew-flash-thunder {
-  0%, 100% { opacity: 0; }
-  8% { opacity: 1; }
-  12% { opacity: 0; }
-  18% { opacity: 0.6; }
-  22% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.6;
+  }
+  22% {
+    opacity: 0;
+  }
 }
 </style>

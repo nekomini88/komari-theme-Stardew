@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { Toaster } from '@/components/ui/sonner'
+import { startAtmosphere, stopAtmosphere } from '@/composables/useStardewAtmosphere'
 import { useAppStore } from '@/stores/app'
 import { destroyInitManager, initApp } from '@/utils/init'
 import Background from './components/Background.vue'
@@ -9,7 +10,6 @@ import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import LoadingCover from './components/LoadingCover.vue'
 import Provider from './components/Provider.vue'
-import { startAtmosphere, stopAtmosphere } from '@/composables/useStardewAtmosphere'
 
 const appStore = useAppStore()
 
@@ -43,33 +43,28 @@ onUnmounted(() => {
   <Provider>
     <Background />
     <div class="app-foreground">
-    <FloraFaunaOverlay />
-    <div v-if="appStore.enableGlassEffect" class="glass-orbs" aria-hidden="true">
-      <div class="glass-orb glass-orb-1" />
-      <div class="glass-orb glass-orb-2" />
-      <div class="glass-orb glass-orb-3" />
+      <FloraFaunaOverlay />
+      <LoadingCover v-if="appStore.loading" />
+      <Header />
+      <main v-if="!appStore.loading" class="relative z-10 min-h-screen overflow-hidden">
+        <div class="max-w-[1600px] mx-auto">
+          <RouterView v-slot="{ Component }">
+            <Transition
+              enter-active-class="transition-all duration-200 ease-out"
+              enter-from-class="opacity-0 translate-x-4 blur-sm" enter-to-class="opacity-100 translate-x-0 blur-0"
+              leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-x-0 blur-0"
+              leave-to-class="opacity-0 -translate-x-4 blur-sm" mode="out-in"
+            >
+              <KeepAlive :include="['HomeView']">
+                <component :is="Component" />
+              </KeepAlive>
+            </Transition>
+          </RouterView>
+        </div>
+      </main>
+      <Footer v-if="!appStore.loading" />
+      <Toaster rich-colors close-button position="top-center" />
     </div>
-    <LoadingCover v-if="appStore.loading" />
-    <Header />
-    <main v-if="!appStore.loading" class="relative z-10 min-h-screen overflow-hidden">
-      <div class="max-w-[1600px] mx-auto">
-        <RouterView v-slot="{ Component }">
-          <Transition
-            enter-active-class="transition-all duration-200 ease-out"
-            enter-from-class="opacity-0 translate-x-4 blur-sm" enter-to-class="opacity-100 translate-x-0 blur-0"
-            leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-x-0 blur-0"
-            leave-to-class="opacity-0 -translate-x-4 blur-sm" mode="out-in"
-          >
-            <KeepAlive :include="['HomeView']">
-              <component :is="Component" />
-            </KeepAlive>
-          </Transition>
-        </RouterView>
-      </div>
-    </main>
-    <Footer v-if="!appStore.loading" />
-    <Toaster rich-colors close-button position="top-center" />
-  </div>
   </Provider>
 </template>
 

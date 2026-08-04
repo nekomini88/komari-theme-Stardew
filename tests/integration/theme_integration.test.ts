@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { describe, expect, it } from 'vitest'
 
 describe('theme integration', () => {
-  it('SHOULD expose stardew visual-style option in Header.vue', () => {
+  it('sHOULD expose stardew visual-style option in Header.vue', () => {
     const header = readFileSync('src/components/Header.vue', 'utf-8')
-    expect(header).toContain("value: 'stardew'")
-    expect(header).toContain("label: '星露谷风格'")
+    expect(header).toContain('value: \'stardew\'')
+    expect(header).toContain('label: \'星露谷风格\'')
     expect(header).toContain('selectVisualStyle')
   })
 
-  it('MUST define stardew visual-style css tokens', () => {
+  it('mUST define stardew visual-style css tokens', () => {
     const css = readFileSync('src/styles/main.css', 'utf-8')
     expect(css).toContain('[data-theme="stardew"]')
     expect(css).toContain('--visual-radius-panel')
@@ -19,18 +19,18 @@ describe('theme integration', () => {
 })
 
 describe('matte pixel surfaces under stardew theme', () => {
-  it('MUST disable glass blur and enforce matte surfaces in main.css', () => {
+  it('mUST disable glass blur and enforce matte surfaces in main.css', () => {
     const css = readFileSync('src/styles/main.css', 'utf8')
-    expect(css).toContain("matte-pixel.css")
-    expect(css).toContain("backdrop-filter: none !important")
+    expect(css).toContain('matte-pixel.css')
+    expect(css).toContain('backdrop-filter: none !important')
     // pixel shadow signature is enforced in matte-pixel.css and visual-card-patch.css
     const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
-    expect(matte).toContain("[data-theme=\"stardew\"]")
-    expect(matte).toContain("box-shadow:")
-    expect(matte).toContain("var(--border-strong")
+    expect(matte).toContain('[data-theme="stardew"]')
+    expect(matte).toContain('box-shadow:')
+    expect(matte).toContain('var(--border-strong')
   })
 
-  it('MUST use dotted matte borders and pixel shadows in matte-pixel.css', () => {
+  it('mUST use dotted matte borders and pixel shadows in matte-pixel.css', () => {
     const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
     expect(matte).toContain('[data-theme="stardew"]')
     // dotted is expressed either as shorthand or border-style

@@ -202,7 +202,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                   >
                     <span class="tab-label">
                       <span v-if="g.code" class="flag-icon">
-                        <img :src="'/images/flags/' + g.code + '.svg'" :alt="g.tab" class="flag-img">
+                        <img :src="`/images/flags/${g.code}.svg`" :alt="g.tab" class="flag-img">
                       </span>
                       <span class="flag-text">{{ g.plain ?? g.tab }}</span>
                     </span>
@@ -359,7 +359,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 .tab-label .flag-emoji {
   font-size: 0.85em;
   line-height: 1;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.1));
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.1));
   flex-shrink: 0;
   vertical-align: middle;
 }

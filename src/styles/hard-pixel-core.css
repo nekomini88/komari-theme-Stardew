@@ -1,9 +1,9 @@
 /* v0.14.1 hard Stardew pixel matte core — force visual baseline */
 /* Scene layers (.stardew-scene and children) are excluded from destructive resets */
 
-[data-theme="stardew"] *,
-[data-theme="stardew"] *::before,
-[data-theme="stardew"] *::after {
+[data-theme='stardew'] *,
+[data-theme='stardew'] *::before,
+[data-theme='stardew'] *::after {
   image-rendering: pixelated;
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: none;
@@ -11,79 +11,81 @@
 }
 
 /* Disable backdrop blur globally for stardew UI chrome */
-[data-theme="stardew"] {
+[data-theme='stardew'] {
   --tw-backdrop-blur: none !important;
 }
-[data-theme="stardew"] *:not(.stardew-scene):not(.stardew-scene *):not(.stardew-flora-fauna):not(.stardew-flora-fauna *),
-[data-theme="stardew"] *:not(.stardew-scene):not(.stardew-scene *)::before,
-[data-theme="stardew"] *:not(.stardew-scene):not(.stardew-scene *)::after {
+[data-theme='stardew']
+  *:not(.stardew-scene):not(.stardew-scene *):not(.stardew-flora-fauna):not(.stardew-flora-fauna *),
+[data-theme='stardew'] *:not(.stardew-scene):not(.stardew-scene *)::before,
+[data-theme='stardew'] *:not(.stardew-scene):not(.stardew-scene *)::after {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
 /* Soft shadow tokens off — pixel shadows re-applied on cards only */
-[data-theme="stardew"] {
+[data-theme='stardew'] {
   --tw-shadow: 0 0 0 0 transparent !important;
   --tw-shadow-colored: 0 0 0 0 transparent !important;
 }
 
 /* Node cards / panels: solid fill + hard pixel shadow (wood-sign look) */
-[data-theme="stardew"] .card,
-[data-theme="stardew"] .server-card,
-[data-theme="stardew"] .node-card,
-[data-theme="stardew"] .sd-card,
-[data-theme="stardew"] .stardew-stat,
-[data-theme="stardew"] .glass-panel,
-[data-theme="stardew"] [class*="glass"]:not(.stardew-scene):not(.stardew-scene *) {
+[data-theme='stardew'] .card,
+[data-theme='stardew'] .server-card,
+[data-theme='stardew'] .node-card,
+[data-theme='stardew'] .sd-card,
+[data-theme='stardew'] .stardew-stat,
+[data-theme='stardew'] .glass-panel,
+[data-theme='stardew'] [class*='glass']:not(.stardew-scene):not(.stardew-scene *) {
   background: #f3e2bd !important;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      rgba(139, 90, 43, 0.08) 0 2px,
-      rgba(160, 110, 55, 0.04) 2px 8px
-    ) !important;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(139, 90, 43, 0.08) 0 2px,
+    rgba(160, 110, 55, 0.04) 2px 8px
+  ) !important;
   border: 4px solid #6b4423 !important;
   border-style: solid !important;
-  box-shadow: 5px 5px 0 0 #3E2723 !important;
+  box-shadow: 5px 5px 0 0 #3e2723 !important;
   border-radius: 8px !important;
   image-rendering: pixelated !important;
 }
 
 /* Overview / top stats tiles */
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] .stardew-stat,
-[data-theme="stardew"] [class*="overview"] {
+[data-theme='stardew'] .overview-card,
+[data-theme='stardew'] .stardew-stat,
+[data-theme='stardew'] [class*='overview'] {
   background: #f6e7c4 !important;
   border: 4px solid #6b4423 !important;
   border-style: solid !important;
-  box-shadow: 4px 4px 0 0 #3E2723 !important;
+  box-shadow: 4px 4px 0 0 #3e2723 !important;
   border-radius: 8px !important;
 }
 
 /* Pixel buttons */
-[data-theme="stardew"] button,
-[data-theme="stardew"] .btn,
-[data-theme="stardew"] [role="button"],
-[data-theme="stardew"] [role="tab"] {
+[data-theme='stardew'] button,
+[data-theme='stardew'] .btn,
+[data-theme='stardew'] [role='button'],
+[data-theme='stardew'] [role='tab'] {
   background: #f3e2bd !important;
   background-image: none !important;
   border: 3px solid #6b4423 !important;
   border-radius: 6px !important;
-  box-shadow: 3px 3px 0 0 #3E2723 !important;
+  box-shadow: 3px 3px 0 0 #3e2723 !important;
   image-rendering: pixelated !important;
   -webkit-font-smoothing: none !important;
 }
 
-[data-theme="stardew"] button[aria-pressed="true"],
-[data-theme="stardew"] [role="tab"][aria-selected="true"] {
+[data-theme='stardew'] button[aria-pressed='true'],
+[data-theme='stardew'] [role='tab'][aria-selected='true'] {
   background: #e9c46a !important;
-  box-shadow: inset 0 -2px 0 0 #3E2723, 2px 2px 0 0 #3E2723 !important;
+  box-shadow:
+    inset 0 -2px 0 0 #3e2723,
+    2px 2px 0 0 #3e2723 !important;
 }
 
 /* Inputs */
-[data-theme="stardew"] input,
-[data-theme="stardew"] textarea,
-[data-theme="stardew"] select {
+[data-theme='stardew'] input,
+[data-theme='stardew'] textarea,
+[data-theme='stardew'] select {
   background: #f6e7c4 !important;
   border: 3px solid #6b4423 !important;
   border-radius: 6px !important;
@@ -91,29 +93,29 @@
 }
 
 /* Progress bars: hard pixel */
-[data-theme="stardew"] .metric-bar,
-[data-theme="stardew"] .ping-bar,
-[data-theme="stardew"] [class*="metric-bar"],
-[data-theme="stardew"] [class*="ping-bar"],
-[data-theme="stardew"] [class*="progress"] {
+[data-theme='stardew'] .metric-bar,
+[data-theme='stardew'] .ping-bar,
+[data-theme='stardew'] [class*='metric-bar'],
+[data-theme='stardew'] [class*='ping-bar'],
+[data-theme='stardew'] [class*='progress'] {
   image-rendering: pixelated !important;
   border-radius: 0 !important;
 }
 
 /* Dropdowns */
-[data-theme="stardew"] [role="menu"],
-[data-theme="stardew"] .dropdown-menu,
-[data-theme="stardew"] [class*="Menu"] {
+[data-theme='stardew'] [role='menu'],
+[data-theme='stardew'] .dropdown-menu,
+[data-theme='stardew'] [class*='Menu'] {
   background: #f3e2bd !important;
   border: 3px solid #6b4423 !important;
   border-radius: 6px !important;
-  box-shadow: 5px 5px 0 0 #3E2723 !important;
+  box-shadow: 5px 5px 0 0 #3e2723 !important;
   backdrop-filter: none !important;
 }
 
 /* Light scanlines */
-[data-theme="stardew"] body::after {
-  content: "";
+[data-theme='stardew'] body::after {
+  content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -124,15 +126,15 @@
 }
 
 /* === Protect living world scene from matte resets === */
-[data-theme="stardew"] .stardew-scene,
-[data-theme="stardew"] .stardew-scene *,
-[data-theme="stardew"] .stardew-flora-fauna,
-[data-theme="stardew"] .stardew-flora-fauna *,
-[data-theme="stardew"] .background-container,
-[data-theme="stardew"] .background-container * {
+[data-theme='stardew'] .stardew-scene,
+[data-theme='stardew'] .stardew-scene *,
+[data-theme='stardew'] .stardew-flora-fauna,
+[data-theme='stardew'] .stardew-flora-fauna *,
+[data-theme='stardew'] .background-container,
+[data-theme='stardew'] .background-container * {
   backdrop-filter: none !important;
 }
-[data-theme="stardew"] .stardew-scene .stardew-sun,
-[data-theme="stardew"] .stardew-scene .stardew-moon {
+[data-theme='stardew'] .stardew-scene .stardew-sun,
+[data-theme='stardew'] .stardew-scene .stardew-moon {
   box-shadow: inherit;
 }

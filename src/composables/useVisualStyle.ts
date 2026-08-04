@@ -11,15 +11,18 @@ function isVisualStyle(value: unknown): value is VisualStyle {
 }
 
 function readStorageItem(key: string): string | null {
-  try { return localStorage.getItem(key) } catch { return null }
+  try { return localStorage.getItem(key) }
+  catch { return null }
 }
 
 function writeStorageItem(key: string, value: string) {
-  try { localStorage.setItem(key, value) } catch {}
+  try { localStorage.setItem(key, value) }
+  catch {}
 }
 
 function parse(raw: string | null, fallbackFromSettings: VisualStyle = 'stardew'): VisualStyle {
-  if (!raw) return fallbackFromSettings
+  if (!raw)
+    return fallbackFromSettings
   const v = raw.trim()
   return isVisualStyle(v) ? v : fallbackFromSettings
 }
@@ -28,7 +31,8 @@ function apply(style: VisualStyle) {
   const root = document.documentElement
   if (style === 'stardew') {
     root.setAttribute('data-theme', 'stardew')
-  } else {
+  }
+  else {
     root.removeAttribute('data-theme')
   }
 }
@@ -39,9 +43,11 @@ let isReady = false
 export function useVisualStyle() {
   const explicit = (): VisualStyle => {
     const raw = readStorageItem(KEY)
-    if (raw !== null) return parse(raw)
+    if (raw !== null)
+      return parse(raw)
     const fallback = readStorageItem(KEY_DEFAULT)
-    if (fallback !== null) return parse(fallback)
+    if (fallback !== null)
+      return parse(fallback)
     return parse(readStorageItem(KEY_SETTINGS), 'stardew')
   }
 

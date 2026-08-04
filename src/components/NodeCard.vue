@@ -2,14 +2,14 @@
 import type { NodeData } from '@/stores/nodes'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
+import PixelProgress from '@/components/PixelProgress.vue'
 import { useNodePingDisplay } from '@/composables/useNodePingDisplay'
+import { cn } from '@/lib/utils'
 import { useAppStore } from '@/stores/app'
 import { formatBytesPerSecondWithConfig, formatBytesWithConfig } from '@/utils/helper'
 import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
 import { getDaysUntilExpired, getExpireStatus } from '@/utils/tagHelper'
-import PixelProgress from '@/components/PixelProgress.vue'
-import { cn } from '@/lib/utils'
 
 const props = defineProps<{ node: NodeData }>()
 const emit = defineEmits<{ click: [] }>()
@@ -77,7 +77,7 @@ const osLabel = computed(() => {
   return [os, arch, virt].filter(Boolean).join(' · ')
 })
 
-type BannerTheme = {
+interface BannerTheme {
   key: string
   banner: string
   accent: string
@@ -293,7 +293,7 @@ const offline = computed(() => !props.node.online)
         <div class="ping-bar">
           <span
             v-for="i in 8"
-            :key="'lat-' + i"
+            :key="`lat-${i}`"
             :class="pingDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.latency : undefined)"
           />
         </div>
@@ -309,7 +309,7 @@ const offline = computed(() => !props.node.online)
         <div class="ping-bar">
           <span
             v-for="i in 8"
-            :key="'loss-' + i"
+            :key="`loss-${i}`"
             :class="lossDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.loss : undefined)"
           />
         </div>
@@ -363,20 +363,22 @@ const offline = computed(() => !props.node.online)
   color: #3a2a1a;
   font-family: 'VT323', 'Press Start 2P', 'Nunito', system-ui, sans-serif;
   letter-spacing: 0.02em;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
   overflow: visible;
   image-rendering: auto;
 }
 
 .sd-card:hover {
-  transform: translate(-1px, -1px);
+  transform: translate(-2px, -2px);
   box-shadow:
     6px 6px 0 #3e2723,
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .sd-card--offline {
-  filter: grayscale(0.35) brightness(0.95);
+  filter: grayscale(0.35) brightness(0.95) contrast(1.1);
   border-color: #7a3b2a;
   box-shadow: 4px 4px 0 #5a2417;
 }
@@ -587,7 +589,13 @@ const offline = computed(() => !props.node.online)
   opacity: 0.5;
 }
 
-.c-sky { color: #0288d1; }
-.c-em { color: #2e7d32; }
-.c-rose { color: #c62828; }
+.c-sky {
+  color: #0288d1;
+}
+.c-em {
+  color: #2e7d32;
+}
+.c-rose {
+  color: #c62828;
+}
 </style>

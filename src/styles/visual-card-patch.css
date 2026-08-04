@@ -1,12 +1,12 @@
 /* Shared visual-style pixel package for key cards under data-theme="stardew */
-[data-theme="stardew"] .server-card,
-[data-theme="stardew"] .compact-node-card,
-[data-theme="stardew"] .mini-node-card,
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] .node-list,
-[data-theme="stardew"] .instance-panel,
-[data-theme="stardew"] .theme-masthead,
-[data-theme="stardew"] .surface-inset {
+[data-theme='stardew'] .server-card,
+[data-theme='stardew'] .compact-node-card,
+[data-theme='stardew'] .mini-node-card,
+[data-theme='stardew'] .overview-card,
+[data-theme='stardew'] .node-list,
+[data-theme='stardew'] .instance-panel,
+[data-theme='stardew'] .theme-masthead,
+[data-theme='stardew'] .surface-inset {
   border-color: var(--border);
   border-style: solid;
   border-width: var(--visual-border-width, 1px);
@@ -17,19 +17,25 @@
     linear-gradient(180deg, rgba(255, 239, 184, 0.28), rgba(199, 132, 55, 0.06)),
     radial-gradient(circle at 18% 24%, rgba(124, 73, 32, 0.05) 0 1px, transparent 1.5px),
     radial-gradient(circle at 72% 68%, rgba(255, 250, 210, 0.2) 0 1px, transparent 1.5px);
-  background-position: center, 0 0, 7px 9px;
-  background-size: auto, 20px 18px, 23px 21px;
+  background-position:
+    center,
+    0 0,
+    7px 9px;
+  background-size:
+    auto,
+    20px 18px,
+    23px 21px;
 }
 
-[data-theme="stardew"] .server-card,
-[data-theme="stardew"] .compact-node-card,
-[data-theme="stardew"] .mini-node-card,
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] .node-list,
-[data-theme="stardew"] .instance-panel,
-[data-theme="stardew"] .theme-masthead,
-[data-theme="stardew"] .surface-inset {
-  font-family: "Jersey 10", "Chill RoundM", "Microsoft YaHei UI", sans-serif;
+[data-theme='stardew'] .server-card,
+[data-theme='stardew'] .compact-node-card,
+[data-theme='stardew'] .mini-node-card,
+[data-theme='stardew'] .overview-card,
+[data-theme='stardew'] .node-list,
+[data-theme='stardew'] .instance-panel,
+[data-theme='stardew'] .theme-masthead,
+[data-theme='stardew'] .surface-inset {
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', 'Microsoft YaHei UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: none;

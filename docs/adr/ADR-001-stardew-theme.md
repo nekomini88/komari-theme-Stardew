@@ -49,12 +49,13 @@ komari-theme-Neko 提供翠绿/日出/沙漠等 8 套主题，无像素风/农�
 
 ## 已知偏离（以 v0.1.0 为界）
 
-v0.1.0 之前的提交直接在 `main` 上，未经历 `feature/* → develop → main` 流程。  
+v0.1.0 之前的提交直接在 `main` 上，未经历 `feature/* → develop → main` 流程。
 这是已知偏离，不影响后续发布稳定性，但本 ADR 要求从 v0.1.0 开始严格按 Git Flow 执行。
 
 ## Git Flow 后处理
 
 从 v0.1.0 起，新功能必须走：
+
 ```
 feature/<id>-<slug> -> develop (PR) -> main (PR) -> v<tag>
 ```

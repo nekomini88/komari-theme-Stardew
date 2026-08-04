@@ -41,6 +41,7 @@ GitHub Release 通过 CI 自动创建；回滚时需手动删除错误 Release �
 ## 配置回滚
 
 若主题 `komari-theme.json` 配置变更需要回滚：
+
 1. 从 Git History 恢复前版本 `git show vX.Y.Z~1:komari-theme.json > komari-theme.json`
 2. bump patch 版本号
 3. 重建 zip

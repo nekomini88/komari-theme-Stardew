@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useNodesStore } from '@/stores/nodes'
+import { computed } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { useNodesStore } from '@/stores/nodes'
 import * as financeHelper from '@/utils/financeHelper'
-import { formatBytesSplit, formatBytesPerSecondSplit } from '@/utils/helper'
+import { formatBytesPerSecondSplit, formatBytesSplit } from '@/utils/helper'
 
 const nodesStore = useNodesStore()
 const appStore = useAppStore()
@@ -38,7 +38,8 @@ const balanceText = computed(() => {
     const currency = appStore.lang === 'zh-CN' ? 'CNY' : 'USD'
     const formatted = financeHelper.formatFinanceAmount(value, currency)
     return `${formatted.symbol}${formatted.value} ${formatted.currency}`
-  } catch {
+  }
+  catch {
     return '¥0 CNY'
   }
 })
@@ -52,50 +53,78 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     <div class="stardew-wood-card stardew-stat">
       <img src="/images/icons/memory.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">内存</div>
-        <div class="stardew-stat__value good">{{ memPct }}%</div>
-        <div class="stardew-stat__sub">{{ fmt(totalMemoryUsed).value }} {{ fmt(totalMemoryUsed).unit }} / {{ fmt(totalMemoryTotal).value }} {{ fmt(totalMemoryTotal).unit }}</div>
+        <div class="stardew-stat__label">
+          内存
+        </div>
+        <div class="stardew-stat__value good">
+          {{ memPct }}%
+        </div>
+        <div class="stardew-stat__sub">
+          {{ fmt(totalMemoryUsed).value }} {{ fmt(totalMemoryUsed).unit }} / {{ fmt(totalMemoryTotal).value }} {{ fmt(totalMemoryTotal).unit }}
+        </div>
       </div>
     </div>
 
     <div class="stardew-wood-card stardew-stat">
       <img src="/images/icons/disk.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">硬盘</div>
-        <div class="stardew-stat__value good">{{ diskPct }}%</div>
-        <div class="stardew-stat__sub">{{ fmt(totalDiskUsed).value }} {{ fmt(totalDiskUsed).unit }} / {{ fmt(totalDiskTotal).value }} {{ fmt(totalDiskTotal).unit }}</div>
+        <div class="stardew-stat__label">
+          硬盘
+        </div>
+        <div class="stardew-stat__value good">
+          {{ diskPct }}%
+        </div>
+        <div class="stardew-stat__sub">
+          {{ fmt(totalDiskUsed).value }} {{ fmt(totalDiskUsed).unit }} / {{ fmt(totalDiskTotal).value }} {{ fmt(totalDiskTotal).unit }}
+        </div>
       </div>
     </div>
 
     <div class="stardew-wood-card stardew-stat">
       <Icon icon="tabler:coin" :width="28" :height="28" class="stardew-stat__icon-lucide" />
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">剩余价值</div>
-        <div class="stardew-stat__value">{{ balanceText }}</div>
+        <div class="stardew-stat__label">
+          剩余价值
+        </div>
+        <div class="stardew-stat__value">
+          {{ balanceText }}
+        </div>
       </div>
     </div>
 
     <div class="stardew-wood-card stardew-stat">
       <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">累计流量</div>
-        <div class="stardew-stat__value">{{ fmt(totalTraffic).value }} {{ fmt(totalTraffic).unit }}</div>
+        <div class="stardew-stat__label">
+          累计流量
+        </div>
+        <div class="stardew-stat__value">
+          {{ fmt(totalTraffic).value }} {{ fmt(totalTraffic).unit }}
+        </div>
       </div>
     </div>
 
     <div class="stardew-wood-card stardew-stat">
       <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">实时上行</div>
-        <div class="stardew-stat__value">{{ fmtSpeed(totalSpeedUp).value }}{{ fmtSpeed(totalSpeedUp).unit }}/s</div>
+        <div class="stardew-stat__label">
+          实时上行
+        </div>
+        <div class="stardew-stat__value">
+          {{ fmtSpeed(totalSpeedUp).value }}{{ fmtSpeed(totalSpeedUp).unit }}/s
+        </div>
       </div>
     </div>
 
     <div class="stardew-wood-card stardew-stat">
       <img src="/images/icons/download.png" class="stardew-stat__icon" alt="">
       <div class="stardew-stat__body">
-        <div class="stardew-stat__label">实时下行</div>
-        <div class="stardew-stat__value">{{ fmtSpeed(totalSpeedDown).value }}{{ fmtSpeed(totalSpeedDown).unit }}/s</div>
+        <div class="stardew-stat__label">
+          实时下行
+        </div>
+        <div class="stardew-stat__value">
+          {{ fmtSpeed(totalSpeedDown).value }}{{ fmtSpeed(totalSpeedDown).unit }}/s
+        </div>
       </div>
     </div>
   </div>
@@ -109,10 +138,14 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
   padding: 12px 16px 4px;
 }
 @media (min-width: 640px) {
-  .stardew-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stardew-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (min-width: 1024px) {
-  .stardew-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stardew-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .stardew-stat {
@@ -125,7 +158,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
   background: #f6e7c4 !important;
   border: 4px solid #6b4423 !important;
   border-radius: 10px !important;
-  box-shadow: 5px 5px 0 #3E2723 !important;
+  box-shadow: 5px 5px 0 #3e2723 !important;
   image-rendering: pixelated;
 }
 
@@ -157,8 +190,8 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
 .stardew-stat__value {
   font-size: 20px;
   font-weight: 800;
-  color: #3E2723;
-  font-family: "VT323", "Press Start 2P", ui-monospace, monospace;
+  color: #3e2723;
+  font-family: 'VT323', 'Press Start 2P', ui-monospace, monospace;
   line-height: 1.15;
 }
 .stardew-stat__value.good {
@@ -168,6 +201,6 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
   font-size: 11px;
   color: #7a5a32;
   margin-top: 2px;
-  font-family: "VT323", monospace;
+  font-family: 'VT323', monospace;
 }
 </style>

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { describe, expect, it } from 'vitest'
 
 describe('boundary: spec.yaml and sources', () => {
   it('spec.yaml required fields are non-empty after colon', () => {
@@ -17,7 +17,7 @@ describe('boundary: spec.yaml and sources', () => {
     expect(json.short.length).toBeGreaterThan(0)
   })
 
-  it('Header.vue must contain stardew theme option', () => {
+  it('header.vue must contain stardew theme option', () => {
     const header = readFileSync('src/components/Header.vue', 'utf8')
     expect(header).toContain('stardew')
   })

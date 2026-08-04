@@ -34,7 +34,12 @@ const isDark = computed(() => appStore.isDark)
 }
 
 @keyframes loading-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 </style>

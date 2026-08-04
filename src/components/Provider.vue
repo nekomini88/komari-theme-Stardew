@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { VisualStyle } from '@/composables/useVisualStyle'
 import type { ThemeMode } from '@/stores/app'
 import { useDark } from '@vueuse/core'
-import { computed, onMounted, provide, ref, watch } from 'vue'
-import type { VisualStyle } from '@/composables/useVisualStyle'
-import { useVisualStyle } from '@/composables/useVisualStyle'
 import { storeToRefs } from 'pinia'
+import { computed, onMounted, provide, ref, watch } from 'vue'
 import { BackTop } from '@/components/ui/back-top'
+import { useVisualStyle } from '@/composables/useVisualStyle'
 import { useAppStore } from '@/stores/app'
 
 const appStore = useAppStore()
@@ -39,7 +39,7 @@ watch(
       root.classList.remove('dark')
     root.style.colorScheme = dark ? 'dark' : 'light'
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(
@@ -51,7 +51,7 @@ watch(
     else
       body.style.removeProperty('background-color')
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Theme selection from theme_settings (color palette)
@@ -71,12 +71,13 @@ watch(
     if (typeof newVal === 'string' && newVal !== 'emerald') {
       console.log('[Palette] Setting theme to:', newVal)
       root.setAttribute('data-theme', newVal)
-    } else {
+    }
+    else {
       console.log('[Palette] Resetting to default')
       root.removeAttribute('data-theme')
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Visual style persistence: stardew vs baseline

@@ -16,7 +16,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* v0.16.6 visual priority: soft pastoral glass UI */
-[data-theme="stardew"] {
+[data-theme='stardew'] {
   --shadow-card: none;
 }
 
@@ -142,7 +142,7 @@
 }
 
 /* 日出主题 */
-[data-theme="sunrise"] {
+[data-theme='sunrise'] {
   --background: oklch(0.98 0.015 60);
   --foreground: oklch(0.25 0.02 30);
   --card: oklch(0.99 0.01 50);
@@ -177,7 +177,7 @@
 }
 
 /* 青山主题 */
-[data-theme="green-mountain"] {
+[data-theme='green-mountain'] {
   --background: oklch(0.97 0.015 120);
   --foreground: oklch(0.2 0.02 130);
   --card: oklch(0.99 0.01 140);
@@ -212,7 +212,7 @@
 }
 
 /* 绿水主题 */
-[data-theme="blue-water"] {
+[data-theme='blue-water'] {
   --background: oklch(0.97 0.015 210);
   --foreground: oklch(0.2 0.02 220);
   --card: oklch(0.99 0.01 200);
@@ -247,7 +247,7 @@
 }
 
 /* 夜晚主题（深色主题） */
-[data-theme="night"] {
+[data-theme='night'] {
   --background: oklch(0.12 0.01 240);
   --foreground: oklch(0.95 0.01 240);
   --card: oklch(0.18 0.01 240);
@@ -282,7 +282,7 @@
 }
 
 /* Material Design - Indigo 主题 */
-[data-theme="material-indigo"] {
+[data-theme='material-indigo'] {
   --background: oklch(0.985 0.005 270);
   --foreground: oklch(0.2 0.03 270);
   --card: oklch(1 0 0);
@@ -317,7 +317,7 @@
 }
 
 /* Material Design - Pink 主题 */
-[data-theme="material-pink"] {
+[data-theme='material-pink'] {
   --background: oklch(0.98 0.01 350);
   --foreground: oklch(0.2 0.02 340);
   --card: oklch(1 0 0);
@@ -352,7 +352,7 @@
 }
 
 /* Material Design - Teal 主题 */
-[data-theme="material-teal"] {
+[data-theme='material-teal'] {
   --background: oklch(0.97 0.015 180);
   --foreground: oklch(0.2 0.025 180);
   --card: oklch(0.99 0.01 180);
@@ -453,9 +453,8 @@ html.no-glass body {
   }
 }
 
-
 /* Stardew 谷主题 - full token set */
-[data-theme="stardew"] {
+[data-theme='stardew'] {
   --bg-0: #f4ead5;
   --surface: #fbecc8;
   --surface-elev: #fff3cc;
@@ -500,7 +499,7 @@ html.no-glass body {
   --visual-panel-shadow: inset 0 0 0 1px rgba(120, 90, 60, 0.35);
 }
 
-[data-appearance="dark"][data-theme="stardew"] {
+[data-appearance='dark'][data-theme='stardew'] {
   --bg-0: #22180a;
   --surface: #35281a;
   --surface-elev: #40321f;
@@ -514,62 +513,95 @@ html.no-glass body {
   --text-tertiary: #a08250;
   --text-on-strong: #181008;
   --fill-secondary: rgba(210, 170, 90, 0.16);
-  --fill-tertiary: rgba(210, 170, 90, 0.10);
+  --fill-tertiary: rgba(210, 170, 90, 0.1);
   --hover-bg: #4e3a22;
   --progress-bg: #2e2215;
   --ring: rgba(220, 170, 60, 0.52);
   --visual-panel-shadow: inset 0 0 0 1px rgba(200, 150, 70, 0.32);
 }
 
-[data-theme="stardew"] {
+[data-theme='stardew'] {
   --shadow-card: none;
-  font-family: "Silkscreen", "Jersey 10", "Chill RoundM", sans-serif;
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', sans-serif;
 }
-
-
 
 /* === Stardew seasonal light/dark palettes === */
-[data-theme="stardew"][data-season="spring"][data-appearance="light"] {
-  --surface:#fbecc8; --surface-elev:#fff3cc; --border:#a89a72; --border-strong:#7d8c64; --hairline:#c7d5a8;
+[data-theme='stardew'][data-season='spring'][data-appearance='light'] {
+  --surface: #fbecc8;
+  --surface-elev: #fff3cc;
+  --border: #a89a72;
+  --border-strong: #7d8c64;
+  --hairline: #c7d5a8;
 }
-[data-theme="stardew"][data-season="summer"][data-appearance="light"] {
-  --surface:#fde8b0; --surface-elev:#fff3cc; --border:#b47a38; --border-strong:#c2552b; --hairline:#f3cc8c;
+[data-theme='stardew'][data-season='summer'][data-appearance='light'] {
+  --surface: #fde8b0;
+  --surface-elev: #fff3cc;
+  --border: #b47a38;
+  --border-strong: #c2552b;
+  --hairline: #f3cc8c;
 }
-[data-theme="stardew"][data-season="autumn"][data-appearance="light"] {
-  --surface:#f2cc8f; --surface-elev:#fde8c8; --border:#8c5e34; --border-strong:#b5542a; --hairline:#d9a06b;
+[data-theme='stardew'][data-season='autumn'][data-appearance='light'] {
+  --surface: #f2cc8f;
+  --surface-elev: #fde8c8;
+  --border: #8c5e34;
+  --border-strong: #b5542a;
+  --hairline: #d9a06b;
 }
-[data-theme="stardew"][data-season="winter"][data-appearance="light"] {
-  --surface:#e8f0f5; --surface-elev:#f3f7fa; --border:#7397b8; --border-strong:#5b7f9a; --hairline:#a3c1d6;
+[data-theme='stardew'][data-season='winter'][data-appearance='light'] {
+  --surface: #e8f0f5;
+  --surface-elev: #f3f7fa;
+  --border: #7397b8;
+  --border-strong: #5b7f9a;
+  --hairline: #a3c1d6;
 }
-[data-theme="stardew"][data-season="spring"][data-appearance="dark"] {
-  --bg-0:#1f241a; --surface:#2a3324; --surface-elev:#354230; --border:#7d8c64; --border-strong:#a2b07a; --hairline:#5a6a48;
+[data-theme='stardew'][data-season='spring'][data-appearance='dark'] {
+  --bg-0: #1f241a;
+  --surface: #2a3324;
+  --surface-elev: #354230;
+  --border: #7d8c64;
+  --border-strong: #a2b07a;
+  --hairline: #5a6a48;
 }
-[data-theme="stardew"][data-season="summer"][data-appearance="dark"] {
-  --bg-0:#241c15; --surface:#33231b; --surface-elev:#4a3125; --border:#b47a38; --border-strong:#d08848; --hairline:#6a4830;
+[data-theme='stardew'][data-season='summer'][data-appearance='dark'] {
+  --bg-0: #241c15;
+  --surface: #33231b;
+  --surface-elev: #4a3125;
+  --border: #b47a38;
+  --border-strong: #d08848;
+  --hairline: #6a4830;
 }
-[data-theme="stardew"][data-season="autumn"][data-appearance="dark"] {
-  --bg-0:#221813; --surface:#2f201a; --surface-elev:#3f2a22; --border:#b5542a; --border-strong:#d06538; --hairline:#6e402c;
+[data-theme='stardew'][data-season='autumn'][data-appearance='dark'] {
+  --bg-0: #221813;
+  --surface: #2f201a;
+  --surface-elev: #3f2a22;
+  --border: #b5542a;
+  --border-strong: #d06538;
+  --hairline: #6e402c;
 }
-[data-theme="stardew"][data-season="winter"][data-appearance="dark"] {
-  --bg-0:#141920; --surface:#1b232d; --surface-elev:#22303d; --border:#7397b8; --border-strong:#8db0cc; --hairline:#3e546a;
+[data-theme='stardew'][data-season='winter'][data-appearance='dark'] {
+  --bg-0: #141920;
+  --surface: #1b232d;
+  --surface-elev: #22303d;
+  --border: #7397b8;
+  --border-strong: #8db0cc;
+  --hairline: #3e546a;
 }
-
 
 /* stardew: 页面透明，让 Background 里的白天/夜晚全景图全屏可见 */
-[data-theme="stardew"],
-[data-theme="stardew"] html,
-[data-theme="stardew"] body,
-[data-theme="stardew"] #app {
+[data-theme='stardew'],
+[data-theme='stardew'] html,
+[data-theme='stardew'] body,
+[data-theme='stardew'] #app {
   background-color: transparent !important;
   background-image: none !important;
 }
-[data-theme="stardew"] main {
+[data-theme='stardew'] main {
   background: transparent !important;
   position: relative;
   z-index: 1;
 }
-[data-theme="stardew"] header,
-[data-theme="stardew"] footer {
+[data-theme='stardew'] header,
+[data-theme='stardew'] footer {
   position: relative;
   z-index: 2;
 }

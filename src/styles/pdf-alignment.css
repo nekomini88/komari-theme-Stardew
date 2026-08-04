@@ -1,50 +1,66 @@
 /* v0.12.0 PDF + post-844876-1 pixel typography alignment */
 
-[data-theme="stardew"] #app {
+[data-theme='stardew'] #app {
   font-size: 13px;
   line-height: 1.45;
   letter-spacing: 0.02em;
 }
 
-[data-theme="stardew"] h1,
-[data-theme="stardew"] h2,
-[data-theme="stardew"] h3,
-[data-theme="stardew"] h4,
-[data-theme="stardew"] h5,
-[data-theme="stardew"] h6 {
+[data-theme='stardew'] h1,
+[data-theme='stardew'] h2,
+[data-theme='stardew'] h3,
+[data-theme='stardew'] h4,
+[data-theme='stardew'] h5,
+[data-theme='stardew'] h6 {
   letter-spacing: 0.04em;
   line-height: 1.35;
   text-transform: uppercase;
 }
 
-[data-theme="stardew"] h1 { font-size: 22px; }
-[data-theme="stardew"] h2 { font-size: 18px; }
-[data-theme="stardew"] h3 { font-size: 15px; }
-[data-theme="stardew"] h4 { font-size: 13px; }
+[data-theme='stardew'] h1 {
+  font-size: 22px;
+}
+[data-theme='stardew'] h2 {
+  font-size: 18px;
+}
+[data-theme='stardew'] h3 {
+  font-size: 15px;
+}
+[data-theme='stardew'] h4 {
+  font-size: 13px;
+}
 
-[data-theme="stardew"] .card,
-[data-theme="stardew"] [class*="card"],
-[data-theme="stardew"] .glass,
-[data-theme="stardew"] .panel {
+[data-theme='stardew'] .card,
+[data-theme='stardew'] [class*='card'],
+[data-theme='stardew'] .glass,
+[data-theme='stardew'] .panel {
   border-radius: 3px !important;
   padding: 8px 10px !important;
   gap: 8px !important;
 }
 
-[data-theme="stardew"] .space-x-2,
-[data-theme="stardew"] [class*="space-x"]:not(html) {
+[data-theme='stardew'] .space-x-2,
+[data-theme='stardew'] [class*='space-x']:not(html) {
   --gap: 8px !important;
 }
 
-[data-theme="stardew"] .text-xs { font-size: 11px; }
-[data-theme="stardew"] .text-sm { font-size: 12px; }
-[data-theme="stardew"] .text-base { font-size: 13px; }
-[data-theme="stardew"] .text-lg { font-size: 15px; }
+[data-theme='stardew'] .text-xs {
+  font-size: 11px;
+}
+[data-theme='stardew'] .text-sm {
+  font-size: 12px;
+}
+[data-theme='stardew'] .text-base {
+  font-size: 13px;
+}
+[data-theme='stardew'] .text-lg {
+  font-size: 15px;
+}
 
-[data-theme="stardew"] .metric,
-[data-theme="stardew"] .progress,
-[data-theme="stardew"] .bar,
-[data-theme="stardew"] .stat {
+[data-theme='stardew'] .metric,
+[data-theme='stardew'] .progress,
+[data-theme='stardew'] .bar,
+[data-theme='stardew'] .stat {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 12px;

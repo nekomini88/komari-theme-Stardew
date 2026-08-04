@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { VersionInfo } from '@/utils/api'
 import { computed, onMounted, ref } from 'vue'
-import { DataTooltip } from '@/components/ui/data-tooltip'
 import { useAppStore } from '@/stores/app'
 import { getSharedApi } from '@/utils/api'
 
@@ -29,10 +28,11 @@ const showIcp = computed(() => appStore.icpEnabled && appStore.icpNumber)
 const showPolice = computed(() => appStore.policeEnabled && appStore.policeNumber)
 const showFiling = computed(() => showIcp.value || showPolice.value)
 
-const openLink = (url: string) => {
+function openLink(url: string) {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 </script>
+
 <template>
   <footer class="w-full flex flex-row items-center justify-between max-w-[1600px] mx-auto p-4">
     <div class="flex gap-1 items-center text-xs text-muted-foreground">

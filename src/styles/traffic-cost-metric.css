@@ -1,100 +1,101 @@
 /* v0.6.0 matte pixel tokens for traffic/cost/metric/node-card metric grid */
 
 /* Home overview tiles: RAM, Disk, Price, Traffic, Net */
-[data-theme="stardew"] .overview-card,
-[data-theme="stardew"] .overview-card * {
+[data-theme='stardew'] .overview-card,
+[data-theme='stardew'] .overview-card * {
   text-rendering: optimizespeed;
   -webkit-font-smoothing: none;
 }
-[data-theme="stardew"] .overview-card {
+[data-theme='stardew'] .overview-card {
   border-width: var(--visual-border-width);
   border-style: dotted;
-  border-color: var(--border,#a67c2e);
-  border-radius: var(--visual-radius-card,6px);
-  background-color: var(--surface,#fbecc8);
-  box-shadow: 2px 2px 0 0 var(--border-strong,#8c5f1b),
-              inset 0 0 0 1px #785a3c59;
+  border-color: var(--border, #a67c2e);
+  border-radius: var(--visual-radius-card, 6px);
+  background-color: var(--surface, #fbecc8);
+  box-shadow:
+    2px 2px 0 0 var(--border-strong, #8c5f1b),
+    inset 0 0 0 1px #785a3c59;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   image-rendering: pixelated;
 }
-[data-theme="stardew"] .overview-card .overview-card-value,
-[data-theme="stardew"] .overview-card .overview-card-unit {
-  font-family: "Jersey 10", Chill RoundM, sans-serif;
-  letter-spacing: .06em;
+[data-theme='stardew'] .overview-card .overview-card-value,
+[data-theme='stardew'] .overview-card .overview-card-unit {
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', sans-serif;
+  letter-spacing: 0.06em;
 }
 
 /* Traffic panel items */
-[data-theme="stardew"] .traffic-stat,
-[data-theme="stardew"] .traffic,
-[data-theme="stardew"] .traffic-volume-value,
-[data-theme="stardew"] .traffic-stat-value {
+[data-theme='stardew'] .traffic-stat,
+[data-theme='stardew'] .traffic,
+[data-theme='stardew'] .traffic-volume-value,
+[data-theme='stardew'] .traffic-stat-value {
   text-rendering: optimizespeed;
   -webkit-font-smoothing: none;
-  font-family: "Jersey 10", Chill RoundM, sans-serif;
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', sans-serif;
 }
-[data-theme="stardew"] .traffic-stat-value,
-[data-theme="stardew"] .traffic-volume-value strong {
+[data-theme='stardew'] .traffic-stat-value,
+[data-theme='stardew'] .traffic-volume-value strong {
   font-size: 1.05em;
 }
-[data-theme="stardew"] .traffic-stat-label,
-[data-theme="stardew"] .traffic-sample-note {
-  color: var(--text-tertiary,#7f5630);
-  letter-spacing: .04em;
+[data-theme='stardew'] .traffic-stat-label,
+[data-theme='stardew'] .traffic-sample-note {
+  color: var(--text-tertiary, #7f5630);
+  letter-spacing: 0.04em;
 }
 
 /* Cost summary tiles */
-[data-theme="stardew"] .cost-summary-card,
-[data-theme="stardew"] [class*="cost summary"],
-[data-theme="stardew"] [class*="cost-summary"] {
+[data-theme='stardew'] .cost-summary-card,
+[data-theme='stardew'] [class*='cost summary'],
+[data-theme='stardew'] [class*='cost-summary'] {
   border-width: var(--visual-border-width);
   border-style: dotted;
-  border-color: var(--border,#a67c2e);
-  border-radius: var(--visual-radius-card,6px);
-  background-color: var(--surface,#fbecc8);
-  box-shadow: 2px 2px 0 0 var(--border-strong,#8c5f1b);
+  border-color: var(--border, #a67c2e);
+  border-radius: var(--visual-radius-card, 6px);
+  background-color: var(--surface, #fbecc8);
+  box-shadow: 2px 2px 0 0 var(--border-strong, #8c5f1b);
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   image-rendering: pixelated;
 }
-[data-theme="stardew"] .cost-summary-sort-tab[data-active="true"] {
-  background: var(--surface-elev,#fff3cc);
-  box-shadow: inset 0 -2px 0 0 var(--border-strong,#8c5f1b);
-  border-radius: var(--visual-radius-control,6px);
+[data-theme='stardew'] .cost-summary-sort-tab[data-active='true'] {
+  background: var(--surface-elev, #fff3cc);
+  box-shadow: inset 0 -2px 0 0 var(--border-strong, #8c5f1b);
+  border-radius: var(--visual-radius-control, 6px);
 }
 
 /* Node-card metric grid pixel bars */
-[data-theme="stardew"] .node-card .grid > div {
-  font-family: "Jersey 10", Chill RoundM, sans-serif;
-  letter-spacing: .05em;
+[data-theme='stardew'] .node-card .grid > div {
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', sans-serif;
+  letter-spacing: 0.05em;
 }
-[data-theme="stardew"] .node-card .bg-muted,
-[data-theme="stardew"] .node-card [class*="bg-muted"] {
+[data-theme='stardew'] .node-card .bg-muted,
+[data-theme='stardew'] .node-card [class*='bg-muted'] {
   border-radius: 0 !important;
   image-rendering: pixelated;
 }
-[data-theme="stardew"] .node-card .bg-success,
-[data-theme="stardew"] .node-card .bg-info,
-[data-theme="stardew"] .node-card .bg-warning,
-[data-theme="stardew"] .node-card .bg-destructive,
-[data-theme="stardew"] .node-card [class*="bg-"] {
+[data-theme='stardew'] .node-card .bg-success,
+[data-theme='stardew'] .node-card .bg-info,
+[data-theme='stardew'] .node-card .bg-warning,
+[data-theme='stardew'] .node-card .bg-destructive,
+[data-theme='stardew'] .node-card [class*='bg-'] {
   border-radius: 0 !important;
   image-rendering: pixelated;
 }
 
 /* General container pixel matte for homes */
-[data-theme="stardew"] main .glass-hover-blur,
-[data-theme="stardew"] main .backdrop-blur-xl,
-[data-theme="stardew"] main .backdrop-blur-lg,
-[data-theme="stardew"] main .backdrop-blur-md,
-[data-theme="stardew"] main .backdrop-blur-sm {
+[data-theme='stardew'] main .glass-hover-blur,
+[data-theme='stardew'] main .backdrop-blur-xl,
+[data-theme='stardew'] main .backdrop-blur-lg,
+[data-theme='stardew'] main .backdrop-blur-md,
+[data-theme='stardew'] main .backdrop-blur-sm {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 
 /* Force pixel rendering for numeric reads */
-[data-theme="stardew"] [class*="tabular"],
-[data-theme="stardew"] .tabular-nums {
-  font-family: "Jersey 10", Chill RoundM, sans-serif;
-  letter-spacing: .06em;
+[data-theme='stardew'] [class*='tabular'],
+[data-theme='stardew'] .tabular-nums {
+  font-family: 'Press Start 2P', 'VT323', 'Chill RoundM', sans-serif;
+  letter-spacing: 0.06em;
 }

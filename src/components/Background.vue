@@ -125,8 +125,9 @@ function handleVideoLoaded() { isLoaded.value = true; hasError.value = false }
 function handleVideoError() { isLoaded.value = false; hasError.value = true }
 
 watch([currentUrl, backgroundType], ([url, type]) => {
-  if (url && type === 'image')
+  if (url && type === 'image') {
     loadImage(url)
+  }
   else if (url && type === 'video') {
     clearImageLoader()
     isLoaded.value = false
@@ -172,11 +173,11 @@ onUnmounted(() => clearImageLoader())
           :key="n"
           class="star"
           :style="{
-            left: ((n * 37) % 100) + '%',
-            top: ((n * 23) % 40) + '%',
-            animationDelay: (n * 0.15) + 's',
-            width: (2 + (n % 3)) + 'px',
-            height: (2 + (n % 3)) + 'px',
+            left: `${(n * 37) % 100}%`,
+            top: `${(n * 23) % 40}%`,
+            animationDelay: `${n * 0.15}s`,
+            width: `${2 + (n % 3)}px`,
+            height: `${2 + (n % 3)}px`,
           }"
         />
       </div>
@@ -317,17 +318,32 @@ onUnmounted(() => clearImageLoader())
   margin-left: -28px;
   margin-top: -28px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, #fff8d0 0%, #ffe27a 40%, rgba(255, 200, 80, 0.3) 65%, transparent 100%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    #fff8d0 0%,
+    #ffe27a 40%,
+    rgba(255, 200, 80, 0.3) 65%,
+    transparent 100%
+  );
   box-shadow:
     0 0 24px 8px rgba(255, 226, 122, 0.45),
     0 0 48px 16px rgba(255, 200, 80, 0.18) !important;
-  transition: left 2s ease, top 2s ease, opacity 1.5s ease;
+  transition:
+    left 2s ease,
+    top 2s ease,
+    opacity 1.5s ease;
   z-index: 3;
   pointer-events: none;
 }
 
 .time-dusk .stardew-sun {
-  background: radial-gradient(circle at 50% 50%, #ffd59a 0%, #ff8c42 45%, rgba(255, 100, 40, 0.25) 70%, transparent 100%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    #ffd59a 0%,
+    #ff8c42 45%,
+    rgba(255, 100, 40, 0.25) 70%,
+    transparent 100%
+  );
 }
 
 .stardew-moon {
@@ -338,8 +354,13 @@ onUnmounted(() => clearImageLoader())
   margin-top: -22px;
   border-radius: 50%;
   background: #fdfbf0;
-  box-shadow: inset -14px -10px 0 0 rgba(10, 20, 40, 0.38), 0 0 20px 6px rgba(200, 210, 255, 0.35) !important;
-  transition: left 2s ease, top 2s ease, opacity 1.5s ease;
+  box-shadow:
+    inset -14px -10px 0 0 rgba(10, 20, 40, 0.38),
+    0 0 20px 6px rgba(200, 210, 255, 0.35) !important;
+  transition:
+    left 2s ease,
+    top 2s ease,
+    opacity 1.5s ease;
   z-index: 3;
   pointer-events: none;
 }
@@ -359,8 +380,15 @@ onUnmounted(() => clearImageLoader())
 }
 
 @keyframes star-twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
 }
 
 .stardew-clouds {
@@ -379,10 +407,29 @@ onUnmounted(() => clearImageLoader())
   opacity: 0.85;
   filter: brightness(0.85) saturate(0.7);
 }
-.stardew-clouds .c1 { top: 8%; left: -15%; width: 200px; animation-duration: 85s; }
-.stardew-clouds .c2 { top: 18%; left: -30%; width: 160px; animation-duration: 100s; animation-delay: -30s; }
-.stardew-clouds .c3 { top: 5%; left: -50%; width: 220px; animation-duration: 120s; animation-delay: -50s; }
-.is-night .stardew-clouds { opacity: 0.15; }
+.stardew-clouds .c1 {
+  top: 8%;
+  left: -15%;
+  width: 200px;
+  animation-duration: 85s;
+}
+.stardew-clouds .c2 {
+  top: 18%;
+  left: -30%;
+  width: 160px;
+  animation-duration: 100s;
+  animation-delay: -30s;
+}
+.stardew-clouds .c3 {
+  top: 5%;
+  left: -50%;
+  width: 220px;
+  animation-duration: 120s;
+  animation-delay: -50s;
+}
+.is-night .stardew-clouds {
+  opacity: 0.15;
+}
 
 .stardew-weather-rain {
   position: absolute;
@@ -434,27 +481,71 @@ onUnmounted(() => clearImageLoader())
 }
 
 @keyframes stardew-cloud {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(135vw); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(135vw);
+  }
 }
 @keyframes rain-fall {
-  from { background-position: 0 0; }
-  to { background-position: 14px 32px; }
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 14px 32px;
+  }
 }
 @keyframes snow-drift {
-  from { background-position: 0 0, 20px 10px, 40px 0, 10px 30px, 50px 15px; }
-  to { background-position: 24px 140px, 48px 150px, 68px 140px, 34px 170px, 78px 155px; }
+  from {
+    background-position:
+      0 0,
+      20px 10px,
+      40px 0,
+      10px 30px,
+      50px 15px;
+  }
+  to {
+    background-position:
+      24px 140px,
+      48px 150px,
+      68px 140px,
+      34px 170px,
+      78px 155px;
+  }
 }
 @keyframes fog-drift {
-  0%, 100% { transform: translate(-2%, 0); opacity: 0.65; }
-  50% { transform: translate(2%, 1%); opacity: 0.85; }
+  0%,
+  100% {
+    transform: translate(-2%, 0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate(2%, 1%);
+    opacity: 0.85;
+  }
 }
 @keyframes thunder-flash {
-  0%, 9%, 14%, 100% { opacity: 0; }
-  10% { opacity: 1; }
-  12% { opacity: 0.3; }
-  42% { opacity: 0; }
-  43% { opacity: 0.5; }
-  45% { opacity: 0; }
+  0%,
+  9%,
+  14%,
+  100% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0.3;
+  }
+  42% {
+    opacity: 0;
+  }
+  43% {
+    opacity: 0.5;
+  }
+  45% {
+    opacity: 0;
+  }
 }
 </style>
