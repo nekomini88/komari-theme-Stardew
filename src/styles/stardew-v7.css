@@ -1,0 +1,6 @@
+
+/* Stardew Valley Farm Dashboard v7 */
+:root{--wood:#6b4226;--paper:#fff0c8;--grass:#78b159}
+.no-glass *{backdrop-filter:none!important}
+body{image-rendering:auto}
+.stardew-v7{font-family:Pixelify Sans,monospace}

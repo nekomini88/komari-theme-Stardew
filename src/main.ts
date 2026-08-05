@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 
 import './styles/main.css'
+import './styles/stardew-v7.css'
 
 window.$message = message
 
