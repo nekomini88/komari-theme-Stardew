@@ -29,7 +29,19 @@ const showPolice = computed(() => appStore.policeEnabled && appStore.policeNumbe
 const showFiling = computed(() => showIcp.value || showPolice.value)
 
 function openLink(url: string) {
-  window.open(url, '_blank', 'noopener,noreferrer')
+  // 兜底: <a target=_blank> 在部分环境(iframe/沙箱)可能被拦截,
+  // 此处用 window.open 显式打开; 若被 popup blocker 拦截则降级为当前页导航
+  const win = window.open(url, '_blank', 'noopener,noreferrer')
+  if (!win) {
+    window.location.href = url
+  }
+}
+
+function onLinkClick(e: MouseEvent, url: string) {
+  // 允许 Ctrl/Cmd/Middle-click 走浏览器原生行为(新标签), 其余场景确保导航
+  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return
+  e.preventDefault()
+  openLink(url)
 }
 </script>
 
@@ -42,6 +54,7 @@ function openLink(url: string) {
         target="_blank"
         rel="noopener noreferrer"
         class="font-medium text-foreground underline decoration-foreground/30 underline-offset-2 hover:decoration-foreground transition-opacity hover:opacity-80"
+        @click="onLinkClick($event, 'https://github.com/komari-monitor/komari')"
       >Komari Monitor</a>
     </div>
     <div class="flex gap-1 items-center text-xs text-muted-foreground">
@@ -51,6 +64,7 @@ function openLink(url: string) {
         target="_blank"
         rel="noopener noreferrer"
         class="font-medium text-foreground underline decoration-foreground/30 underline-offset-2 hover:decoration-foreground transition-opacity hover:opacity-80"
+        @click="onLinkClick($event, themeUrl)"
       >{{ themeName }}</a>
     </div>
 
