@@ -181,7 +181,7 @@ const offline = computed(() => !props.node.online)
     <span class="sd-status" :class="offline ? 'sd-status--off' : 'sd-status--on'" />
 
     <!-- title banner -->
-    <div class="sd-banner" :style="{ background: theme.banner }">
+    <div class="sd-banner" :style="{ background: theme.banner, '--sd-banner-color': theme.banner }">
       <span class="sd-banner__name">{{ props.node.name }}</span>
       <img
         v-if="hasRegion(props.node.region)"
@@ -189,6 +189,9 @@ const offline = computed(() => !props.node.online)
         :alt="getRegionDisplayName(props.node.region)"
         class="sd-banner__flag"
       >
+      <span class="sd-banner__notch" aria-hidden="true">
+        <i /><i /><i /><i /><i /><i />
+      </span>
     </div>
 
     <!-- OS line -->
@@ -411,6 +414,7 @@ const offline = computed(() => !props.node.online)
 }
 
 .sd-banner {
+  position: relative;
   align-self: center;
   display: inline-flex;
   align-items: center;
@@ -418,16 +422,67 @@ const offline = computed(() => !props.node.online)
   gap: 6px;
   min-width: 56%;
   max-width: 88%;
-  padding: 4px 14px;
-  margin-top: 2px;
-  border-radius: 8px;
-  border: 2px solid rgba(62, 39, 35, 0.35);
+  padding: 5px 16px 7px;
+  margin-top: 10px;
+  /* 像素锯齿标牌：直角 + 硬阴影（对齐 PDF 的彩色木牌） */
+  border-radius: 0;
+  border: 3px solid rgba(62, 39, 35, 0.9);
   box-shadow:
-    0 2px 0 rgba(62, 39, 35, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    0 3px 0 rgba(62, 39, 35, 0.55),
+    0 6px 0 rgba(62, 39, 35, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18);
   color: #fff;
   z-index: 2;
+  /* 顶部两侧木牌挂耳（像素阶梯） */
 }
+
+.sd-banner::before,
+.sd-banner::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 14px;
+  height: 14px;
+  background: var(--sd-banner-color, #4caf50);
+  border: 3px solid rgba(62, 39, 35, 0.9);
+  border-radius: 0;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+.sd-banner::before {
+  left: -3px;
+}
+
+.sd-banner::after {
+  right: -3px;
+}
+
+/* 标牌下方像素锯齿边 */
+.sd-banner__notch {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 6px;
+  pointer-events: none;
+}
+
+.sd-banner__notch i {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 6px;
+  background: var(--sd-banner-color, #4caf50);
+}
+
+.sd-banner__notch i:nth-child(1) { left: 10%; }
+.sd-banner__notch i:nth-child(2) { left: 26%; }
+.sd-banner__notch i:nth-child(3) { left: 42%; }
+.sd-banner__notch i:nth-child(4) { left: 58%; }
+.sd-banner__notch i:nth-child(5) { left: 74%; }
+.sd-banner__notch i:nth-child(6) { left: 90%; }
 
 .sd-banner__name {
   font-size: 13px;

@@ -290,7 +290,13 @@ html[data-theme='stardew'] .stardew-lightning {
   box-shadow: 6px 6px 0 #5a2417 !important;
 }
 [data-theme='stardew'] .sd-card .sd-banner {
-  border: 2px solid rgba(62, 39, 35, 0.35) !important;
-  border-radius: 8px !important;
-  box-shadow: 2px 2px 0 rgba(62, 39, 35, 0.25) !important;
+  /* 像素锯齿标牌：直角 + 深色硬边框 + 硬阴影（对齐 PDF 木牌）。
+     不再强制圆角/细边框（旧 "tasteful" 圆角与 Stardew 像素标牌冲突）。 */
+  border-radius: 0 !important;
+  border: 3px solid rgba(62, 39, 35, 0.9) !important;
+  box-shadow:
+    0 3px 0 rgba(62, 39, 35, 0.55),
+    0 6px 0 rgba(62, 39, 35, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18) !important;
 }
