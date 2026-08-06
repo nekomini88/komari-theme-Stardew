@@ -81,10 +81,6 @@ interface BannerTheme {
   key: string
   banner: string
   building: string
-  barCpu: string
-  barMem: string
-  barDisk: string
-  barLoad: string
 }
 
 const themes: readonly BannerTheme[] = [
@@ -92,55 +88,31 @@ const themes: readonly BannerTheme[] = [
     key: 'green',
     banner: '#4caf50',
     building: '/images/card/building/cottage-red.png',
-    barCpu: '#66bb6a',
-    barMem: '#81c784',
-    barDisk: '#a5d6a7',
-    barLoad: '#ffb74d',
   },
   {
     key: 'blue',
     banner: '#42a5f5',
     building: '/images/card/building/cottage-blue.png',
-    barCpu: '#42a5f5',
-    barMem: '#64b5f6',
-    barDisk: '#90caf9',
-    barLoad: '#ffb74d',
   },
   {
     key: 'purple',
     banner: '#7e57c2',
     building: '/images/card/building/tower-stone.png',
-    barCpu: '#ab47bc',
-    barMem: '#ba68c8',
-    barDisk: '#ce93d8',
-    barLoad: '#ffb74d',
   },
   {
     key: 'pink',
     banner: '#ec407a',
     building: '/images/card/building/coop.png',
-    barCpu: '#ec407a',
-    barMem: '#f06292',
-    barDisk: '#f48fb1',
-    barLoad: '#ffb74d',
   },
   {
     key: 'orange',
     banner: '#ff9800',
     building: '/images/card/building/barn-wooden.png',
-    barCpu: '#ffa726',
-    barMem: '#66bb6a',
-    barDisk: '#ffb74d',
-    barLoad: '#ffb74d',
   },
   {
     key: 'teal',
     banner: '#26a69a',
     building: '/images/card/building/windmill-wood.png',
-    barCpu: '#26a69a',
-    barMem: '#4db6ac',
-    barDisk: '#80cbc4',
-    barLoad: '#ffb74d',
   },
 ]
 
@@ -151,6 +123,14 @@ const theme = computed<BannerTheme>(() => {
     hash = (hash * 31 + name.charCodeAt(i)) >>> 0
   return themes[hash % themes.length]!
 })
+
+// 统一资源进度条与数值颜色（所有节点一致，不随主题变）
+const SD_BAR = {
+  cpu: '#42a5f5',
+  mem: '#66bb6a',
+  disk: '#ef5350',
+  load: '#ffb74d',
+}
 
 function hasRegion(region: string | null | undefined): boolean {
   return Boolean(region?.trim())
@@ -207,45 +187,45 @@ const offline = computed(() => !props.node.online)
       <div class="sd-metric">
         <div class="sd-metric__head">
           <span class="sd-metric__label">
-            <Icon icon="mdi:chip" width="14" height="14" />
+            <img src="/images/card/icon-cpu.png" alt="" aria-hidden="true" class="sd-metric__icon">
             CPU
           </span>
-          <b class="sd-metric__val" :style="{ color: theme.barCpu }">{{ (props.node.cpu ?? 0).toFixed(0) }}%</b>
+          <b class="sd-metric__val sd-metric__val--cpu">{{ (props.node.cpu ?? 0).toFixed(0) }}%</b>
         </div>
-        <PixelProgress :percentage="props.node.cpu ?? 0" :color="theme.barCpu" />
+        <PixelProgress :percentage="props.node.cpu ?? 0" :color="SD_BAR.cpu" />
       </div>
 
       <div class="sd-metric">
         <div class="sd-metric__head">
           <span class="sd-metric__label">
-            <Icon icon="mdi:memory" width="14" height="14" />
+            <img src="/images/card/icon-memory.png" alt="" aria-hidden="true" class="sd-metric__icon">
             Memory
           </span>
-          <b class="sd-metric__val" :style="{ color: theme.barMem }">{{ memPercentage.toFixed(1) }}%</b>
+          <b class="sd-metric__val sd-metric__val--mem">{{ memPercentage.toFixed(1) }}%</b>
         </div>
-        <PixelProgress :percentage="memPercentage" :color="theme.barMem" />
+        <PixelProgress :percentage="memPercentage" :color="SD_BAR.mem" />
       </div>
 
       <div class="sd-metric">
         <div class="sd-metric__head">
           <span class="sd-metric__label">
-            <Icon icon="mdi:harddisk" width="14" height="14" />
+            <img src="/images/card/icon-disk.png" alt="" aria-hidden="true" class="sd-metric__icon">
             Disk
           </span>
-          <b class="sd-metric__val" :style="{ color: theme.barDisk }">{{ diskPercentage.toFixed(1) }}%</b>
+          <b class="sd-metric__val sd-metric__val--disk">{{ diskPercentage.toFixed(1) }}%</b>
         </div>
-        <PixelProgress :percentage="diskPercentage" :color="theme.barDisk" />
+        <PixelProgress :percentage="diskPercentage" :color="SD_BAR.disk" />
       </div>
 
       <div class="sd-metric">
         <div class="sd-metric__head">
           <span class="sd-metric__label">
-            <Icon icon="mdi:chart-bar" width="14" height="14" />
+            <img src="/images/card/icon-load.png" alt="" aria-hidden="true" class="sd-metric__icon">
             Load
           </span>
-          <b class="sd-metric__val" :style="{ color: theme.barLoad }">{{ (props.node.load ?? 0).toFixed(2) }}</b>
+          <b class="sd-metric__val sd-metric__val--load">{{ (props.node.load ?? 0).toFixed(2) }}</b>
         </div>
-        <PixelProgress :percentage="loadPct" :color="theme.barLoad" />
+        <PixelProgress :percentage="loadPct" :color="SD_BAR.load" />
       </div>
     </div>
 
@@ -253,14 +233,14 @@ const offline = computed(() => !props.node.online)
     <div class="sd-row sd-row--speed">
       <div class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:arrow-up-bold" width="12" height="12" class="c-sky" />
+          <img src="/images/card/icon-up.png" alt="" aria-hidden="true" class="sd-pair__icon c-sky">
           Upload
         </span>
         <span class="sd-pair__val c-sky">{{ formatBytesPerSecond(props.node.net_out ?? 0) }}</span>
       </div>
       <div class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:arrow-down-bold" width="12" height="12" class="c-em" />
+          <img src="/images/card/icon-down.png" alt="" aria-hidden="true" class="sd-pair__icon c-em">
           Download
         </span>
         <span class="sd-pair__val c-em">{{ formatBytesPerSecond(props.node.net_in ?? 0) }}</span>
@@ -561,6 +541,29 @@ const offline = computed(() => !props.node.online)
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+/* 像素指标图标（统一素材，不随主题） */
+.sd-metric__icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+/* 网速方向像素箭头 */
+.sd-pair__icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+/* 统一资源数值颜色（与进度条一致，所有节点相同） */
+.sd-metric__val--cpu { color: #42a5f5; }
+.sd-metric__val--mem { color: #66bb6a; }
+.sd-metric__val--disk { color: #ef5350; }
+.sd-metric__val--load { color: #ffb74d; }
 
 .sd-row {
   display: grid;
