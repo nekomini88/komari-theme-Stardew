@@ -80,74 +80,60 @@ const osLabel = computed(() => {
 interface BannerTheme {
   key: string
   banner: string
-  accent: string
   barCpu: string
   barMem: string
   barDisk: string
   barLoad: string
-  decor: string
 }
 
 const themes: readonly BannerTheme[] = [
   {
     key: 'green',
     banner: '#4caf50',
-    accent: '#2e7d32',
     barCpu: '#66bb6a',
     barMem: '#81c784',
     barDisk: '#a5d6a7',
     barLoad: '#ffb74d',
-    decor: 'mdi:sprout',
   },
   {
     key: 'blue',
     banner: '#42a5f5',
-    accent: '#1565c0',
     barCpu: '#42a5f5',
     barMem: '#64b5f6',
     barDisk: '#90caf9',
     barLoad: '#ffb74d',
-    decor: 'mdi:home-variant',
   },
   {
     key: 'purple',
     banner: '#7e57c2',
-    accent: '#4527a0',
     barCpu: '#ab47bc',
     barMem: '#ba68c8',
     barDisk: '#ce93d8',
     barLoad: '#ffb74d',
-    decor: 'mdi:flower',
   },
   {
     key: 'pink',
     banner: '#ec407a',
-    accent: '#ad1457',
     barCpu: '#ec407a',
     barMem: '#f06292',
     barDisk: '#f48fb1',
     barLoad: '#ffb74d',
-    decor: 'mdi:tree',
   },
   {
     key: 'orange',
     banner: '#ff9800',
-    accent: '#e65100',
     barCpu: '#ffa726',
     barMem: '#66bb6a',
     barDisk: '#ffb74d',
     barLoad: '#ffb74d',
-    decor: 'mdi:account-cowboy-hat',
   },
   {
     key: 'teal',
     banner: '#26a69a',
-    accent: '#00695c',
     barCpu: '#26a69a',
     barMem: '#4db6ac',
     barDisk: '#80cbc4',
     barLoad: '#ffb74d',
-    decor: 'mdi:bird',
   },
 ]
 
@@ -172,27 +158,31 @@ const offline = computed(() => !props.node.online)
     :class="cn(offline && 'sd-card--offline')"
     @click="emit('click')"
   >
-    <!-- corner plant / character -->
-    <div class="sd-plant" :style="{ color: theme.accent }">
-      <Icon :icon="theme.decor" width="28" height="28" />
+    <!-- PDF 式卡片顶部：独立小房屋 + 三角形瓦屋顶 + 名牌横幅 -->
+    <div class="sd-top">
+      <!-- 第1层：顶饰建筑（像素小屋，透明素材） -->
+      <div class="sd-top__house" :style="{ '--sd-banner-color': theme.banner }">
+        <img src="/images/card/house.png" alt="" aria-hidden="true">
+      </div>
+
+      <!-- 第2层：大三角形瓦片坡屋顶 -->
+      <div class="sd-roof" :style="{ '--sd-banner-color': theme.banner }">
+        <img
+          v-if="hasRegion(props.node.region)"
+          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+          :alt="getRegionDisplayName(props.node.region)"
+          class="sd-roof__flag"
+        >
+      </div>
+
+      <!-- 第3层：名牌横板（服务器名） -->
+      <div class="sd-banner" :style="{ background: theme.banner, '--sd-banner-color': theme.banner }">
+        <span class="sd-banner__name">{{ props.node.name }}</span>
+      </div>
     </div>
 
     <!-- online status dot -->
     <span class="sd-status" :class="offline ? 'sd-status--off' : 'sd-status--on'" />
-
-    <!-- title banner -->
-    <div class="sd-banner" :style="{ background: theme.banner, '--sd-banner-color': theme.banner }">
-      <span class="sd-banner__name">{{ props.node.name }}</span>
-      <img
-        v-if="hasRegion(props.node.region)"
-        :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-        :alt="getRegionDisplayName(props.node.region)"
-        class="sd-banner__flag"
-      >
-      <span class="sd-banner__notch" aria-hidden="true">
-        <i /><i /><i /><i /><i /><i />
-      </span>
-    </div>
 
     <!-- OS line -->
     <div class="sd-os">
@@ -386,15 +376,6 @@ const offline = computed(() => !props.node.online)
   box-shadow: 4px 4px 0 #5a2417;
 }
 
-.sd-plant {
-  position: absolute;
-  top: -10px;
-  left: -8px;
-  z-index: 3;
-  filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.25));
-  pointer-events: none;
-}
-
 .sd-status {
   position: absolute;
   top: 10px;
@@ -413,6 +394,82 @@ const offline = computed(() => !props.node.online)
   background: #e53935;
 }
 
+/* ===== PDF 式卡片顶部：小屋 + 三角形瓦屋顶 + 名牌 ===== */
+.sd-top {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2px;
+}
+
+/* 第1层：顶饰小屋（缩写 PDF 独立小建筑） */
+.sd-top__house {
+  position: relative;
+  z-index: 4;
+  margin-bottom: -6px;
+  margin-top: -4px;
+  filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
+}
+.sd-top__house img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* 第2层：大三角形瓦片坡屋顶（纯 CSS 像素瓦片） */
+.sd-roof {
+  position: relative;
+  z-index: 3;
+  width: 52%;
+  max-width: 190px;
+  height: 34px;
+  margin-bottom: -1px;
+  /* 三角形屋顶主体 */
+  background:
+    /* 瓦片纹理 */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(0, 0, 0, 0.14) 7px 8px
+    ),
+    linear-gradient(var(--sd-banner-color), var(--sd-banner-color));
+  background-size:
+    auto,
+    auto;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+}
+
+/* 屋顶边缘深色描边 */
+.sd-roof::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: inherit;
+  background: transparent;
+  box-shadow: 0 -2px 0 rgba(62, 39, 35, 0.5);
+  pointer-events: none;
+}
+
+/* 屋顶上的国旗（让卡片顶部更灵动） */
+.sd-roof__flag {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 14px;
+  object-fit: contain;
+  image-rendering: auto;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+  border-radius: 1px;
+}
+
+/* 第3层 奢侈品：名牌横幅 */
 .sd-banner {
   position: relative;
   align-self: center;
@@ -423,8 +480,8 @@ const offline = computed(() => !props.node.online)
   min-width: 56%;
   max-width: 88%;
   padding: 5px 16px 7px;
-  margin-top: 10px;
-  /* 像素锯齿标牌：直角 + 硬阴影（对齐 PDF 的彩色木牌） */
+  margin-top: 2px;
+  /* 像素直角标牌 */
   border-radius: 0;
   border: 3px solid rgba(62, 39, 35, 0.9);
   box-shadow:
@@ -434,56 +491,25 @@ const offline = computed(() => !props.node.online)
     inset 0 -2px 0 rgba(0, 0, 0, 0.18);
   color: #fff;
   z-index: 2;
-  /* 顶部两侧木牌挂耳（像素阶梯） */
 }
 
+/* 名牌两侧木牌挂耳 */
 .sd-banner::before,
 .sd-banner::after {
   content: '';
   position: absolute;
-  top: -8px;
-  width: 14px;
-  height: 14px;
+  top: -7px;
+  width: 13px;
+  height: 13px;
   background: var(--sd-banner-color, #4caf50);
   border: 3px solid rgba(62, 39, 35, 0.9);
   border-radius: 0;
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
+.sd-banner::before { left: -3px; }
+.sd-banner::after { right: -3px; }
 
-.sd-banner::before {
-  left: -3px;
-}
-
-.sd-banner::after {
-  right: -3px;
-}
-
-/* 标牌下方像素锯齿边 */
-.sd-banner__notch {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 6px;
-  pointer-events: none;
-}
-
-.sd-banner__notch i {
-  display: block;
-  position: absolute;
-  bottom: 0;
-  width: 8px;
-  height: 6px;
-  background: var(--sd-banner-color, #4caf50);
-}
-
-.sd-banner__notch i:nth-child(1) { left: 10%; }
-.sd-banner__notch i:nth-child(2) { left: 26%; }
-.sd-banner__notch i:nth-child(3) { left: 42%; }
-.sd-banner__notch i:nth-child(4) { left: 58%; }
-.sd-banner__notch i:nth-child(5) { left: 74%; }
-.sd-banner__notch i:nth-child(6) { left: 90%; }
-
+/* 名牌底部像素锯齿 */
 .sd-banner__name {
   font-size: 13px;
   font-weight: 700;
@@ -494,16 +520,6 @@ const offline = computed(() => !props.node.online)
   text-overflow: ellipsis;
   max-width: 140px;
   letter-spacing: 0.04em;
-}
-
-.sd-banner__flag {
-  height: 12px;
-  width: auto;
-  max-width: 18px;
-  object-fit: contain;
-  border-radius: 1px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
-  image-rendering: auto;
 }
 
 .sd-os {
