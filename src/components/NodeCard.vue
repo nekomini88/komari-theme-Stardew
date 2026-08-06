@@ -80,7 +80,6 @@ const osLabel = computed(() => {
 interface BannerTheme {
   key: string
   banner: string
-  roof: string
   building: string
   barCpu: string
   barMem: string
@@ -92,7 +91,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'green',
     banner: '#4caf50',
-    roof: '/images/card/roof-green.png',
     building: '/images/card/building/cottage-red.png',
     barCpu: '#66bb6a',
     barMem: '#81c784',
@@ -102,7 +100,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'blue',
     banner: '#42a5f5',
-    roof: '/images/card/roof-blue.png',
     building: '/images/card/building/cottage-blue.png',
     barCpu: '#42a5f5',
     barMem: '#64b5f6',
@@ -112,7 +109,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'purple',
     banner: '#7e57c2',
-    roof: '/images/card/roof-purple.png',
     building: '/images/card/building/tower-stone.png',
     barCpu: '#ab47bc',
     barMem: '#ba68c8',
@@ -122,7 +118,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'pink',
     banner: '#ec407a',
-    roof: '/images/card/roof-pink.png',
     building: '/images/card/building/coop.png',
     barCpu: '#ec407a',
     barMem: '#f06292',
@@ -132,7 +127,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'orange',
     banner: '#ff9800',
-    roof: '/images/card/roof-orange.png',
     building: '/images/card/building/barn-wooden.png',
     barCpu: '#ffa726',
     barMem: '#66bb6a',
@@ -142,7 +136,6 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'teal',
     banner: '#26a69a',
-    roof: '/images/card/roof-teal.png',
     building: '/images/card/building/windmill-wood.png',
     barCpu: '#26a69a',
     barMem: '#4db6ac',
@@ -185,13 +178,7 @@ const offline = computed(() => !props.node.online)
         <img :src="theme.building" alt="" aria-hidden="true">
       </div>
 
-      <!-- 第2层：像素瓦片坡屋顶（AI 像素素材，随主题色） -->
-      <img
-        :src="theme.roof"
-        alt=""
-        aria-hidden="true"
-        class="sd-roof-img"
-      >
+      <!-- 第2层：像素瓦片坡屋顶 → 移除（建筑自带屋顶，避免砖块金字塔观感） -->
 
       <!-- 第3层：名牌横板（木质标牌素材 + 服务器名 + 国旗） -->
       <div class="sd-banner">
@@ -438,7 +425,7 @@ const offline = computed(() => !props.node.online)
   background: #e53935;
 }
 
-/* ===== PDF 式卡片顶部：小屋 + 三角形瓦屋顶 + 名牌 ===== */
+/* ===== PDF 式卡片顶部：小建筑（自带屋顶）+ 木质名牌 ===== */
 .sd-top {
   position: relative;
   display: flex;
@@ -447,37 +434,22 @@ const offline = computed(() => !props.node.online)
   margin-top: 2px;
 }
 
-/* 第1层：顶饰建筑（像素小屋/谷仓/风车） */
+/* 第1层：顶饰建筑（像素小屋/谷仓/风车，自带屋顶） */
 .sd-top__house {
   position: relative;
   z-index: 4;
-  margin-bottom: -4px;
-  margin-top: -6px;
+  margin-bottom: -2px;
+  margin-top: -4px;
   filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
 }
 .sd-top__house img {
   display: block;
-  height: 52px;
+  height: 64px;
   width: auto;
-  max-width: 74px;
+  max-width: 92px;
   object-fit: contain;
   image-rendering: pixelated;
   pointer-events: none;
-}
-
-/* 第2层：像素瓦片坡屋顶（AI 像素素材） */
-.sd-roof-img {
-  position: relative;
-  z-index: 3;
-  display: block;
-  width: 62%;
-  max-width: 210px;
-  margin: -2px auto 0;
-  margin-bottom: -8px;
-  object-fit: contain;
-  image-rendering: pixelated;
-  pointer-events: none;
-  filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
 }
 
 /* 第3层：名牌横幅（木质标牌素材） */
