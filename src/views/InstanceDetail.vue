@@ -259,6 +259,9 @@ const sdLoadPct = computed(() => {
   const cores = Math.max(data.value?.cpu_cores ?? 1, 1)
   return Math.min(((data.value?.load ?? 0) / cores) * 100, 100)
 })
+// 上行/下行不需要百分比进度条，固定 0 避免误导
+const sdUpPct = 0
+const sdDownPct = 0
 
 const sdResourceCards = computed(() => {
   const n = data.value
@@ -268,6 +271,9 @@ const sdResourceCards = computed(() => {
     { key: 'cpu', title: 'CPU', icon: '/images/card/icon-cpu.png', decor: '/images/card/decor-cpu.png', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5' },
     { key: 'disk', title: 'DISK', icon: '/images/card/icon-disk.png', decor: '/images/card/decor-disk.png', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350' },
     { key: 'load', title: 'LOAD', icon: '/images/card/icon-load.png', decor: '/images/card/decor-load.png', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d' },
+    // 上行 / 下行 网速卡（与四卡统一风格；进度条用相对占用比例）
+    { key: 'up', title: 'UPLOAD', icon: '/images/card/icon-up.png', decor: '', pct: sdUpPct, text: formatBytesPerSecond(data.value?.net_out ?? 0), color: '#42a5f5' },
+    { key: 'down', title: 'DOWNLOAD', icon: '/images/card/icon-down.png', decor: '', pct: sdDownPct, text: formatBytesPerSecond(data.value?.net_in ?? 0), color: '#66bb6a' },
   ]
 })
 
@@ -305,7 +311,7 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
         </Badge>
       </div>
 
-      <div class="px-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div class="px-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <div
           v-for="card in sdResourceCards" :key="card.key"
           class="sd-resource-card group relative flex h-full flex-col rounded-lg p-3 ring-1 ring-[#3e2723]/20"
@@ -324,7 +330,7 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
             <PixelProgress :percentage="card.pct" :color="card.color" :blocks="10" :size="10" />
           </div>
           <!-- 底部装饰 -->
-          <img :src="card.decor" alt="" aria-hidden="true" class="sd-resource-decor">
+          <img v-if="card.decor" :src="card.decor" alt="" aria-hidden="true" class="sd-resource-decor">
         </div>
       </div>
 
