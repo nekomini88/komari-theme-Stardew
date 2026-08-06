@@ -172,6 +172,12 @@ const offline = computed(() => !props.node.online)
     :class="cn(offline && 'sd-card--offline')"
     @click="emit('click')"
   >
+        <!-- 四角花朵装饰（像素素材，PDF 对齐） -->
+    <img src="/images/card/corner/tl.png" alt="" aria-hidden="true" class="sd-corner sd-corner--tl">
+    <img src="/images/card/corner/tr.png" alt="" aria-hidden="true" class="sd-corner sd-corner--tr">
+    <img src="/images/card/corner/bl.png" alt="" aria-hidden="true" class="sd-corner sd-corner--bl">
+    <img src="/images/card/corner/br.png" alt="" aria-hidden="true" class="sd-corner sd-corner--br">
+
     <!-- PDF 式卡片顶部：独立小建筑 + 像素瓦片屋顶 + 名牌横幅 -->
     <div class="sd-top">
       <!-- 第1层：顶饰建筑（像素小屋/谷仓/风车，透明素材） -->
@@ -389,6 +395,24 @@ const offline = computed(() => !props.node.online)
     6px 6px 0 #3e2723,
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
+
+/* 四角花朵装饰（像素素材，对齐 PDF 卡片四角花朵） */
+.sd-corner {
+  position: absolute;
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.92;
+  filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.18));
+}
+/* 素材初始方向：L 形转角在左下（垂直茎左、水平藤蔓底） */
+.sd-corner--tl { top: -8px; left: -8px; transform: rotate(90deg); }
+.sd-corner--tr { top: -8px; right: -8px; transform: rotate(180deg); }
+.sd-corner--bl { bottom: -8px; left: -8px; transform: rotate(0deg); }
+.sd-corner--br { bottom: -8px; right: -8px; transform: rotate(270deg); }
 
 .sd-card--offline {
   filter: grayscale(0.35) brightness(0.95) contrast(1.1);
