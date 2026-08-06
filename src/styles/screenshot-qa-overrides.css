@@ -173,24 +173,6 @@
   color: #e9c46a !important;
 }
 
-/* === 6. 扫描线像素质感（轻） === */
-[data-theme='stardew'] body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.035) 0px,
-    rgba(0, 0, 0, 0.035) 1px,
-    transparent 1px,
-    transparent 3px
-  ) !important;
-  mix-blend-mode: multiply;
-  opacity: 0.35;
-}
-
 /* === 7. 不破坏组件自带的天空/天气/动植物 === */
 /* Background.vue 的 .stardew-scene 与 StardewSky / FloraFaunaOverlay 照常显示 */
 html[data-theme='stardew'] .stardew-sky,

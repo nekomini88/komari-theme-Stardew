@@ -113,18 +113,6 @@
   backdrop-filter: none !important;
 }
 
-/* Light scanlines */
-[data-theme='stardew'] body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0 1px, transparent 1px 3px);
-  mix-blend-mode: multiply;
-  opacity: 0.4;
-}
-
 /* === Protect living world scene from matte resets === */
 [data-theme='stardew'] .stardew-scene,
 [data-theme='stardew'] .stardew-scene *,
