@@ -36,8 +36,10 @@ function blockStyle(i: number) {
   return {
     width: `${props.size}px`,
     height: `${Math.max(5, props.size - 1)}px`,
-    background: filled ? activeColor.value : 'rgba(62,39,35,0.10)',
-    borderColor: filled ? 'rgba(62,39,35,0.35)' : 'rgba(62,39,35,0.18)',
+    background: filled ? activeColor.value : `url('/images/card/progress-slot.png') center / 100% 100% no-repeat`,
+    borderColor: filled ? 'rgba(62,39,35,0.35)' : 'transparent',
+    border: filled ? undefined : 'none',
+    boxShadow: filled ? undefined : 'none',
   }
 }
 </script>
