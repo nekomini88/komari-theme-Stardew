@@ -225,10 +225,7 @@ onMounted(async () => {
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
               <span class="text-xs font-medium tracking-wider text-muted-foreground">内存用量</span>
-              <Icon
-                icon="tabler:cash" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <img src="/images/card/icon-memory.png" alt="内存" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
               <div
@@ -243,6 +240,7 @@ onMounted(async () => {
                 </span>
               </div>
             </Transition>
+            <img src="/images/card/decor-memory.png" alt="" aria-hidden="true" class="sd-summary-decor sd-summary-decor--memory">
           </div>
         </CardX>
 
@@ -257,10 +255,7 @@ onMounted(async () => {
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
               <span class="text-xs font-medium tracking-wider text-muted-foreground">硬盘用量</span>
-              <Icon
-                icon="tabler:server-2" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <img src="/images/card/icon-disk.png" alt="硬盘" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
               <div
@@ -274,6 +269,7 @@ onMounted(async () => {
                 </span>
               </div>
             </Transition>
+            <img src="/images/card/decor-disk.png" alt="" aria-hidden="true" class="sd-summary-decor sd-summary-decor--disk">
           </div>
         </CardX>
 
@@ -545,5 +541,34 @@ onMounted(async () => {
     transform: none;
     filter: none;
   }
+}
+
+/* 概览卡像素图标（对齐星露谷素材） */
+.sd-summary-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  flex-shrink: 0;
+  filter: drop-shadow(1px 1px 0 rgba(62, 39, 35, 0.25));
+}
+
+/* 概览卡底部像素装饰（盆栽/植物/浇水壶等） */
+.sd-summary-decor {
+  align-self: center;
+  flex-shrink: 0;
+  height: 26px;
+  width: auto;
+  max-width: 30px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.9;
+  margin-top: 1px;
+  filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.2));
+}
+.sd-summary-decor--disk {
+  height: 22px;
 }
 </style>
