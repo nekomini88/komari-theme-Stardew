@@ -241,6 +241,37 @@ const trafficUsageText = computed(() => {
 const trafficProgressStyle = computed(() => ({
   width: `${trafficUsedPercentage.value}%`,
 }))
+
+// ==================== 星露谷风格 MEMORY/CPU/DISK/LOAD 实时四卡 ====================
+const sdMemPct = computed(() => {
+  const n = data.value
+  if (!n) return 0
+  return (n.ram ?? 0) / (n.mem_total || 1) * 100
+})
+const sdCpuPct = computed(() => Math.max(0, Math.min(data.value?.cpu ?? 0, 100)))
+const sdDiskPct = computed(() => {
+  const n = data.value
+  if (!n) return 0
+  return (n.disk ?? 0) / (n.disk_total || 1) * 100
+})
+const sdLoadVal = computed(() => data.value?.load ?? 0)
+const sdLoadPct = computed(() => {
+  const cores = Math.max(data.value?.cpu_cores ?? 1, 1)
+  return Math.min(((data.value?.load ?? 0) / cores) * 100, 100)
+})
+
+const sdResourceCards = computed(() => {
+  const n = data.value
+  if (!n) return []
+  return [
+    { key: 'memory', title: 'MEMORY', icon: '/images/card/icon-memory.png', decor: '/images/card/decor-memory.png', pct: sdMemPct.value, text: `${sdMemPct.value.toFixed(1)}%`, color: '#66bb6a' },
+    { key: 'cpu', title: 'CPU', icon: '/images/card/icon-cpu.png', decor: '/images/card/decor-cpu.png', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5' },
+    { key: 'disk', title: 'DISK', icon: '/images/card/icon-disk.png', decor: '/images/card/decor-disk.png', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350' },
+    { key: 'load', title: 'LOAD', icon: '/images/card/icon-load.png', decor: '/images/card/decor-load.png', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d' },
+  ]
+})
+
+const sdProgressProps = (percent: number, color: string) => ({ percent, color })
 </script>
 
 <template>
@@ -272,6 +303,29 @@ const trafficProgressStyle = computed(() => ({
         <Badge :variant="data.online ? 'default' : 'destructive'" class="text-xs !rounded">
           {{ data.online ? '在线' : '离线' }}
         </Badge>
+      </div>
+
+      <div class="px-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div
+          v-for="card in sdResourceCards" :key="card.key"
+          class="sd-resource-card group relative flex h-full flex-col rounded-lg p-3 ring-1 ring-[#3e2723]/20"
+        >
+          <!-- 顶部图标 -->
+          <div class="flex items-center justify-between">
+            <span class="sd-resource-title">{{ card.title }}</span>
+            <img :src="card.icon" :alt="card.title" class="sd-resource-icon">
+          </div>
+          <!-- 主数值 -->
+          <div class="mt-2 flex items-baseline gap-1 min-w-0">
+            <span class="sd-resource-value" :style="{ color: card.color }">{{ card.text }}</span>
+          </div>
+          <!-- 像素进度条 -->
+          <div class="mt-2">
+            <PixelProgress :percentage="card.pct" :color="card.color" :blocks="10" :size="10" />
+          </div>
+          <!-- 底部装饰 -->
+          <img :src="card.decor" alt="" aria-hidden="true" class="sd-resource-decor">
+        </div>
       </div>
 
       <div class="px-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -413,3 +467,57 @@ const trafficProgressStyle = computed(() => ({
     </template>
   </div>
 </template>
+
+<style scoped>
+/* 星露谷风格资源四卡（MEMORY/CPU/DISK/LOAD） */
+.sd-resource-card {
+  background:
+    linear-gradient(rgba(245, 230, 200, 0.55), rgba(245, 230, 200, 0.45)),
+    #f5e6c8;
+  box-shadow:
+    3px 3px 0 rgba(62, 39, 35, 0.16),
+    inset 0 0 0 3px #fbf3e3,
+    inset 0 0 0 4px rgba(62, 39, 35, 0.9);
+}
+.sd-resource-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    4px 4px 0 rgba(62, 39, 35, 0.22),
+    inset 0 0 0 3px #fbf3e3,
+    inset 0 0 0 4px rgba(62, 39, 35, 0.9);
+}
+.sd-resource-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #3d2b1f;
+}
+.sd-resource-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  filter: drop-shadow(1px 1px 0 rgba(62, 39, 35, 0.25));
+}
+.sd-resource-value {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.sd-resource-decor {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  height: 22px;
+  width: auto;
+  max-width: 26px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.92;
+  filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.2));
+}
+</style>
