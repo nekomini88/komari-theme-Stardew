@@ -35,11 +35,14 @@ function blockStyle(i: number) {
   const filled = i <= filledCount.value
   return {
     width: `${props.size}px`,
-    height: `${Math.max(5, props.size - 1)}px`,
-    background: filled ? activeColor.value : `url('/images/card/progress-slot.png') center / 100% 100% no-repeat`,
-    borderColor: filled ? 'rgba(62,39,35,0.35)' : 'transparent',
-    border: filled ? undefined : 'none',
-    boxShadow: filled ? undefined : 'none',
+    height: `${Math.max(7, props.size)}px`,
+    // 空槽: 官方凹槽素材; 已填充: 纯色块
+    background: filled
+      ? activeColor.value
+      : `url('/images/card/progress-slot.png') center / 100% 100% no-repeat`,
+    boxShadow: filled
+      ? 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.18)'
+      : 'none',
   }
 }
 </script>
@@ -62,21 +65,17 @@ function blockStyle(i: number) {
   flex-wrap: nowrap;
   align-items: center;
   gap: 2px;
-  height: 10px;
+  height: 12px;
   image-rendering: pixelated;
 }
 
 .pixel-block {
   display: inline-block;
   border-radius: 1px;
-  border: 1px solid rgba(62, 39, 35, 0.25);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
   transition: background 120ms ease;
 }
 
 .pixel-block--active {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(62, 39, 35, 0.3);
 }
 </style>
