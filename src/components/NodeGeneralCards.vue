@@ -557,23 +557,15 @@ onMounted(async () => {
   height: 22px;
 }
 
-/* ===== 统一概览卡为星露谷羊皮纸像素风格 ===== */
+/* ===== 统一概览卡为星露谷羊皮纸像素风格(官方木框素材) ===== */
 .sd-summary-card {
-  background:
-    linear-gradient(rgba(245, 230, 200, 0.5), rgba(245, 230, 200, 0.4)),
-    #f5e6c8 !important;
-  box-shadow:
-    3px 3px 0 rgba(62, 39, 35, 0.16),
-    inset 0 0 0 3px #fbf3e3,
-    inset 0 0 0 4px rgba(62, 39, 35, 0.9) !important;
-  border-radius: 8px;
+  border: 18px solid transparent !important;
+  border-image: url('/images/card/frame-slice.png') 64 round;
+  background: rgba(250, 243, 220, 0.35) !important;
+  border-radius: 0 !important;
 }
 .sd-summary-card:hover {
   transform: translate(-1px, -1px);
-  box-shadow:
-    4px 4px 0 rgba(62, 39, 35, 0.22),
-    inset 0 0 0 3px #fbf3e3,
-    inset 0 0 0 4px rgba(62, 39, 35, 0.9) !important;
 }
 .sd-summary-card .sd-summary-label {
   color: #3d2b1f;

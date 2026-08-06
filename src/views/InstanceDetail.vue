@@ -477,20 +477,12 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
 <style scoped>
 /* 星露谷风格资源四卡（MEMORY/CPU/DISK/LOAD） */
 .sd-resource-card {
-  background:
-    linear-gradient(rgba(245, 230, 200, 0.55), rgba(245, 230, 200, 0.45)),
-    #f5e6c8;
-  box-shadow:
-    3px 3px 0 rgba(62, 39, 35, 0.16),
-    inset 0 0 0 3px #fbf3e3,
-    inset 0 0 0 4px rgba(62, 39, 35, 0.9);
+  border: 18px solid transparent;
+  border-image: url('/images/card/frame-slice.png') 64 round;
+  background: rgba(250, 243, 220, 0.35);
 }
 .sd-resource-card:hover {
   transform: translate(-1px, -1px);
-  box-shadow:
-    4px 4px 0 rgba(62, 39, 35, 0.22),
-    inset 0 0 0 3px #fbf3e3,
-    inset 0 0 0 4px rgba(62, 39, 35, 0.9);
 }
 .sd-resource-title {
   font-size: 12px;

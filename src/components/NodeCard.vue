@@ -340,7 +340,8 @@ const offline = computed(() => !props.node.online)
   padding: 14px 14px 12px;
   cursor: pointer;
   background: linear-gradient(180deg, #fbf3dc 0%, #f3e2bd 55%, #ecd7a6 100%);
-  border: 3px solid #6b4423;
+  border: 20px solid transparent;
+  border-image: url('/images/card/frame-slice.png') 64 round;
   /* 直角像素木框（对齐 PDF 星露谷对话框，非圆角） */
   border-radius: 0;
   box-shadow:
