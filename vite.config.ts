@@ -13,6 +13,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 const require = createRequire(import.meta.url)
 const fs = require('node:fs')
 const archiver = require('archiver')
+const packageJson = require('./package.json')
 
 function getCommitHash(): string {
   try {
@@ -20,6 +21,49 @@ function getCommitHash(): string {
   }
   catch {
     return 'unknown'
+  }
+}
+
+/**
+ * Vite 插件：解决 Komari 主题缓存问题
+ *
+ * Komari 服务器 serve 静态文件时 index.html 无 no-cache 头、图片无内容 hash，
+ * 浏览器会一直用旧版缓存（发版后看不到新元素）。
+ *
+ * 修复（两层）：
+ * 1. index.html 注入 <meta http-equiv="Cache-Control" content="no-cache"> +
+ *    版本标记 meta —— 浏览器每次加载 HTML 都重新校验
+ * 2. 注入缓存清理脚本：HTML 中的 data-theme-version 与 localStorage 上次版本
+ *    不一致时，清空静态资源缓存并硬刷新一次（只发生一次，防止死循环）
+ */
+function cacheBustPlugin(): Plugin {
+  return {
+    name: 'komari-cache-bust',
+    apply: 'build',
+    transformIndexHtml(html) {
+      const version = packageJson.version || '0.0.0'
+      const bustScript = `<script>
+(function () {
+  var KEY = 'sd-theme-version';
+  var cur = ${JSON.stringify(version)};
+  try {
+    var prev = localStorage.getItem(KEY);
+    if (prev !== null && prev !== cur) {
+      localStorage.setItem(KEY, cur);
+      location.reload(true);
+    } else {
+      localStorage.setItem(KEY, cur);
+    }
+  } catch (e) {}
+})();
+</script>`
+      return html
+        .replace(
+          '<meta name="viewport"',
+          '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />\n    <meta http-equiv="Pragma" content="no-cache" />\n    <meta http-equiv="Expires" content="0" />\n    <meta name="viewport"'
+        )
+        .replace('</head>', bustScript + '\n  </head>')
+    },
   }
 }
 
@@ -82,8 +126,6 @@ function komariThemeZip(): Plugin {
   }
 }
 
-const packageJson = require('./package.json')
-
 export default defineConfig({
   define: {
     __BUILD_VERSION__: JSON.stringify(packageJson.version),
@@ -94,6 +136,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
+    cacheBustPlugin(),
   ],
   resolve: {
     alias: {
