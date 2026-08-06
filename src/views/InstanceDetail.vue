@@ -267,13 +267,13 @@ const sdResourceCards = computed(() => {
   const n = data.value
   if (!n) return []
   return [
-    { key: 'memory', title: 'MEMORY', icon: '/images/card/icon-memory.png', decor: '/images/card/decor-memory.png', pct: sdMemPct.value, text: `${sdMemPct.value.toFixed(1)}%`, color: '#66bb6a' },
-    { key: 'cpu', title: 'CPU', icon: '/images/card/icon-cpu.png', decor: '/images/card/decor-cpu.png', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5' },
-    { key: 'disk', title: 'DISK', icon: '/images/card/icon-disk.png', decor: '/images/card/decor-disk.png', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350' },
-    { key: 'load', title: 'LOAD', icon: '/images/card/icon-load.png', decor: '/images/card/decor-load.png', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d' },
+    { key: 'memory', title: 'MEMORY', banner: '/images/banner/banner-green.png', icon: '/images/card/icon-memory.png', decor: '/images/card/decor-memory.png', pct: sdMemPct.value, text: `${sdMemPct.value.toFixed(1)}%`, color: '#66bb6a' },
+    { key: 'cpu', title: 'CPU', banner: '/images/banner/banner-blue.png', icon: '/images/card/icon-cpu.png', decor: '/images/card/decor-cpu.png', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5' },
+    { key: 'disk', title: 'DISK', banner: '/images/banner/banner-red.png', icon: '/images/card/icon-disk.png', decor: '/images/card/decor-disk.png', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350' },
+    { key: 'load', title: 'LOAD', banner: '/images/banner/banner-orange.png', icon: '/images/card/icon-load.png', decor: '/images/card/decor-load.png', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d' },
     // 上行 / 下行 网速卡（与四卡统一风格；进度条用相对占用比例）
-    { key: 'up', title: 'UPLOAD', icon: '/images/card/icon-up.png', decor: '', pct: sdUpPct, text: formatBytesPerSecond(data.value?.net_out ?? 0), color: '#42a5f5' },
-    { key: 'down', title: 'DOWNLOAD', icon: '/images/card/icon-down.png', decor: '', pct: sdDownPct, text: formatBytesPerSecond(data.value?.net_in ?? 0), color: '#66bb6a' },
+    { key: 'up', title: 'UPLOAD', banner: '', icon: '/images/card/icon-up.png', decor: '', pct: sdUpPct, text: formatBytesPerSecond(data.value?.net_out ?? 0), color: '#42a5f5' },
+    { key: 'down', title: 'DOWNLOAD', banner: '', icon: '/images/card/icon-down.png', decor: '', pct: sdDownPct, text: formatBytesPerSecond(data.value?.net_in ?? 0), color: '#66bb6a' },
   ]
 })
 
@@ -316,8 +316,11 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
           v-for="card in sdResourceCards" :key="card.key"
           class="sd-resource-card group relative flex h-full flex-col rounded-lg p-3 ring-1 ring-[#3e2723]/20"
         >
-          <!-- 顶部图标 -->
-          <div class="flex items-center justify-between">
+          <!-- 顶部标题横幅(有官方素材用横幅, 无则文字+图标) -->
+          <div v-if="card.banner" class="sd-resource-banner-wrap">
+            <img :src="card.banner" :alt="card.title" class="sd-resource-banner">
+          </div>
+          <div v-else class="flex items-center justify-between">
             <span class="sd-resource-title">{{ card.title }}</span>
             <img :src="card.icon" :alt="card.title" class="sd-resource-icon">
           </div>
@@ -483,6 +486,20 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
 }
 .sd-resource-card:hover {
   transform: translate(-1px, -1px);
+}
+.sd-resource-banner-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 2px;
+}
+.sd-resource-banner {
+  width: 100%;
+  max-width: 170px;
+  height: auto;
+  object-fit: cover;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 .sd-resource-title {
   font-size: 12px;
