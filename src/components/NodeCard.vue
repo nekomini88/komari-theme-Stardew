@@ -187,8 +187,9 @@ const offline = computed(() => !props.node.online)
         class="sd-roof-img"
       >
 
-      <!-- 第3层：名牌横板（服务器名） -->
-      <div class="sd-banner" :style="{ background: theme.banner, '--sd-banner-color': theme.banner }">
+      <!-- 第3层：名牌横板（木质标牌素材 + 服务器名 + 国旗） -->
+      <div class="sd-banner">
+        <img src="/images/card/sign-banner.png" alt="" aria-hidden="true" class="sd-banner__board">
         <span class="sd-banner__name">{{ props.node.name }}</span>
         <img
           v-if="hasRegion(props.node.region)"
@@ -455,7 +456,7 @@ const offline = computed(() => !props.node.online)
   filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
 }
 
-/* 第3层：名牌横幅 */
+/* 第3层：名牌横幅（木质标牌素材） */
 .sd-banner {
   position: relative;
   align-self: center;
@@ -463,59 +464,53 @@ const offline = computed(() => !props.node.online)
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-width: 56%;
-  max-width: 88%;
-  padding: 5px 16px 7px;
-  margin-top: 2px;
-  /* 像素直角标牌 */
-  border-radius: 0;
-  border: 3px solid rgba(62, 39, 35, 0.9);
-  box-shadow:
-    0 3px 0 rgba(62, 39, 35, 0.55),
-    0 6px 0 rgba(62, 39, 35, 0.25),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.18);
-  color: #fff;
+  min-width: 58%;
+  max-width: 86%;
+  margin-top: -4px;
   z-index: 2;
+  /* 去掉旧 CSS 直角背景，改由素材铺底 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 6px 22px 8px;
 }
 
-/* 名牌两侧木牌挂耳 */
-.sd-banner::before,
-.sd-banner::after {
-  content: '';
+/* 木质标牌素材铺底 */
+.sd-banner__board {
   position: absolute;
-  top: -7px;
-  width: 13px;
-  height: 13px;
-  background: var(--sd-banner-color, #4caf50);
-  border: 3px solid rgba(62, 39, 35, 0.9);
-  border-radius: 0;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
-}
-.sd-banner::before { left: -3px; }
-.sd-banner::after { right: -3px; }
-
-/* 名牌底部像素锯齿 */
-.sd-banner__flag {
-  height: 12px;
-  width: auto;
-  max-width: 18px;
-  object-fit: contain;
-  border-radius: 1px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
-  image-rendering: auto;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
+/* 名牌文字：深棕色（木牌上可读，对齐 PDF 木牌文字） */
 .sd-banner__name {
+  position: relative;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  color: #3d2b1f;
+  text-shadow: 0 1px 0 rgba(255, 245, 220, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
+  max-width: 150px;
   letter-spacing: 0.04em;
+}
+
+/* 国旗：放在名字右侧 */
+.sd-banner__flag {
+  position: relative;
+  height: 13px;
+  width: auto;
+  max-width: 19px;
+  object-fit: contain;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+  image-rendering: auto;
 }
 
 .sd-os {
