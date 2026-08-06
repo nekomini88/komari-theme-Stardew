@@ -218,13 +218,13 @@ onMounted(async () => {
         <CardX
           v-if="cardType === 'memory'"
           hoverable
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">内存用量</span>
+              <span class="sd-summary-label text-xs font-medium tracking-wider">内存用量</span>
               <img src="/images/card/icon-memory.png" alt="内存" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
@@ -248,13 +248,13 @@ onMounted(async () => {
         <CardX
           v-else-if="cardType === 'disk'"
           hoverable
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">硬盘用量</span>
+              <span class="sd-summary-label text-xs font-medium tracking-wider">硬盘用量</span>
               <img src="/images/card/icon-disk.png" alt="硬盘" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
@@ -281,16 +281,13 @@ onMounted(async () => {
         >
           <CardX
             hoverable
-            class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+            class="group h-full sd-summary-card rounded-lg transition-all"
             content-class="h-full !p-3" @click="openFinanceCard = !openFinanceCard"
           >
             <div class="flex h-full flex-col justify-between gap-1">
               <div class="flex items-start justify-between">
-                <span class="text-xs font-medium tracking-wider text-muted-foreground">剩余价值</span>
-                <Icon
-                  icon="tabler:cash" :width="20" :height="20"
-                  class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-                />
+                <span class="sd-summary-label text-xs font-medium tracking-wider">剩余价值</span>
+                <img src="/images/card/icon-coin.png" alt="剩余价值" class="sd-summary-icon">
               </div>
               <Transition v-bind="metricSwitchTransitionProps">
                 <div
@@ -310,7 +307,7 @@ onMounted(async () => {
           </CardX>
           <CardX
             hoverable
-            class="absolute top-0 left-1/2 -translate-x-[50%] -translate-y-[25%] z-20 w-[260%] max-w-88 h-42 group bg-background/40 rounded-lg shadow-xl border-none backdrop-blur-xl backdrop-saturate-150 ring-1 ring-foreground/[0.06] transition-all"
+            class="absolute top-0 left-1/2 -translate-x-[50%] -translate-y-[25%] z-20 w-[260%] max-w-88 h-42 group sd-summary-card rounded-lg shadow-xl transition-all"
             :class="openFinanceCard ? 'opacity-100 scale-100  -translate-y-[5%]' : 'opacity-0 pointer-events-none scale-50'"
             content-class="h-full !p-4" @click="openFinanceCard = false"
           >
@@ -369,17 +366,14 @@ onMounted(async () => {
         <CardX
           v-else-if="cardType === 'traffic'"
           hoverable
-          class="group backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">累计流量</span>
-              <Icon
-                icon="tabler:download" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <span class="sd-summary-label text-xs font-medium tracking-wider">累计流量</span>
+              <img src="/images/card/icon-traffic.png" alt="累计流量" class="sd-summary-icon">
             </div>
             <DataTooltip
               as="span" placement="top"
@@ -407,17 +401,14 @@ onMounted(async () => {
         <CardX
           v-else-if="cardType === 'speedUp'"
           hoverable
-          class="group backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">实时上行</span>
-              <Icon
-                icon="tabler:chevrons-up" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <span class="sd-summary-label text-xs font-medium tracking-wider">实时上行</span>
+              <img src="/images/card/icon-up.png" alt="实时上行" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
               <div
@@ -436,17 +427,14 @@ onMounted(async () => {
         <CardX
           v-else-if="cardType === 'speedDown'"
           hoverable
-          class="group backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">实时下行</span>
-              <Icon
-                icon="tabler:chevrons-down" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <span class="sd-summary-label text-xs font-medium tracking-wider">实时下行</span>
+              <img src="/images/card/icon-down.png" alt="实时下行" class="sd-summary-icon">
             </div>
             <Transition v-bind="metricSwitchTransitionProps">
               <div
@@ -467,17 +455,14 @@ onMounted(async () => {
         <CardX
           v-else-if="cardType === 'connections'"
           hoverable
-          class="group backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 ring-1 ring-foreground/[0.06] shadow-sm rounded-lg transition-all glass-hover-blur"
+          class="group h-full sd-summary-card rounded-lg transition-all"
           :class="getCardPositionClass(idx)"
           content-class="h-full !p-3"
         >
           <div class="flex h-full flex-col justify-between gap-1">
             <div class="flex items-start justify-between">
-              <span class="text-xs font-medium tracking-wider text-muted-foreground">连接数</span>
-              <Icon
-                icon="tabler:network" :width="20" :height="20"
-                class="text-slate-500/20 group-hover:text-slate-500 transition-colors"
-              />
+              <span class="sd-summary-label text-xs font-medium tracking-wider">连接数</span>
+              <img src="/images/card/icon-network.png" alt="连接数" class="sd-summary-icon">
             </div>
             <DataTooltip
               as="span" placement="top"
@@ -570,5 +555,32 @@ onMounted(async () => {
 }
 .sd-summary-decor--disk {
   height: 22px;
+}
+
+/* ===== 统一概览卡为星露谷羊皮纸像素风格 ===== */
+.sd-summary-card {
+  background:
+    linear-gradient(rgba(245, 230, 200, 0.5), rgba(245, 230, 200, 0.4)),
+    #f5e6c8 !important;
+  box-shadow:
+    3px 3px 0 rgba(62, 39, 35, 0.16),
+    inset 0 0 0 3px #fbf3e3,
+    inset 0 0 0 4px rgba(62, 39, 35, 0.9) !important;
+  border-radius: 8px;
+}
+.sd-summary-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    4px 4px 0 rgba(62, 39, 35, 0.22),
+    inset 0 0 0 3px #fbf3e3,
+    inset 0 0 0 4px rgba(62, 39, 35, 0.9) !important;
+}
+.sd-summary-card .sd-summary-label {
+  color: #3d2b1f;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.sd-summary-card .sd-summary-value {
+  color: #3d2b1f;
 }
 </style>
