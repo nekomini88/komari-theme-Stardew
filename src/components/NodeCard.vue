@@ -80,6 +80,8 @@ const osLabel = computed(() => {
 interface BannerTheme {
   key: string
   banner: string
+  roof: string
+  building: string
   barCpu: string
   barMem: string
   barDisk: string
@@ -90,6 +92,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'green',
     banner: '#4caf50',
+    roof: '/images/card/roof-green.png',
+    building: '/images/card/building/cottage-red.png',
     barCpu: '#66bb6a',
     barMem: '#81c784',
     barDisk: '#a5d6a7',
@@ -98,6 +102,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'blue',
     banner: '#42a5f5',
+    roof: '/images/card/roof-blue.png',
+    building: '/images/card/building/cottage-blue.png',
     barCpu: '#42a5f5',
     barMem: '#64b5f6',
     barDisk: '#90caf9',
@@ -106,6 +112,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'purple',
     banner: '#7e57c2',
+    roof: '/images/card/roof-purple.png',
+    building: '/images/card/building/tower-stone.png',
     barCpu: '#ab47bc',
     barMem: '#ba68c8',
     barDisk: '#ce93d8',
@@ -114,6 +122,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'pink',
     banner: '#ec407a',
+    roof: '/images/card/roof-pink.png',
+    building: '/images/card/building/coop.png',
     barCpu: '#ec407a',
     barMem: '#f06292',
     barDisk: '#f48fb1',
@@ -122,6 +132,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'orange',
     banner: '#ff9800',
+    roof: '/images/card/roof-orange.png',
+    building: '/images/card/building/barn-wooden.png',
     barCpu: '#ffa726',
     barMem: '#66bb6a',
     barDisk: '#ffb74d',
@@ -130,6 +142,8 @@ const themes: readonly BannerTheme[] = [
   {
     key: 'teal',
     banner: '#26a69a',
+    roof: '/images/card/roof-teal.png',
+    building: '/images/card/building/windmill-wood.png',
     barCpu: '#26a69a',
     barMem: '#4db6ac',
     barDisk: '#80cbc4',
@@ -158,26 +172,30 @@ const offline = computed(() => !props.node.online)
     :class="cn(offline && 'sd-card--offline')"
     @click="emit('click')"
   >
-    <!-- PDF 式卡片顶部：独立小房屋 + 三角形瓦屋顶 + 名牌横幅 -->
+    <!-- PDF 式卡片顶部：独立小建筑 + 像素瓦片屋顶 + 名牌横幅 -->
     <div class="sd-top">
-      <!-- 第1层：顶饰建筑（像素小屋，透明素材） -->
-      <div class="sd-top__house" :style="{ '--sd-banner-color': theme.banner }">
-        <img src="/images/card/house.png" alt="" aria-hidden="true">
+      <!-- 第1层：顶饰建筑（像素小屋/谷仓/风车，透明素材） -->
+      <div class="sd-top__house">
+        <img :src="theme.building" alt="" aria-hidden="true">
       </div>
 
-      <!-- 第2层：大三角形瓦片坡屋顶 -->
-      <div class="sd-roof" :style="{ '--sd-banner-color': theme.banner }">
-        <img
-          v-if="hasRegion(props.node.region)"
-          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
-          :alt="getRegionDisplayName(props.node.region)"
-          class="sd-roof__flag"
-        >
-      </div>
+      <!-- 第2层：像素瓦片坡屋顶（AI 像素素材，随主题色） -->
+      <img
+        :src="theme.roof"
+        alt=""
+        aria-hidden="true"
+        class="sd-roof-img"
+      >
 
       <!-- 第3层：名牌横板（服务器名） -->
       <div class="sd-banner" :style="{ background: theme.banner, '--sd-banner-color': theme.banner }">
         <span class="sd-banner__name">{{ props.node.name }}</span>
+        <img
+          v-if="hasRegion(props.node.region)"
+          :src="`/images/flags/${getRegionCode(props.node.region)}.svg`"
+          :alt="getRegionDisplayName(props.node.region)"
+          class="sd-banner__flag"
+        >
       </div>
     </div>
 
@@ -349,9 +367,10 @@ const offline = computed(() => !props.node.online)
   cursor: pointer;
   background: linear-gradient(180deg, #fbf3dc 0%, #f3e2bd 55%, #ecd7a6 100%);
   border: 3px solid #6b4423;
-  border-radius: 12px;
+  /* 直角像素木框（对齐 PDF 星露谷对话框，非圆角） */
+  border-radius: 0;
   box-shadow:
-    4px 4px 0 #3e2723,
+    5px 5px 0 #3e2723,
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
   color: #3a2a1a;
   font-family: 'VT323', 'Press Start 2P', 'Nunito', system-ui, sans-serif;
@@ -403,73 +422,40 @@ const offline = computed(() => !props.node.online)
   margin-top: 2px;
 }
 
-/* 第1层：顶饰小屋（缩写 PDF 独立小建筑） */
+/* 第1层：顶饰建筑（像素小屋/谷仓/风车） */
 .sd-top__house {
   position: relative;
   z-index: 4;
-  margin-bottom: -6px;
-  margin-top: -4px;
+  margin-bottom: -4px;
+  margin-top: -6px;
   filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
 }
 .sd-top__house img {
   display: block;
-  width: 40px;
-  height: 40px;
+  height: 52px;
+  width: auto;
+  max-width: 74px;
+  object-fit: contain;
   image-rendering: pixelated;
   pointer-events: none;
 }
 
-/* 第2层：大三角形瓦片坡屋顶（纯 CSS 像素瓦片） */
-.sd-roof {
+/* 第2层：像素瓦片坡屋顶（AI 像素素材） */
+.sd-roof-img {
   position: relative;
   z-index: 3;
-  width: 52%;
-  max-width: 190px;
-  height: 34px;
-  margin-bottom: -1px;
-  /* 三角形屋顶主体 */
-  background:
-    /* 瓦片纹理 */
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 7px,
-      rgba(0, 0, 0, 0.14) 7px 8px
-    ),
-    linear-gradient(var(--sd-banner-color), var(--sd-banner-color));
-  background-size:
-    auto,
-    auto;
-  clip-path: polygon(50% 100%, 0 0, 100% 0);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
-  border-radius: 0;
-}
-
-/* 屋顶边缘深色描边 */
-.sd-roof::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  clip-path: inherit;
-  background: transparent;
-  box-shadow: 0 -2px 0 rgba(62, 39, 35, 0.5);
-  pointer-events: none;
-}
-
-/* 屋顶上的国旗（让卡片顶部更灵动） */
-.sd-roof__flag {
-  position: absolute;
-  left: 50%;
-  top: 2px;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 14px;
+  display: block;
+  width: 62%;
+  max-width: 210px;
+  margin: -2px auto 0;
+  margin-bottom: -8px;
   object-fit: contain;
-  image-rendering: auto;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
-  border-radius: 1px;
+  image-rendering: pixelated;
+  pointer-events: none;
+  filter: drop-shadow(2px 3px 0 rgba(62, 39, 35, 0.3));
 }
 
-/* 第3层 奢侈品：名牌横幅 */
+/* 第3层：名牌横幅 */
 .sd-banner {
   position: relative;
   align-self: center;
@@ -510,6 +496,16 @@ const offline = computed(() => !props.node.online)
 .sd-banner::after { right: -3px; }
 
 /* 名牌底部像素锯齿 */
+.sd-banner__flag {
+  height: 12px;
+  width: auto;
+  max-width: 18px;
+  object-fit: contain;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  image-rendering: auto;
+}
+
 .sd-banner__name {
   font-size: 13px;
   font-weight: 700;
