@@ -212,29 +212,29 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
               <div class="search flex gap-2 items-center pointer-events-auto">
                 <Button
                   variant="outline" size="icon" aria-label="卡片视图"
-                  class="w-8 h-8 border-none backdrop-blur-xl backdrop-saturate-150 bg-background/40 shadow-none hover:bg-background/60 rounded-lg ring-1 ring-foreground/[0.06]"
-                  :class="[appStore.nodeViewMode === 'card' ? '!text-green-600 !bg-background' : '']"
+                  class="sd-header-btn w-8 h-8 rounded-lg"
+                  :class="[appStore.nodeViewMode === 'card' ? 'sd-header-btn--active' : '']"
                   @click="appStore.nodeViewMode = 'card'"
                 >
-                  <Icon icon="tabler:layout-grid" :width="14" :height="14" />
+                  <img src="/images/card/icon-viewgrid.png" alt="卡片视图" class="sd-header-icon">
                 </Button>
                 <Button
                   variant="outline" size="icon" aria-label="列表视图"
-                  class="w-8 h-8 border-none backdrop-blur-xl backdrop-saturate-150 bg-background/40 shadow-none hover:bg-background/60 rounded-lg ring-1 ring-foreground/[0.06]"
-                  :class="[appStore.nodeViewMode === 'list' ? '!text-green-600 !bg-background' : '']"
+                  class="sd-header-btn w-8 h-8 rounded-lg"
+                  :class="[appStore.nodeViewMode === 'list' ? 'sd-header-btn--active' : '']"
                   @click="appStore.nodeViewMode = 'list'"
                 >
-                  <Icon icon="tabler:table" :width="14" :height="14" />
+                  <img src="/images/card/icon-viewlist.png" alt="列表视图" class="sd-header-icon">
                 </Button>
                 <div class="relative z-1 w-8 h-8">
                   <div class="absolute top-0 right-0">
                     <Input
                       v-model="searchText" placeholder="搜索节点名称、地区、系统"
-                      class="transition-all placeholder:text-transparent border-none shadow-none w-8 h-8 backdrop-blur-xl backdrop-saturate-150 bg-background/40 rounded-lg ring-1 ring-foreground/[0.06] hover:!bg-background/60 focus:!w-60 focus:!pl-7.5 focus:placeholder:!text-muted-foreground focus:!bg-background/60 focus:!ring-foreground/[0.1]"
+                      class="transition-all placeholder:text-transparent border-none shadow-none w-8 h-8 sd-header-btn rounded-lg focus:!w-60 focus:!pl-7.5 focus:placeholder:!text-muted-foreground"
                     />
-                    <Icon
-                      icon="tabler:search" :width="14" :height="14"
-                      class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                    <img
+                      src="/images/card/icon-search.png" alt="搜索"
+                      class="sd-header-icon absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
                     />
                   </div>
                 </div>
@@ -276,6 +276,44 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 </template>
 
 <style scoped>
+/* 星露谷风格 header 按钮（羊皮纸 + 像素图标） */
+.sd-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba(245, 230, 200, 0.55), rgba(245, 230, 200, 0.45)),
+    #f5e6c8 !important;
+  box-shadow:
+    2px 2px 0 rgba(62, 39, 35, 0.15),
+    inset 0 0 0 2px #fbf3e3,
+    inset 0 0 0 3px rgba(62, 39, 35, 0.85) !important;
+  border: none !important;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sd-header-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    3px 3px 0 rgba(62, 39, 35, 0.22),
+    inset 0 0 0 2px #fbf3e3,
+    inset 0 0 0 3px rgba(62, 39, 35, 0.85) !important;
+}
+.sd-header-btn--active {
+  background: linear-gradient(rgba(76, 175, 80, 0.22), rgba(76, 175, 80, 0.14)), #f0e0bd !important;
+  box-shadow:
+    2px 2px 0 rgba(62, 39, 35, 0.15),
+    inset 0 0 0 2px #fbf3e3,
+    inset 0 0 0 3px rgba(62, 39, 35, 0.85) !important;
+}
+.sd-header-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
 .node-card-switch-enter-active,
 .node-card-switch-leave-active {
   transition:
