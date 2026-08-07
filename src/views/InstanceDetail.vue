@@ -50,12 +50,13 @@ interface InfoItem {
   icon?: string
 }
 
-interface MetricCard {
-  label: string
+/** 财务指标卡：复用 InfoItem 的 label/icon 字段，扩展 value 拆分与状态样式 */
+interface MetricCard extends InfoItem {
   value: string
   unit?: string
-  icon: string
   valueClass?: string
+  /** 指标卡图标为必填（与 InfoItem 可选的 icon 区分） */
+  icon: string
 }
 
 const EXPIRES_IN_SUFFIX_REGEX = /^(\d+)\s*(天|days?)$/i
@@ -242,10 +243,6 @@ const trafficUsageText = computed(() => {
   return `${formatBytes(trafficUsed.value)} / ${formatBytes(data.value?.traffic_limit ?? 0)}`
 })
 
-const trafficProgressStyle = computed(() => ({
-  width: `${trafficUsedPercentage.value}%`,
-}))
-
 // ==================== 星露谷风格 MEMORY/CPU/DISK/LOAD 实时卡 ====================
 const sdMemPct = computed(() => {
   const n = data.value
@@ -405,7 +402,7 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
               <div
                 v-if="hasTrafficLimit"
                 class="absolute inset-y-0 left-0 rounded-sm bg-primary/10 pointer-events-none transition-[width] duration-300 ease-out"
-                :style="trafficProgressStyle"
+                :style="{ width: `${trafficUsedPercentage}%` }"
               />
               <div class="relative flex flex-col gap-1.5">
                 <div class="flex gap-1 items-center text-muted-foreground">
