@@ -3,6 +3,7 @@ import type { CurrencyCode } from '@/utils/financeHelper'
 import { Icon } from '@iconify/vue'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import InfoGrid from '@/components/InfoGrid.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CardX } from '@/components/ui/card-x'
@@ -20,6 +21,9 @@ const PingChart = defineAsyncComponent(() => import('@/components/PingChart.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+/** 详情页玻璃卡片统一样式（5 处 CardX 复用） */
+const GLASS_CARD_CLASS = 'group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur'
 
 const appStore = useAppStore()
 const nodesStore = useNodesStore()
@@ -242,16 +246,18 @@ const trafficProgressStyle = computed(() => ({
   width: `${trafficUsedPercentage.value}%`,
 }))
 
-// ==================== 星露谷风格 MEMORY/CPU/DISK/LOAD 实时四卡 ====================
+// ==================== 星露谷风格 MEMORY/CPU/DISK/LOAD 实时卡 ====================
 const sdMemPct = computed(() => {
   const n = data.value
-  if (!n) return 0
+  if (!n)
+    return 0
   return (n.ram ?? 0) / (n.mem_total || 1) * 100
 })
 const sdCpuPct = computed(() => Math.max(0, Math.min(data.value?.cpu ?? 0, 100)))
 const sdDiskPct = computed(() => {
   const n = data.value
-  if (!n) return 0
+  if (!n)
+    return 0
   return (n.disk ?? 0) / (n.disk_total || 1) * 100
 })
 const sdLoadVal = computed(() => data.value?.load ?? 0)
@@ -259,25 +265,31 @@ const sdLoadPct = computed(() => {
   const cores = Math.max(data.value?.cpu_cores ?? 1, 1)
   return Math.min(((data.value?.load ?? 0) / cores) * 100, 100)
 })
-// 上行/下行不需要百分比进度条，固定 0 避免误导
-const sdUpPct = 0
-const sdDownPct = 0
 
-const sdResourceCards = computed(() => {
+interface SdResourceCard {
+  key: string
+  title: string
+  text: string
+  color: string
+  /** 是否显示像素进度条（UP/DOWN 网速卡不显示） */
+  progress: boolean
+  pct?: number
+}
+
+const sdResourceCards = computed<SdResourceCard[]>(() => {
   const n = data.value
-  if (!n) return []
+  if (!n)
+    return []
   return [
-    { key: 'memory', title: 'MEMORY', pct: sdMemPct.value, text: `${sdMemPct.value.toFixed(1)}%`, color: '#66bb6a' },
-    { key: 'cpu', title: 'CPU', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5' },
-    { key: 'disk', title: 'DISK', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350' },
-    { key: 'load', title: 'LOAD', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d' },
-    // 上行 / 下行 网速卡（与四卡统一风格；进度条用相对占用比例）
-    { key: 'up', title: 'UPLOAD', pct: sdUpPct, text: formatBytesPerSecond(data.value?.net_out ?? 0), color: '#42a5f5' },
-    { key: 'down', title: 'DOWNLOAD', pct: sdDownPct, text: formatBytesPerSecond(data.value?.net_in ?? 0), color: '#66bb6a' },
+    { key: 'memory', title: 'MEMORY', pct: sdMemPct.value, text: `${sdMemPct.value.toFixed(1)}%`, color: '#66bb6a', progress: true },
+    { key: 'cpu', title: 'CPU', pct: sdCpuPct.value, text: `${sdCpuPct.value.toFixed(0)}%`, color: '#42a5f5', progress: true },
+    { key: 'disk', title: 'DISK', pct: sdDiskPct.value, text: `${sdDiskPct.value.toFixed(1)}%`, color: '#ef5350', progress: true },
+    { key: 'load', title: 'LOAD', pct: sdLoadPct.value, text: sdLoadVal.value.toFixed(2), color: '#ffb74d', progress: true },
+    // 上行 / 下行 网速卡（纯文字 + 无进度条）
+    { key: 'up', title: 'UPLOAD', text: formatBytesPerSecond(n.net_out ?? 0), color: '#42a5f5', progress: false },
+    { key: 'down', title: 'DOWNLOAD', text: formatBytesPerSecond(n.net_in ?? 0), color: '#66bb6a', progress: false },
   ]
 })
-
-const sdProgressProps = (percent: number, color: string) => ({ percent, color })
 </script>
 
 <template>
@@ -324,9 +336,9 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
           <div class="mt-2 flex items-baseline gap-1 min-w-0">
             <span class="sd-resource-value" :style="{ color: card.color }">{{ card.text }}</span>
           </div>
-          <!-- 像素进度条 -->
-          <div class="mt-2">
-            <PixelProgress :percentage="card.pct" :color="card.color" :blocks="10" :size="10" />
+          <!-- 像素进度条（网速卡不显示） -->
+          <div v-if="card.progress" class="mt-2">
+            <PixelProgress :percentage="card.pct ?? 0" :color="card.color" :blocks="10" :size="10" />
           </div>
         </div>
       </div>
@@ -334,7 +346,7 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
       <div class="px-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <CardX
           v-for="item in metricCards" :key="item.label" hoverable size="small"
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur"
+          :class="GLASS_CARD_CLASS"
           content-class="h-full !p-3"
         >
           <div class="flex h-full min-h-10 md:min-h-18 flex-col justify-between gap-3">
@@ -361,71 +373,31 @@ const sdProgressProps = (percent: number, color: string) => ({ percent, color })
       </div>
 
       <div class="px-4 gap-4 grid grid-cols-1 lg:grid-cols-2">
-        <CardX
-          title="硬件信息" size="small"
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur"
-        >
-          <div class="gap-3 grid grid-cols-3">
-            <div
-              v-for="(item, index) in hardwareInfo" :key="item.label"
-              class="min-w-0 flex flex-col gap-1 rounded-sm bg-slate-500/5 p-2" :class="!index && 'col-span-3'"
-            >
-              <div class="flex gap-1 items-center text-muted-foreground">
-                <Icon v-if="item.icon" :icon="item.icon" :width="14" :height="14" />
-                <span class="text-xs sm:text-sm">{{ item.label }}</span>
-              </div>
-              <span class="text-xs sm:text-sm break-all">{{ item.value }}</span>
-            </div>
-          </div>
+        <CardX title="硬件信息" size="small" :class="GLASS_CARD_CLASS">
+          <InfoGrid :items="hardwareInfo" />
         </CardX>
 
-        <CardX
-          title="系统信息" size="small"
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur"
-        >
-          <div class="gap-3 grid grid-cols-1 sm:grid-cols-2">
-            <div
-              v-for="item in systemInfo" :key="item.label"
-              class="min-w-0 flex flex-col gap-1 rounded-sm bg-slate-500/5 p-2"
-            >
-              <div class="flex gap-1 items-center text-muted-foreground">
-                <Icon v-if="item.icon" :icon="item.icon" :width="14" :height="14" />
-                <span class="text-xs sm:text-sm">{{ item.label }}</span>
-              </div>
+        <CardX title="系统信息" size="small" :class="GLASS_CARD_CLASS">
+          <InfoGrid :items="systemInfo" cols="grid-cols-1 sm:grid-cols-2">
+            <template #value="{ item }">
               <div class="flex min-w-0 gap-2 items-center">
                 <img
                   v-if="item.label === '操作系统'" :src="getOSImage(data.os)" :alt="getOSName(data.os)"
                   class="size-5 shrink-0"
                 >
-                <span class="text-xs sm:text-sm break-all">
-                  {{ item.value }}
-                </span>
+                <span class="text-xs sm:text-sm break-all">{{ item.value }}</span>
               </div>
-            </div>
-          </div>
+            </template>
+          </InfoGrid>
         </CardX>
 
-        <CardX
-          title="存储信息" size="small"
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur"
-        >
-          <div class="gap-3 grid grid-cols-3">
-            <div
-              v-for="item in storageInfo" :key="item.label"
-              class="min-w-0 flex flex-col gap-1 rounded-sm bg-slate-500/5 p-2"
-            >
-              <div class="flex gap-1 items-center text-muted-foreground">
-                <Icon v-if="item.icon" :icon="item.icon" :width="14" :height="14" />
-                <span class="text-xs sm:text-sm">{{ item.label }}</span>
-              </div>
-              <span class="text-xs sm:text-sm break-all">{{ item.value }}</span>
-            </div>
-          </div>
+        <CardX title="存储信息" size="small" :class="GLASS_CARD_CLASS">
+          <InfoGrid :items="storageInfo" />
         </CardX>
 
         <CardX
           title="网络信息" size="small"
-          class="group h-full backdrop-blur-xl backdrop-saturate-150 bg-background/40 border-none hover:bg-background/60 transition-all rounded-lg ring-1 ring-foreground/[0.06] shadow-sm glass-hover-blur"
+          :class="GLASS_CARD_CLASS"
           content-class="pt-0"
         >
           <div class="gap-3 grid grid-cols-2">
