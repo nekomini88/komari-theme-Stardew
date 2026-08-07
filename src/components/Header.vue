@@ -14,12 +14,13 @@ const isScrolled = inject<ReturnType<typeof ref<boolean>>>('isScrolled', ref(fal
 const siteFavicon = ref('/favicon.ico')
 
 const actionButtons = computed(() => {
-  const buttons: { title: string, icon: string, action: string }[] = []
+  const buttons: { title: string, icon: string, img?: string, action: string }[] = []
 
   if (appStore.isLoggedIn || !appStore.hideAdminEntryWhenLoggedOut) {
     buttons.push({
       title: '后台管理',
       icon: 'icon-park-outline:setting',
+      img: '/images/icons/admin-gear.png',
       action: 'jumpToSetting',
     })
   }
@@ -57,7 +58,12 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
           <Tooltip v-for="button in actionButtons" :key="button.action">
             <TooltipTrigger as-child>
               <Button variant="ghost" size="icon-sm" @click="handleButtonClick(button.action)">
-                <Icon :icon="button.icon" :width="18" :height="18" />
+                <img
+                  v-if="button.img" :src="button.img" :alt="button.title"
+                  class="size-[18px] object-contain"
+                  style="image-rendering: pixelated;"
+                >
+                <Icon v-else :icon="button.icon" :width="18" :height="18" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>{{ button.title }}</TooltipContent>
