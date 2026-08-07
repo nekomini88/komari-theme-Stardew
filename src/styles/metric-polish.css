@@ -21,15 +21,8 @@
   border-radius: 0 !important;
   image-rendering: pixelated;
   height: 10px !important;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.18) 0px,
-      rgba(0, 0, 0, 0.18) 2px,
-      transparent 2px,
-      transparent 6px
-    ),
-    var(--bar-fill, #4ade80);
+  /* 容器透明：点阵点位自带颜色，不再叠黑色条纹覆盖层（避免波浪条纹透出） */
+  background: transparent !important;
 }
 
 /* traffic/network stat small pills */
