@@ -124,6 +124,85 @@ const theme = computed<BannerTheme>(() => {
   return themes[hash % themes.length]!
 })
 
+// ===== 星露谷农场装饰：屋旁随机动物 + 石子 + 花草（确定性随机，基于节点名） =====
+const FARM_ANIMALS = [
+  '/images/animals/chicken-white.png',
+  '/images/animals/chicken-brown.png',
+  '/images/animals/chick-yellow.png',
+  '/images/animals/hen-tan.png',
+  '/images/animals/rooster-white.png',
+  '/images/animals/calf-brown.png',
+  '/images/animals/calf-stand.png',
+  '/images/animals/cow-bw.png',
+  '/images/animals/lamb-white.png',
+  '/images/animals/sheep-black.png',
+  '/images/animals/sheep-cream.png',
+  '/images/animals/squirrel-sit.png',
+  '/images/animals/squirrel-run.png',
+  '/images/animals/butterfly-blue.png',
+  '/images/animals/butterfly-orange.png',
+  '/images/animals/butterfly-purple.png',
+]
+
+const FARM_GRASS = [
+  '/images/icons/grass/clump-r0-c0.png',
+  '/images/icons/grass/clump-r0-c1.png',
+  '/images/icons/grass/clump-r1-c0.png',
+  '/images/icons/grass/clump-r1-c1.png',
+  '/images/icons/grass/clump-r2-c0.png',
+  '/images/icons/grass/clump-r2-c1.png',
+]
+
+interface FarmDecor {
+  animal: string
+  animalSide: 'left' | 'right'
+  animalScale: number
+  stones: { img: string, x: number, y: number, scale: number, flip: boolean }[]
+  grass: { img: string, x: number, y: number, scale: number, flip: boolean }[]
+}
+
+const farmDecor = computed<FarmDecor>(() => {
+  const name = props.node.name || ''
+  let h = 0
+  for (let i = 0; i < name.length; i++)
+    h = (h * 31 + name.charCodeAt(i)) >>> 0
+  // 独立于 theme hash 的派生随机（同节点每次渲染一致）
+  const pick = <T,>(arr: readonly T[], salt: number): T => arr[(h + salt) % arr.length]!
+
+  const decor: FarmDecor = {
+    animal: pick(FARM_ANIMALS, 7),
+    animalSide: (h >> 3) % 2 === 0 ? 'left' : 'right',
+    animalScale: 0.55 + ((h >> 4) % 5) * 0.08, // 0.55-0.87
+    stones: [],
+    grass: [],
+  }
+
+  // 2-3 颗石子
+  const stoneCount = 2 + (h % 2)
+  for (let i = 0; i < stoneCount; i++) {
+    decor.stones.push({
+      img: '/images/icons/stone.png',
+      x: -30 + ((h + i * 13) % 60), // -30% ~ 30% 相对屋子的偏移
+      y: 0,
+      scale: 0.7 + ((h >> (2 + i)) % 4) * 0.15,
+      flip: ((h >> (3 + i)) % 2) === 1,
+    })
+  }
+
+  // 2-3 棵花草
+  const grassCount = 2 + ((h >> 2) % 2)
+  for (let i = 0; i < grassCount; i++) {
+    decor.grass.push({
+      img: pick(FARM_GRASS, 11 + i * 5),
+      x: -36 + ((h + i * 29) % 72),
+      y: 0,
+      scale: 0.7 + ((h >> (1 + i)) % 4) * 0.15,
+      flip: ((h >> (4 + i)) % 2) === 1,
+    })
+  }
+  return decor
+})
+
 // 统一资源进度条与数值颜色（所有节点一致，不随主题变）
 const SD_BAR = {
   cpu: '#42a5f5',
@@ -145,7 +224,7 @@ const offline = computed(() => !props.node.online)
     :class="cn(offline && 'sd-card--offline')"
     @click="emit('click')"
   >
-        <!-- 四角花朵装饰（像素素材，PDF 对齐） -->
+    <!-- 四角花朵装饰（像素素材，PDF 对齐） -->
     <img src="/images/card/corner/tl.png" alt="" aria-hidden="true" class="sd-corner sd-corner--tl">
     <img src="/images/card/corner/tr.png" alt="" aria-hidden="true" class="sd-corner sd-corner--tr">
     <img src="/images/card/corner/bl.png" alt="" aria-hidden="true" class="sd-corner sd-corner--bl">
@@ -156,6 +235,31 @@ const offline = computed(() => !props.node.online)
       <!-- 第1层：顶饰建筑（像素小屋/谷仓/风车，透明素材） -->
       <div class="sd-top__house">
         <img :src="theme.building" alt="" aria-hidden="true">
+      </div>
+
+      <!-- 农场装饰：屋旁随机动物 + 石子 + 花草（确定性随机） -->
+      <div class="sd-farm" aria-hidden="true">
+        <!-- 屋旁动物 -->
+        <img
+          :src="farmDecor.animal" alt=""
+          class="sd-farm__animal"
+          :class="farmDecor.animalSide === 'right' ? 'sd-farm__animal--right' : ''"
+          :style="{ transform: `scale(${farmDecor.animalScale})${farmDecor.animalSide === 'right' ? ' scaleX(-1)' : ''}` }"
+        >
+        <!-- 石子 -->
+        <img
+          v-for="(s, i) in farmDecor.stones" :key="'s' + i"
+          :src="s.img" alt=""
+          class="sd-farm__stone"
+          :style="{ left: `calc(50% + ${s.x}%)`, transform: `scale(${s.scale})${s.flip ? ' scaleX(-1)' : ''}` }"
+        >
+        <!-- 花草 -->
+        <img
+          v-for="(g, i) in farmDecor.grass" :key="'g' + i"
+          :src="g.img" alt=""
+          class="sd-farm__grass"
+          :style="{ left: `calc(50% + ${g.x}%)`, transform: `scale(${g.scale})${g.flip ? ' scaleX(-1)' : ''}` }"
+        >
       </div>
 
       <!-- 第2层：像素瓦片坡屋顶 → 移除（建筑自带屋顶，避免砖块金字塔观感） -->
@@ -377,10 +481,26 @@ const offline = computed(() => !props.node.online)
   filter: drop-shadow(1px 2px 0 rgba(62, 39, 35, 0.18));
 }
 /* 素材初始方向：L 形转角在左下（垂直茎左、水平藤蔓底） */
-.sd-corner--tl { top: -8px; left: -8px; transform: rotate(90deg); }
-.sd-corner--tr { top: -8px; right: -8px; transform: rotate(180deg); }
-.sd-corner--bl { bottom: -8px; left: -8px; transform: rotate(0deg); }
-.sd-corner--br { bottom: -8px; right: -8px; transform: rotate(270deg); }
+.sd-corner--tl {
+  top: -8px;
+  left: -8px;
+  transform: rotate(90deg);
+}
+.sd-corner--tr {
+  top: -8px;
+  right: -8px;
+  transform: rotate(180deg);
+}
+.sd-corner--bl {
+  bottom: -8px;
+  left: -8px;
+  transform: rotate(0deg);
+}
+.sd-corner--br {
+  bottom: -8px;
+  right: -8px;
+  transform: rotate(270deg);
+}
 
 .sd-card--offline {
   filter: grayscale(0.35) brightness(0.95) contrast(1.1);
@@ -431,6 +551,50 @@ const offline = computed(() => !props.node.online)
   object-fit: contain;
   image-rendering: pixelated;
   pointer-events: none;
+}
+
+/* ===== 农场装饰层：屋旁动物 + 石子 + 花草 ===== */
+.sd-farm {
+  position: relative;
+  z-index: 3;
+  height: 0;
+  width: 100%;
+  pointer-events: none;
+}
+/* 动物：站在屋子旁边，脚对齐横幅上沿 */
+.sd-farm__animal {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  margin-left: 46px; /* 屋子右侧 */
+  max-height: 40px;
+  max-width: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform-origin: bottom center;
+}
+.sd-farm__animal--right {
+  margin-left: -90px; /* 屋子左侧（镜像后视觉在左） */
+}
+/* 石子：散落在屋子脚下 */
+.sd-farm__stone {
+  position: absolute;
+  bottom: -8px;
+  height: auto;
+  width: 26px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform-origin: bottom center;
+}
+/* 花草：簇拥在屋子两侧 */
+.sd-farm__grass {
+  position: absolute;
+  bottom: -9px;
+  height: auto;
+  width: 34px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform-origin: bottom center;
 }
 
 /* 第3层：名牌横幅（木质标牌素材） */
@@ -561,10 +725,18 @@ const offline = computed(() => !props.node.online)
   flex-shrink: 0;
 }
 /* 统一资源数值颜色（与进度条一致，所有节点相同） */
-.sd-metric__val--cpu { color: #42a5f5; }
-.sd-metric__val--mem { color: #66bb6a; }
-.sd-metric__val--disk { color: #ef5350; }
-.sd-metric__val--load { color: #ffb74d; }
+.sd-metric__val--cpu {
+  color: #42a5f5;
+}
+.sd-metric__val--mem {
+  color: #66bb6a;
+}
+.sd-metric__val--disk {
+  color: #ef5350;
+}
+.sd-metric__val--load {
+  color: #ffb74d;
+}
 
 .sd-row {
   display: grid;
