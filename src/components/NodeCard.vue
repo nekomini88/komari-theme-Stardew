@@ -814,7 +814,7 @@ const offline = computed(() => !props.node.online)
   margin-top: 2px;
   padding-top: 6px;
   /* 左 padding 避开左下角花朵装饰 (62x62)，防止遮挡 EXPIRES 天数 */
-  padding-left: 34px;
+  padding-left: 48px;
   border-top: 1px dashed rgba(107, 68, 35, 0.35);
 }
 
