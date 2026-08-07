@@ -46,7 +46,7 @@ function sunProgress(hour: number, minute: number): number {
 
 const seasonWeatherPool: Record<Season, Weather[]> = {
   spring: ['clear', 'clear', 'rain', 'fog', 'clear'],
-  summer: ['clear', 'clear', 'rain', 'thunder', 'clear'],
+  summer: ['clear', 'clear', 'clear', 'clear', 'rain'],  // 雨/雷降为 1/5，减少斜纹干扰
   autumn: ['clear', 'rain', 'fog', 'clear', 'clear'],
   winter: ['clear', 'snow', 'snow', 'fog', 'clear'],
 }

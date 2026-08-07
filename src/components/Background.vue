@@ -439,12 +439,13 @@ onUnmounted(() => clearImageLoader())
   background: repeating-linear-gradient(
     -14deg,
     transparent 0,
-    transparent 7px,
-    rgba(180, 210, 255, 0.28) 7px,
-    rgba(180, 210, 255, 0.28) 9px
+    transparent 10px,
+    rgba(190, 215, 255, 0.12) 10px,
+    rgba(190, 215, 255, 0.12) 12px
   );
   animation: rain-fall 0.5s linear infinite;
-  opacity: 0.6;
+  /* 淡化雨丝: 原 0.6/0.28 → 0.2/0.12, 避免白色斜线破坏画面质感 */
+  opacity: 0.2;
 }
 .stardew-weather-snow {
   position: absolute;
