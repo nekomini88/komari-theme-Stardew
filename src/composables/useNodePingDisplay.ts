@@ -73,7 +73,7 @@ export function useNodePingDisplay(
       return {
         key: `${point.time}-${index}`,
         className: value === null
-          ? 'bg-muted-foreground/15'
+          ? 'bg-transparent'
           : metric === 'latency'
             ? getLatencyToneClass(value)
             : getLossToneClass(value),
@@ -99,7 +99,7 @@ export function useNodePingDisplay(
 
     return Array.from({ length: EMPTY_PING_BAR_COUNT }, (_, index) => ({
       key: `${metric}-empty-${index}`,
-      className: 'bg-muted-foreground/10',
+      className: 'bg-transparent',
       tooltip,
     }))
   }

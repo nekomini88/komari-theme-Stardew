@@ -380,11 +380,13 @@ const offline = computed(() => !props.node.online)
           <b class="sd-metric__val c-rose">{{ latencyDisplay }}</b>
         </div>
         <div class="ping-bar">
-          <span
-            v-for="i in 8"
-            :key="`lat-${i}`"
-            :class="pingDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.latency : undefined)"
-          />
+          <template v-if="pingStats.hasData">
+            <span
+              v-for="i in 8"
+              :key="`lat-${i}`"
+              :class="pingDotClass(pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.latency)"
+            />
+          </template>
         </div>
       </div>
       <div class="sd-ping" :title="lossPanelTooltip">
@@ -396,11 +398,13 @@ const offline = computed(() => !props.node.online)
           <b class="sd-metric__val c-em">{{ lossDisplay }}</b>
         </div>
         <div class="ping-bar">
-          <span
-            v-for="i in 8"
-            :key="`loss-${i}`"
-            :class="lossDotClass(pingStats.hasData ? pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.loss : undefined)"
-          />
+          <template v-if="pingStats.hasData">
+            <span
+              v-for="i in 8"
+              :key="`loss-${i}`"
+              :class="lossDotClass(pingStats.history.value[Math.min(i - 1, Math.max(pingStats.history.value.length - 1, 0))]?.loss)"
+            />
+          </template>
         </div>
       </div>
     </div>
@@ -788,8 +792,9 @@ const offline = computed(() => !props.node.online)
   width: 8px;
   height: 8px;
   border-radius: 1px;
-  background: rgba(62, 39, 35, 0.12);
-  border: 1px solid rgba(62, 39, 35, 0.2);
+  /* 空态透明：只保留有颜色的点位（绿/黄/红），无数据不显示凹槽 */
+  background: transparent;
+  border: 1px solid transparent;
 }
 .ping-dot--active {
   /* 柔和星露谷草绿：正常态低调不刺眼（黄/红警示色保持醒目） */
