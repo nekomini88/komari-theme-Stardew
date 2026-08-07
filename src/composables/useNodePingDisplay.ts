@@ -22,24 +22,17 @@ interface UseNodePingDisplayOptions {
 const EMPTY_PING_BAR_COUNT = 20
 
 function getLatencyToneClass(latency: number): string {
-  if (latency <= 60)
-    return 'bg-emerald-600/90'
-  if (latency <= 100)
-    return 'bg-green-400/80'
+  // 正常区间统一柔和草绿（不刺眼）；仅异常时黄/红警示
   if (latency <= 160)
-    return 'bg-lime-400/80'
+    return 'bg-[#8bc34a]'
   if (latency <= 200)
     return 'bg-yellow-400/80'
   return 'bg-rose-500/80'
 }
 
 function getLossToneClass(loss: number): string {
-  if (loss <= 1)
-    return 'bg-emerald-600/90'
-  if (loss <= 3)
-    return 'bg-green-400/90'
   if (loss <= 6)
-    return 'bg-lime-400/90'
+    return 'bg-[#8bc34a]'
   if (loss <= 9)
     return 'bg-yellow-400/90'
   return 'bg-rose-500/80'

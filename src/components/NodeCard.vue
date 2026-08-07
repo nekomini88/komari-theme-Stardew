@@ -792,8 +792,9 @@ const offline = computed(() => !props.node.online)
   border: 1px solid rgba(62, 39, 35, 0.2);
 }
 .ping-dot--active {
-  background: #67b447;
-  border-color: #4a8c2e;
+  /* 柔和星露谷草绿：正常态低调不刺眼（黄/红警示色保持醒目） */
+  background: #8bc34a;
+  border-color: #6d9e37;
 }
 .ping-dot--warn {
   background: #e6a23c;
