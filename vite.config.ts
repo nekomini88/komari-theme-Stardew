@@ -60,9 +60,9 @@ function cacheBustPlugin(): Plugin {
       return html
         .replace(
           '<meta name="viewport"',
-          '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />\n    <meta http-equiv="Pragma" content="no-cache" />\n    <meta http-equiv="Expires" content="0" />\n    <meta name="viewport"'
+          '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />\n    <meta http-equiv="Pragma" content="no-cache" />\n    <meta http-equiv="Expires" content="0" />\n    <meta name="viewport"',
         )
-        .replace('</head>', bustScript + '\n  </head>')
+        .replace('</head>', `${bustScript}\n  </head>`)
     },
   }
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { NodeData } from '@/stores/nodes'
 import type { CurrencyCode } from '@/utils/financeHelper'
-import { Icon } from '@iconify/vue'
 import { computed, onMounted, ref } from 'vue'
 import NodeEarthGlobe from '@/components/NodeEarthGlobe.vue'
 import { CardX } from '@/components/ui/card-x'

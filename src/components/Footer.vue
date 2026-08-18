@@ -39,7 +39,8 @@ function openLink(url: string) {
 
 function onLinkClick(e: MouseEvent, url: string) {
   // 允许 Ctrl/Cmd/Middle-click 走浏览器原生行为(新标签), 其余场景确保导航
-  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return
+  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)
+    return
   e.preventDefault()
   openLink(url)
 }

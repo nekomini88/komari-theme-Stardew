@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, defineAsyncComponent, nextTick, onActivated, onDeactivated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -235,7 +234,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
                     <img
                       src="/images/card/icon-search.png" alt="搜索"
                       class="sd-header-icon absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
-                    />
+                    >
                   </div>
                 </div>
               </div>
@@ -281,15 +280,15 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background:
-    linear-gradient(rgba(245, 230, 200, 0.55), rgba(245, 230, 200, 0.45)),
-    #f5e6c8 !important;
+  background: linear-gradient(rgba(245, 230, 200, 0.55), rgba(245, 230, 200, 0.45)), #f5e6c8 !important;
   box-shadow:
     2px 2px 0 rgba(62, 39, 35, 0.15),
     inset 0 0 0 2px #fbf3e3,
     inset 0 0 0 3px rgba(62, 39, 35, 0.85) !important;
   border: none !important;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 .sd-header-btn:hover {
   transform: translate(-1px, -1px);
