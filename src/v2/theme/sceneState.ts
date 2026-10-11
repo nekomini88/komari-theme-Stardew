@@ -83,11 +83,11 @@ const LAYER_COLORS: Record<TimeOfDay, Record<'far' | 'mid' | 'near' | 'ground', 
   night: { far: '#2f4a56', mid: '#5a4034', near: '#3f6b4c', ground: '#5a4034' },
 }
 
-/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜叠一层轻冷色（夜间已由夜色插画承载，故压淡避免过暗） */
+/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜只留极淡冷调（夜景亮化改由 scene.css 抬底图亮度承担，避免再压暗） */
 const TIME_TINTS: Record<TimeOfDay, TintSpec> = {
   day: { color: '#7ec8f2', opacity: 0 },
   dusk: { color: '#e8a05c', opacity: 0.35 },
-  night: { color: '#1e2c4c', opacity: 0.12 },
+  night: { color: '#3a548c', opacity: 0.05 },
 }
 
 /** 季节 tint：只对整栈套一层，颜色取自母板的季节色 */

@@ -224,7 +224,18 @@
 }
 
 /* ---- 夜：整幅底图已是夜色插画，各层不再另铺色（避免盖住插画）；
-        仅留远山/中景亮度微调与整栈 tint，保持整栈时间感。 ---- */
+        关键：夜景必须「看得见的夜空田园」——
+        ① 不再用 4 段深色带盖住插画自带星空/月亮（色带退为透明兜底，元素仍在）；
+        ② 给夜色底图抬一层亮度，使远山轮廓 / 栅栏 / 草地仍可辨认；
+        ③ 时间 tint 只留极淡冷调，不再压暗。 ---- */
+.vk-scene[data-time='night'] .vk-sky-band {
+  opacity: 0;   /* 露出底图自带的星空 + 月亮 */
+}
+
+.vk-scene[data-time='night'] .vk-scene-bg {
+  filter: brightness(1.42) saturate(1.06) contrast(1.02);
+}
+
 .vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='mid'] .vk-layer-base {
   filter: brightness(0.94) saturate(0.9);
@@ -235,23 +246,18 @@
   background: none;   /* 夜间插画自带草地/坡沿，不再铺冷色渐变遮盖 */
 }
 
-/* 夜晚：太阳退为清冷月亮，云变薄 */
-.vk-scene[data-time='night'] .vk-sun {
-  background: radial-gradient(circle at 46% 42%,
-    var(--vk-paper-cream) 0%,
-    color-mix(in srgb, var(--vk-sky-hi) 60%, var(--vk-paper-cream)) 52%,
-    color-mix(in srgb, var(--vk-sky-hi) 24%, transparent) 84%,
-    transparent 100%);
-  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--vk-sky-hi) 46%, transparent));
+/* 夜晚：天空改由插画自带星空承载 → 收回 CSS 太阳/月亮与 CSS 云，
+   避免与插画里的月亮/云重影；地平线奶白雾也压淡。 */
+.vk-scene[data-time='night'] .vk-sky::after {
+  opacity: 0.22;
 }
 
-.vk-scene[data-time='night'] .vk-sun::before {
-  opacity: 0.22;
+.vk-scene[data-time='night'] .vk-sun {
+  display: none;
 }
 
 .vk-scene[data-time='night'] .vk-cloud {
-  opacity: 0.22;
-  filter: blur(1.4px);
+  opacity: 0;
 }
 
 /* ---- 栅栏已改由 mid 层的手绘插画提供（mid-ground.png 内含木栅栏），
@@ -326,3 +332,204 @@
     opacity: 0;
   }
 }
+
+/* ============================================================
+ * 天气层（按访客 IP 叠加到场景之上）
+ *
+ * 位置：.vk-weather 在 .vk-scene 内、视差层与 tint 之上，
+ *       而卡片内容在 .vk-scene 之外（更高 z）→ 天气只作用于场景，绝不影响卡片可读性。
+ * 退化：prefers-reduced-motion 下动画停用，只留静态层（仍有视觉标识，不可动）。
+ * 兜底：data-weather 缺省为 clear → 全部子层隐藏（无网络/取数失败时的优雅退化态）。
+ * ============================================================ */
+.vk-weather {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 所有天气子层默认隐藏，按 data-weather 打开 */
+.vk-weather > span {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+/* ---- 雨：斜向雨丝斜纹下落（重复线性渐变 + 背景位移 = 下落感） ---- */
+.vk-weather-rain {
+  inset: -25% -12%;
+  background-image: repeating-linear-gradient(102deg,
+    transparent 0 7px,
+    color-mix(in srgb, var(--vk-sky-hi) 42%, transparent) 7px 8px,
+    transparent 8px 15px);
+  opacity: 0.5;
+}
+
+/* ---- 大雪/阵雪：平铺小圆点缓缓飘落 + 轻微横向摆动 ---- */
+.vk-weather-snow {
+  inset: -20% -10%;
+  background-image:
+    radial-gradient(2px 2px at 12% 18%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.6px 2.6px at 34% 46%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(1.8px 1.8px at 58% 28%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.4px 2.4px at 76% 62%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2px 2px at 88% 12%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(1.6px 1.6px at 24% 78%, var(--vk-paper-cream) 92%, transparent);
+  background-size: 260px 260px;
+  background-repeat: repeat;
+  opacity: 0.85;
+}
+
+/* ---- 雾：两层柔边奶雾带横向漂移（下浓上淡，贴地感） ---- */
+.vk-weather-fog {
+  background-image:
+    linear-gradient(0deg,
+      transparent 0%,
+      color-mix(in srgb, var(--vk-paper-cream) 30%, transparent) 34%,
+      color-mix(in srgb, var(--vk-paper-cream) 14%, transparent) 62%,
+      transparent 88%),
+    linear-gradient(0deg,
+      transparent 0%,
+      color-mix(in srgb, var(--vk-sky-hi) 18%, transparent) 48%,
+      transparent 100%);
+  background-size: 200% 100%, 160% 100%;
+  background-position: 0 0, 40% 0;
+  opacity: 0.7;
+}
+
+/* ---- 云影（多云/雷雨）：几团柔边暗影缓缓横移，掠过田园 ---- */
+.vk-weather-shadow {
+  background-image:
+    radial-gradient(38% 26% at 22% 24%, color-mix(in srgb, var(--vk-sky-day-lo) 26%, transparent), transparent 70%),
+    radial-gradient(44% 30% at 62% 16%, color-mix(in srgb, var(--vk-sky-day-lo) 20%, transparent), transparent 72%),
+    radial-gradient(36% 24% at 86% 30%, color-mix(in srgb, var(--vk-sky-day-lo) 22%, transparent), transparent 70%);
+  background-size: 180% 100%;
+  opacity: 0.55;
+}
+
+/* ---- 雷闪：全屏白色瞬时提亮（仅雷雨） ---- */
+.vk-weather-flash {
+  background: color-mix(in srgb, var(--vk-paper-cream) 70%, transparent);
+  opacity: 0;
+}
+
+/* 按天气打开对应子层 */
+.vk-scene[data-weather='rain'] .vk-weather-rain,
+.vk-scene[data-weather='thunder'] .vk-weather-rain,
+.vk-scene[data-weather='thunder'] .vk-weather-shadow {
+  display: block;
+}
+
+.vk-scene[data-weather='snow'] .vk-weather-snow {
+  display: block;
+}
+
+.vk-scene[data-weather='fog'] .vk-weather-fog {
+  display: block;
+}
+
+.vk-scene[data-weather='cloudy'] .vk-weather-shadow {
+  display: block;
+}
+
+.vk-scene[data-weather='thunder'] .vk-weather-flash {
+  display: block;
+}
+
+/* 动画（默认开启） */
+.vk-weather-rain {
+  animation: vk-rain-fall 0.62s linear infinite;
+}
+
+.vk-weather-snow {
+  animation: vk-snow-fall 9s linear infinite;
+}
+
+.vk-weather-fog {
+  animation: vk-fog-drift 26s ease-in-out infinite alternate;
+}
+
+.vk-weather-shadow {
+  animation: vk-shadow-drift 34s ease-in-out infinite alternate;
+}
+
+.vk-scene[data-weather='thunder'] .vk-weather-flash {
+  animation: vk-flash 7s linear infinite;
+}
+
+/* 雷雨雨势更密、更亮 */
+.vk-scene[data-weather='thunder'] .vk-weather-rain {
+  opacity: 0.72;
+}
+
+@keyframes vk-rain-fall {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -28px 240px;
+  }
+}
+
+@keyframes vk-snow-fall {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 46px 520px;
+  }
+}
+
+@keyframes vk-fog-drift {
+  from {
+    background-position: 0 0, 40% 0;
+  }
+
+  to {
+    background-position: 60% 0, 0 0;
+  }
+}
+
+@keyframes vk-shadow-drift {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 40% 0;
+  }
+}
+
+@keyframes vk-flash {
+  0%, 92%, 100% {
+    opacity: 0;
+  }
+
+  94% {
+    opacity: 0.55;
+  }
+
+  96% {
+    opacity: 0.1;
+  }
+
+  98% {
+    opacity: 0.4;
+  }
+}
+
+/* 静态/尺寸兜底：无网络等场景不渲染天气层（display:none 已覆盖），
+   这里保证「动效优先、静态可认」——关掉动效后仍是可辨识的天气图层。 */
+@media (prefers-reduced-motion: reduce) {
+  .vk-weather-rain,
+  .vk-weather-snow,
+  .vk-weather-fog,
+  .vk-weather-shadow,
+  .vk-scene[data-weather='thunder'] .vk-weather-flash {
+    animation: none !important;
+  }
+}
+

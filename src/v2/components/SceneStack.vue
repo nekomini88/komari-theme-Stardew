@@ -9,13 +9,20 @@
  * - 所有角色/建筑共享 ground 基线（本组件把 ground 层暴露为具名插槽）
  */
 import type { Season, TimeOfDay, TintSpec } from '@/v2/theme/sceneState'
+import type { WeatherType } from '@/v2/theme/weather'
 import { computed } from 'vue'
 import { resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
 import { useCrossfade } from '@/v2/theme/useCrossfade'
 
-const props = withDefaults(defineProps<{ time?: TimeOfDay, season?: Season }>(), {
+const props = withDefaults(defineProps<{
+  time?: TimeOfDay
+  season?: Season
+  /** 按访客 IP 解析出的本地天气（缺省 clear：无网络/失败时的优雅退化态） */
+  weather?: WeatherType
+}>(), {
   time: 'day',
   season: 'summer',
+  weather: 'clear',
 })
 
 const scene = computed(() => resolveScene(props.time, props.season))
@@ -81,7 +88,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-transitioning="isTransitioning">
+  <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-weather="weather" :data-transitioning="isTransitioning">
     <!-- 场景底图：整幅手绘插画，按访客本地时间交叉淡化（离开层在下、进入层在上） -->
     <div
       v-if="bgFade.leaving.value"
@@ -132,5 +139,16 @@ defineExpose({
     <!-- 整栈 tint：离开层（仅在过渡期间存在 → 交叉淡化而非硬切） -->
     <div v-if="timeFade.leaving.value" class="vk-tint" data-tint="time-leave" :style="tintStyle(timeFade.leaving.value)" />
     <div v-if="seasonFade.leaving.value" class="vk-tint" data-tint="season-leave" :style="tintStyle(seasonFade.leaving.value)" />
+
+    <!-- 天气层：按访客 IP 叠加的轻量天气效果（雨/雪/雾/云影/雷闪）。
+         只作用在场景层（.vk-scene 在内容之下），绝不覆盖卡片文字。
+         动画在 prefers-reduced-motion 下自动退化为静态层（见 scene.css）。 -->
+    <div class="vk-weather" aria-hidden="true">
+      <span class="vk-weather-rain" />
+      <span class="vk-weather-snow" />
+      <span class="vk-weather-fog" />
+      <span class="vk-weather-shadow" />
+      <span class="vk-weather-flash" />
+    </div>
   </div>
 </template>
