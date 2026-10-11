@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NodeData } from '@/stores/nodes'
-import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import PixelProgress from '@/components/PixelProgress.vue'
 import { useNodePingDisplay } from '@/composables/useNodePingDisplay'
 import { cn } from '@/lib/utils'
@@ -355,14 +355,14 @@ const offline = computed(() => !props.node.online)
     <div class="sd-row sd-row--traffic">
       <div class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:earth" width="12" height="12" class="c-sky" />
+          <PixelIcon name="mdi:earth" :size="12" class="c-sky" />
           Outbound
         </span>
         <span class="sd-pair__val c-sky">{{ formatBytes(props.node.net_total_up ?? 0) }}</span>
       </div>
       <div class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:earth" width="12" height="12" class="c-em" />
+          <PixelIcon name="mdi:earth" :size="12" class="c-em" />
           Inbound
         </span>
         <span class="sd-pair__val c-em">{{ formatBytes(props.node.net_total_down ?? 0) }}</span>
@@ -374,7 +374,7 @@ const offline = computed(() => !props.node.online)
       <div class="sd-ping" :title="latencyPanelTooltip">
         <div class="sd-ping__head">
           <span class="sd-pair__label">
-            <Icon icon="mdi:clock-outline" width="12" height="12" />
+            <PixelIcon name="mdi:clock-outline" :size="12" />
             Latency
           </span>
           <b class="sd-metric__val c-rose">{{ latencyDisplay }}</b>
@@ -392,7 +392,7 @@ const offline = computed(() => !props.node.online)
       <div class="sd-ping" :title="lossPanelTooltip">
         <div class="sd-ping__head">
           <span class="sd-pair__label">
-            <Icon icon="mdi:shield-check" width="12" height="12" class="c-em" />
+            <PixelIcon name="mdi:shield-check" :size="12" class="c-em" />
             Packet Loss
           </span>
           <b class="sd-metric__val c-em">{{ lossDisplay }}</b>
@@ -413,7 +413,7 @@ const offline = computed(() => !props.node.online)
     <div class="sd-row sd-row--footer">
       <div class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:calendar" width="12" height="12" class="c-rose" />
+          <PixelIcon name="mdi:calendar" :size="12" class="c-rose" />
           Expires
         </span>
         <span class="sd-pair__val c-rose">
@@ -423,7 +423,7 @@ const offline = computed(() => !props.node.online)
       </div>
       <div v-if="appStore.showNodeUptime" class="sd-pair">
         <span class="sd-pair__label">
-          <Icon icon="mdi:timer-sand" width="12" height="12" class="c-em" />
+          <PixelIcon name="mdi:timer-sand" :size="12" class="c-em" />
           Uptime
         </span>
         <span class="sd-pair__val c-em">{{ uptimeDays }} days</span>
@@ -432,7 +432,7 @@ const offline = computed(() => !props.node.online)
 
     <!-- bottom-right flower -->
     <div class="sd-flower">
-      <Icon icon="mdi:flower-tulip" width="18" height="18" :style="{ color: theme.banner }" />
+      <PixelIcon name="mdi:flower-tulip" :size="18" :style="{ color: theme.banner }" />
     </div>
   </div>
 </template>

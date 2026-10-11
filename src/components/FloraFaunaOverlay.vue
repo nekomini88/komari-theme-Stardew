@@ -1,18 +1,29 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
-import birdUrl from '@/assets/sprites/bird.svg?url'
-
-import bunnyUrl from '@/assets/sprites/bunny.svg?url'
-import butterflyUrl from '@/assets/sprites/butterfly.svg?url'
-import cloudUrl from '@/assets/sprites/cloud.svg?url'
-// Use public-compatible paths via import so Vite bundles them
-import fireflyUrl from '@/assets/sprites/firefly.svg?url'
-import flowerUrl from '@/assets/sprites/flower.svg?url'
-import fogwispUrl from '@/assets/sprites/fogwisp.svg?url'
-import iceUrl from '@/assets/sprites/ice.svg?url'
-import leafUrl from '@/assets/sprites/leaf.svg?url'
-import rainSnowUrl from '@/assets/sprites/rain-snow.svg?url'
-import starUrl from '@/assets/sprites/star.svg?url'
+// 生态/天气精灵:AI 生成的像素 sprite(1px 深棕描边 + 受限调色板),
+// 蝴蝶 / 花 / 叶 各有四季变体(逐色单独生成,不做色相旋转改色)
+import birdUrl from '@/assets/pixel-sprites/bird.png'
+import bunnyUrl from '@/assets/pixel-sprites/bunny.png'
+import butterflyAutumnUrl from '@/assets/pixel-sprites/butterfly-autumn.png'
+import butterflySpringUrl from '@/assets/pixel-sprites/butterfly-spring.png'
+import butterflySummerUrl from '@/assets/pixel-sprites/butterfly-summer.png'
+import butterflyWinterUrl from '@/assets/pixel-sprites/butterfly-winter.png'
+import cloudUrl from '@/assets/pixel-sprites/cloud.png'
+import fireflyUrl from '@/assets/pixel-sprites/firefly.png'
+import flowerAutumnUrl from '@/assets/pixel-sprites/flower-autumn.png'
+import flowerSpringUrl from '@/assets/pixel-sprites/flower-spring.png'
+import flowerSummerUrl from '@/assets/pixel-sprites/flower-summer.png'
+import flowerWinterUrl from '@/assets/pixel-sprites/flower-winter.png'
+import fogwispUrl from '@/assets/pixel-sprites/fogwisp.png'
+import iceUrl from '@/assets/pixel-sprites/ice.png'
+import leafAutumnUrl from '@/assets/pixel-sprites/leaf-autumn.png'
+import leafSpringUrl from '@/assets/pixel-sprites/leaf-spring.png'
+import leafSummerUrl from '@/assets/pixel-sprites/leaf-summer.png'
+import leafWinterUrl from '@/assets/pixel-sprites/leaf-winter.png'
+import lightningUrl from '@/assets/pixel-sprites/lightning.png'
+import raindropUrl from '@/assets/pixel-sprites/raindrop.png'
+import snowflakeUrl from '@/assets/pixel-sprites/snowflake.png'
+import starUrl from '@/assets/pixel-sprites/star.png'
 import { isFog, isNight, isRain, isSnow, isThunder, season } from '@/composables/useStardewAtmosphere'
 
 interface LifeItem {
@@ -35,18 +46,47 @@ let lastTs = 0
 
 const SPRITES: Record<string, string> = {
   firefly: fireflyUrl,
-  butterfly: butterflyUrl,
-  flower: flowerUrl,
-  leaf: leafUrl,
   bird: birdUrl,
   bunny: bunnyUrl,
-  raindrop: rainSnowUrl,
-  snowflake: rainSnowUrl,
+  raindrop: raindropUrl,
+  snowflake: snowflakeUrl,
   ice: iceUrl,
   fogwisp: fogwispUrl,
-  lightning: fogwispUrl,
+  lightning: lightningUrl,
   star: starUrl,
   cloud: cloudUrl,
+}
+
+/** 季节变体:同一个 type 在四季用不同颜色(逐色生成的独立素材) */
+const SEASONAL: Record<string, Record<string, string>> = {
+  butterfly: {
+    spring: butterflySpringUrl,
+    summer: butterflySummerUrl,
+    autumn: butterflyAutumnUrl,
+    winter: butterflyWinterUrl,
+  },
+  flower: {
+    spring: flowerSpringUrl,
+    summer: flowerSummerUrl,
+    autumn: flowerAutumnUrl,
+    winter: flowerWinterUrl,
+  },
+  leaf: {
+    spring: leafSpringUrl,
+    summer: leafSummerUrl,
+    autumn: leafAutumnUrl,
+    winter: leafWinterUrl,
+  },
+}
+
+/** 按当前季节取精灵图;没有季节变体的直接用单张 */
+function spriteOf(type: string): string {
+  // 兜底用直接导入的常量(索引取值在 noUncheckedIndexedAccess 下是 string | undefined)
+  const fallback: string = cloudUrl
+  const bySeason = SEASONAL[type]
+  if (bySeason)
+    return bySeason[season.value] ?? bySeason.spring ?? fallback
+  return SPRITES[type] ?? fallback
 }
 
 function pickType(): string {
@@ -166,7 +206,7 @@ onUnmounted(() => {
         left: `${it.x}%`,
         top: `${it.y}%`,
         opacity: Math.max(0, it.life),
-        backgroundImage: `url(${SPRITES[it.type] || SPRITES.fogwisp})`,
+        backgroundImage: `url(${spriteOf(it.type)})`,
       }"
     />
     <div v-if="isThunder" class="stardew-lightning" />

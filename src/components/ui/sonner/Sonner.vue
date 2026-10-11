@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { ToasterProps } from 'vue-sonner'
 
-import { Icon } from '@iconify/vue'
 import { Toaster as Sonner } from 'vue-sonner'
+import PixelIcon from '@/components/PixelIcon.vue'
 import { cn } from '@/lib/utils'
 import 'vue-sonner/style.css'
 
@@ -19,24 +19,24 @@ const props = defineProps<ToasterProps>()
     }" v-bind="props"
   >
     <template #success-icon>
-      <Icon icon="lucide:circle-check" class="size-4" />
+      <PixelIcon name="lucide:circle-check" class="size-4" />
     </template>
     <template #info-icon>
-      <Icon icon="lucide:info" class="size-4" />
+      <PixelIcon name="lucide:info" class="size-4" />
     </template>
     <template #warning-icon>
-      <Icon icon="lucide:triangle-alert" class="size-4" />
+      <PixelIcon name="lucide:triangle-alert" class="size-4" />
     </template>
     <template #error-icon>
-      <Icon icon="lucide:octagon-x" class="size-4" />
+      <PixelIcon name="lucide:octagon-x" class="size-4" />
     </template>
     <template #loading-icon>
       <div>
-        <Icon icon="lucide:loader-2" class="size-4 animate-spin" />
+        <PixelIcon name="lucide:loader-2" class="size-4 animate-spin" />
       </div>
     </template>
     <template #close-icon>
-      <Icon icon="lucide:x" class="size-4" />
+      <PixelIcon name="lucide:x" class="size-4" />
     </template>
   </Sonner>
 </template>

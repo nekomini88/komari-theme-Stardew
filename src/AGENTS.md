@@ -66,7 +66,13 @@ When you need a new piece of UI:
 
 ## Icons
 
-- All icons go through `@iconify/vue` (`<Icon icon="icon-park-outline:sun" />`). Sets are fetched on demand from the Iconify CDN — `@/utils/iconify`'s `setupIconify()` is a no-op kept as a future extension point. Do not preregister whole icon sets in client bundles.
+- UI icons render through `@/components/PixelIcon.vue` (`<PixelIcon name="tabler:coin" :size="28" />`).
+  It resolves the name via `@/utils/pixelIcons` to an AI-generated pixel sprite in `src/assets/pixel-icons/`;
+  when no pixel art exists for that name it falls back to `@iconify/vue`, so nothing ever renders blank.
+- Add new pixel icons by dropping a 16px-logical PNG (1px `#3e2723` outline, ≤10 colors, 4× nearest-upscaled
+  to 64×64) into `src/assets/pixel-icons/` and listing it in `@/utils/pixelIcons.ts` plus the iconify mapping.
+- Iconify remains the fallback pipeline (`<Icon icon="..." />` still works); do **not** add `lucide-vue-next`
+  or any other icon-as-component package.
 - Lucide icons are available via the `lucide:` prefix (e.g. `lucide:x`, `lucide:minus`). Do **not** add `lucide-vue-next` or any other icon-as-component package — the project deliberately routes everything through Iconify so there is a single icon pipeline.
 
 ## Styles

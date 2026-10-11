@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/utils/financeHelper'
-import { Icon } from '@iconify/vue'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfoGrid from '@/components/InfoGrid.vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CardX } from '@/components/ui/card-x'
@@ -306,7 +306,7 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
     <template v-else>
       <div class="px-4 flex gap-4 items-center">
         <Button variant="ghost" size="icon-sm" class="bg-background/50 hover:bg-background" @click="router.push('/')">
-          <Icon icon="tabler:arrow-left" :width="16" :height="16" />
+          <PixelIcon name="tabler:arrow-left" :size="16" />
         </Button>
         <div class="text-lg font-bold flex gap-2 items-center">
           <img
@@ -349,8 +349,8 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
           <div class="flex h-full min-h-10 md:min-h-18 flex-col justify-between gap-3">
             <div class="flex items-center justify-between gap-2">
               <span class="text-xs font-medium tracking-wider text-muted-foreground">{{ item.label }}</span>
-              <Icon
-                :icon="item.icon" :width="20" :height="20"
+              <PixelIcon
+                :name="item.icon" :size="20"
                 class="text-slate-500/25 transition-colors group-hover:text-slate-500"
               />
             </div>
@@ -406,7 +406,7 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
               />
               <div class="relative flex flex-col gap-1.5">
                 <div class="flex gap-1 items-center text-muted-foreground">
-                  <Icon icon="icon-park-outline:transfer-data" :width="14" :height="14" />
+                  <PixelIcon name="icon-park-outline:transfer-data" :size="14" />
                   <span class="text-xs sm:text-sm">总流量</span>
                   <div class="flex-1" />
                   <span class="hidden sm:block text-[11px] font-medium text-foreground/70">{{
@@ -419,14 +419,14 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
             </div>
             <div class="min-w-0 flex flex-col gap-1 rounded-sm bg-slate-500/5 p-2">
               <div class="flex gap-1 items-center text-muted-foreground">
-                <Icon icon="icon-park-outline:dashboard-one" :width="14" :height="14" />
+                <PixelIcon name="icon-park-outline:dashboard-one" :size="14" />
                 <span class="text-xs sm:text-sm">网络速率</span>
               </div>
               <span class="text-xs sm:text-sm break-all flex flex-row flex-wrap items-center gap-1">
-                <Icon icon="tabler:chevron-up" width="12" height="12" />
+                <PixelIcon name="tabler:chevron-up" :size="12" />
                 {{ formatBytesPerSecond(data?.net_out ?? 0) }}
                 <span class="px-0.5" />
-                <Icon icon="tabler:chevron-down" width="12" height="12" />
+                <PixelIcon name="tabler:chevron-down" :size="12" />
                 {{ formatBytesPerSecond(data?.net_in ?? 0) }}
               </span>
             </div>

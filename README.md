@@ -16,7 +16,10 @@
 
 - **像素素材**：AI 生成的像素风 PNG 图片素材位于 `public/images/`（构建后输出到 `dist/images/`，含 banner / logo / 背景贴图等）
 - **像素字体**：`@fontsource/press-start-2p`（标题像素字）+ `@fontsource/vt323`（正文）
-- **装饰 sprite**：`src/assets/sprites/*.svg`（鸟 / 兔子 / 蝴蝶 / 萤火虫 / 花等动态元素）
+- **生态 / 天气精灵**：`src/assets/pixel-sprites/*.png`（22 张 32×32 逻辑像素；蝴蝶 / 花 / 叶各有**四季变体**，按当前季节自动切换）
+- **界面图标**：`src/assets/pixel-icons/*.png`（44 张 16×16 逻辑像素）。渲染走 `src/components/PixelIcon.vue`：优先用像素图，找不到时自动回落到 Iconify 矢量图标
+- **像素素材规格**：1px 深棕描边（`#3e2723`）+ 受限调色板（精灵 ≤14 色 / 图标 ≤10 色）+ 硬边无抗锯齿；导出为 4× 最近邻放大（精灵 128×128、图标 64×64），页面以 `image-rendering: pixelated` 显示
+- **素材产线**（可复现）：AI 生图 → 抠白底（含**补洞**，避免白云/白兔被整块抠掉）→ 降采样到逻辑像素 → 调色板量化 → 程序化补 1px 深棕描边 → 最近邻放大。脚本与提示词见仓库外归档说明（`tools/art` 思路同源）
 - **视觉规范**：`references/stardew-visual-style.md` 定义设计令牌（色板 / 圆角 / 像素字体 / 背景契约），通过 `data-theme="stardew"` 激活
 - **测试**：`tests/` 含 Vitest 单元测试（`bun run test`）
 
@@ -61,7 +64,7 @@ bun run publish    # 同步提升 package.json 与 komari-theme.json 版本号�
 
 ```
 komari-theme-Stardew/
-├── src/                    # 主题源码（Vue 组件 / 样式 / sprites）
+├── src/                    # 主题源码（Vue 组件 / 样式 / pixel-sprites / pixel-icons）
 ├── public/images/          # AI 像素 PNG 素材（banner / logo / 背景）
 ├── scripts/
 │   ├── package-theme.ts    # 打包主题 zip
@@ -84,7 +87,7 @@ komari-theme-Stardew/
 | 状态管理 | Pinia 3                          |
 | 路由     | Vue Router 5                     |
 | 提示系统 | vue-sonner（Toaster）            |
-| 图标     | @iconify/vue                     |
+| 图标     | 像素 PNG 优先 + @iconify/vue 兜底 |
 | 图表     | vue-echarts                      |
 | 3D 地球  | cobe                             |
 | 像素字体 | Press Start 2P / VT323           |
