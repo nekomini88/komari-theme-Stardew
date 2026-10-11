@@ -77,6 +77,11 @@ defineExpose({
         class="vk-sky-band"
         :style="bandStyle(i)"
       />
+      <!-- 太阳（左上，带光芒）/ 云（柔边白云）—— 田园场景要素 -->
+      <span class="vk-sun" />
+      <span class="vk-cloud vk-cloud-1" />
+      <span class="vk-cloud vk-cloud-2" />
+      <span class="vk-cloud vk-cloud-3" />
     </div>
 
     <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
