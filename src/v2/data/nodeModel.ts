@@ -8,6 +8,7 @@
 
 import type { Node, NodeStatusLevel, Overview, RawClient, RawStatus, SortDir, SortKey } from './types'
 import { toFiniteNumber, toPercent } from './metrics'
+import { nodeViewStatus } from './nodeStatus'
 
 const num = (v: unknown) => toFiniteNumber(v)
 
@@ -168,32 +169,34 @@ export interface FilterOptions {
   group?: string
   /** 附加搜索词 */
   query?: string
-  /** 状态筛选：all 不筛 / online / offline(有状态但离线) / unknown(无状态) */
+  /** 状态筛选：all 不筛 / online(纯在线) / alert(在线但资源告警) / offline(有状态但离线) / unknown(无状态) */
   status?: StatusFilter
 }
 
-/** 状态筛选项（与 UI 控件一一对应） */
-export type StatusFilter = 'all' | 'online' | 'offline' | 'unknown'
+/**
+ * 状态筛选项（与 UI 控件一一对应）。
+ * 与卡片四档状态（nodeStatus.ts 的 NodeViewStatus）对齐：online/alert/offline/unknown 互斥，
+ * 外加 all 表示不筛。
+ */
+export type StatusFilter = 'all' | 'online' | 'alert' | 'offline' | 'unknown'
 
 export const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
   all: '全部',
   online: '在线',
+  alert: '告警',
   offline: '离线',
   unknown: '未知',
 }
 
-/** 状态筛选（纯函数）：all 原样返回；其余按 online/hasStatus 组合判定 */
+/**
+ * 状态筛选（纯函数）：all 原样返回；其余直接以 nodeViewStatus 为单一事实来源，
+ * 禁止再自行拼 online/hasStatus 判定，避免与卡片「在线/告警/离线/未知」口径分叉。
+ */
 export function filterByStatus(nodes: readonly Node[] | null | undefined, status: StatusFilter): Node[] {
   const list = Array.isArray(nodes) ? nodes : []
   if (!status || status === 'all')
     return [...list]
-  return list.filter((n) => {
-    if (status === 'online')
-      return n.online
-    if (status === 'offline')
-      return !n.online && n.hasStatus
-    return !n.hasStatus // unknown
-  })
+  return list.filter(n => nodeViewStatus(n) === status)
 }
 
 /** 筛选：在线 / 分组 / 搜索 / 状态组合（AND） */

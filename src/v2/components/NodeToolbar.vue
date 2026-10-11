@@ -48,7 +48,8 @@ const SORT_OPTIONS: { key: SortKey, label: string }[] = [
   { key: 'latency', label: '延迟' },
 ]
 
-const STATUS_OPTIONS: StatusFilter[] = ['all', 'online', 'offline', 'unknown']
+/** 状态筛选项：直接取自 STATUS_FILTER_LABELS 的键，保证按钮与文案/顺序永不漂移 */
+const STATUS_OPTIONS = Object.keys(STATUS_FILTER_LABELS) as StatusFilter[]
 
 /** 排序方向无意义时（默认排序）隐藏切换按钮 */
 const dirDisabled = computed(() => props.sortKey === 'default')

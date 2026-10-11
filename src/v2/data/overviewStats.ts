@@ -17,10 +17,14 @@ import {
   roundTo,
 } from './metrics'
 import { buildOverview } from './nodeModel'
+import { nodeViewStatus } from './nodeStatus'
 
 export interface OverviewStats {
   total: number
+  /** 纯在线（不含告警），与卡片 data-status="online" 口径一致 */
   online: number
+  /** 在线但资源达 warn/crit，卡片 data-status="alert" */
+  alert: number
   offline: number
   unknown: number
   /** 如 '4 / 6' */
@@ -49,21 +53,27 @@ export function buildOverviewStats(nodes: readonly Node[] | null | undefined): O
   const list = Array.isArray(nodes) ? nodes.filter(n => !!n) : []
   const o = buildOverview(list)
 
+  // 四档状态互斥：以 nodeViewStatus 为单一事实来源，保证与卡片状态口径一致。
   let online = 0
+  let alert = 0
   let unknown = 0
   for (const n of list) {
-    if (n.online)
-      online++
-    if (!n.hasStatus)
-      unknown++
+    switch (nodeViewStatus(n)) {
+      case 'online': online++; break
+      case 'alert': alert++; break
+      case 'unknown': unknown++; break
+      default: break
+    }
   }
-  const offline = Math.max(list.length - online - unknown, 0)
+  const offline = Math.max(list.length - online - alert - unknown, 0)
 
   return {
     total: list.length,
     online,
+    alert,
     offline,
     unknown,
+    // 「在线/总数」只报纯在线（不含告警），与卡片「在线」徒标一致
     onlineText: `${online} / ${list.length}`,
     cpuText: `${roundTo(o.cpuAvg, 1)}%`,
     ramText: `${formatBytes(o.ramUsed)} / ${formatBytes(o.ramTotal)}`,

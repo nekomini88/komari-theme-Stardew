@@ -65,6 +65,16 @@ describe('NodeToolbar：搜索/排序/分组/状态 绑定与 emit', () => {
     expect(w2.find('[data-testid="node-status-offline"]').attributes('data-active')).toBe('true')
   })
 
+  it('状态筛选含「告警」按钮（顺序 全部/在线/告警/离线/未知），点击 emit alert', async () => {
+    const w = mountToolbar()
+    const btns = w.findAll('.vk-status-btn')
+    expect(btns.map(b => b.attributes('data-status'))).toEqual(['all', 'online', 'alert', 'offline', 'unknown'])
+    const alert = w.find('[data-testid="node-status-alert"]')
+    expect(alert.text()).toBe('告警')
+    await alert.trigger('click')
+    expect(w.emitted('update:status')!.at(-1)).toEqual(['alert'])
+  })
+
   it('显示 可见/总数 计数', () => {
     const w = mountToolbar({ visibleCount: 1, totalCount: 3 })
     expect(w.find('[data-testid="node-count"]').text()).toContain('1')

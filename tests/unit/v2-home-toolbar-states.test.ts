@@ -76,12 +76,28 @@ describe('HomeView：搜索/筛选/排序 UI 绑定（复用 nodeModel 纯函数
     w.unmount()
   })
 
-  it('状态筛选「在线」→ 所有卡片为 在线/告警', async () => {
+  it('状态筛选「在线」→ 所有卡片为纯在线（不含告警）', async () => {
     const w = await mountHome(fixtureFetcher())
     await w.find('[data-testid="node-status-online"]').trigger('click')
     await nextTick()
     const statuses = w.findAll('.vk-node-card').map(n => n.attributes('data-status'))
-    expect(statuses.every(s => s === 'online' || s === 'alert')).toBe(true)
+    expect(statuses.length).toBeGreaterThan(0)
+    // filterByStatus 走 nodeViewStatus：在线筛选只留 online，不再吞掉 alert
+    expect(statuses.every(s => s === 'online')).toBe(true)
+    w.unmount()
+  })
+
+  it('状态筛选「告警」→ 只剩告警卡片；「全部」恢复', async () => {
+    const w = await mountHome(fixtureFetcher())
+    await w.find('[data-testid="node-status-alert"]').trigger('click')
+    await nextTick()
+    const statuses = w.findAll('.vk-node-card').map(n => n.attributes('data-status'))
+    expect(statuses.length).toBeGreaterThan(0)
+    expect(statuses.every(s => s === 'alert')).toBe(true)
+
+    await w.find('[data-testid="node-status-all"]').trigger('click')
+    await nextTick()
+    expect(w.findAll('.vk-node-card')).toHaveLength(TOTAL)
     w.unmount()
   })
 

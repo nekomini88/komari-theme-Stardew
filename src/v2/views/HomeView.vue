@@ -99,7 +99,7 @@ const noMatch = computed(() => nodes.value.length > 0 && visibleNodes.value.leng
     />
 
     <p v-else class="vk-home-hint" data-testid="home-summary">
-      共 {{ stats.total }} 台，在线 {{ stats.online }} 台，告警口径见卡片状态。
+      共 {{ stats.total }} 台、在线 {{ stats.online }}、告警 {{ stats.alert }}、未知 {{ stats.unknown }}。
     </p>
 
     <StatePlaceholder

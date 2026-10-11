@@ -7,11 +7,13 @@ import {
   buildNodes,
   buildOverview,
   collectGroups,
+  filterByStatus,
   filterNodes,
   pickLatency,
   searchNodes,
   sortNodes,
 } from '@/v2/data/nodeModel'
+import { nodeViewStatus } from '@/v2/data/nodeStatus'
 
 const fixture = JSON.parse(
   readFileSync(resolve(__dirname, '..', 'fixtures', 'clients.sample.json'), 'utf8'),
@@ -196,5 +198,29 @@ describe('排序/筛选/搜索（纯逻辑，不改动入参）', () => {
       { ...nodes[0]!, group: 'a' },
     ])
     expect(groups).toEqual(['a', 'b'])
+  })
+
+  it('filterByStatus 以 nodeViewStatus 为单一事实源：四档互斥且可加总回全集', () => {
+    const all = filterByStatus(nodes, 'all')
+    expect(all).toHaveLength(nodes.length)
+
+    for (const s of ['online', 'alert', 'offline', 'unknown'] as const) {
+      const out = filterByStatus(nodes, s)
+      // 每个筛选结果都恰好是该状态，且与 nodeViewStatus 逐一对应
+      expect(out.every(n => nodeViewStatus(n) === s)).toBe(true)
+      expect(out).toHaveLength(nodes.filter(n => nodeViewStatus(n) === s).length)
+    }
+
+    const sum = (['online', 'alert', 'offline', 'unknown'] as const)
+      .reduce((acc, s) => acc + filterByStatus(nodes, s).length, 0)
+    expect(sum).toBe(nodes.length)
+  })
+
+  it('filterByStatus「在线」不含告警（与旧 online 判定分叉已修复）', () => {
+    const online = filterByStatus(nodes, 'online')
+    const alert = filterByStatus(nodes, 'alert')
+    expect(alert.length).toBeGreaterThan(0) // fixture 确有告警
+    expect(online.every(n => nodeViewStatus(n) === 'online')).toBe(true)
+    expect(online.some(n => nodeViewStatus(n) === 'alert')).toBe(false)
   })
 })

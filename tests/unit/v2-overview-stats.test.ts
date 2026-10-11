@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { buildOverviewStats, ramPercentText } from '@/v2/data/overviewStats'
 import { buildNodes } from '@/v2/data/nodeModel'
+import { nodeViewStatus } from '@/v2/data/nodeStatus'
 import { formatBytes, formatPercent, roundTo } from '@/v2/data/metrics'
 
 const fixture = JSON.parse(
@@ -110,14 +111,32 @@ describe('buildOverviewStats 计数（全部离线 / 混合 / unknown）', () =>
     expect(s.unknown).toBe(1)
     expect(s.offline).toBe(0)
   })
+
+  it('在线且资源达 warn/crit → 计入 alert，不混入在线', () => {
+    const nodes = [
+      makeNode({ online: true, cpu: 10 }), // 纯在线
+      makeNode({ online: true, cpu: 95 }), // CPU crit → alert
+      makeNode({ online: true, ram: 8, ramTotal: 10 }), // 内存 80% → warn → alert
+    ]
+    const s = buildOverviewStats(nodes)
+    expect(s.online).toBe(1)
+    expect(s.alert).toBe(2)
+    expect(s.offline).toBe(0)
+    expect(s.online + s.alert).toBe(s.total)
+  })
 })
 
 describe('buildOverviewStats 真实 fixture（聚合 → 格式化）', () => {
   const s = buildOverviewStats(fixtureNodes)
 
-  it('总数/在线数与 fixture 一致', () => {
+  it('总数/纯在线/告警/未知数与 fixture 一致（nodeViewStatus 口径）', () => {
     expect(s.total).toBe(Object.keys(fixture.nodes).length)
-    expect(s.online).toBe(fixtureNodes.filter(n => n.online).length)
+    // 「在线」为纯在线：不含告警（口径与卡片 data-status="online" 对齐）
+    expect(s.online).toBe(fixtureNodes.filter(n => nodeViewStatus(n) === 'online').length)
+    expect(s.alert).toBe(fixtureNodes.filter(n => nodeViewStatus(n) === 'alert').length)
+    expect(s.unknown).toBe(fixtureNodes.filter(n => nodeViewStatus(n) === 'unknown').length)
+    // 四档互斥且可加总回总数
+    expect(s.online + s.alert + s.offline + s.unknown).toBe(s.total)
     expect(s.onlineText).toBe(`${s.online} / ${s.total}`)
   })
 

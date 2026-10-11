@@ -52,14 +52,32 @@ describe('HomeView：装配真实首页', () => {
     wrapper.unmount()
   })
 
-  it('渲染顶部总览，在线/总数文案正确', async () => {
+  it('渲染顶部总览，在线/总数只计纯在线（不含告警）', async () => {
     const wrapper = await mountHome()
     const overview = wrapper.find('[data-testid="overview"]')
     expect(overview.exists()).toBe(true)
     const online = wrapper.findAll('.vk-node-card[data-status="online"]').length
-      + wrapper.findAll('.vk-node-card[data-status="alert"]').length
+    const alert = wrapper.findAll('.vk-node-card[data-status="alert"]').length
+    // fixture 同时存在在线与告警节点，才能证明「在线」不再吞掉「告警」
+    expect(online).toBeGreaterThan(0)
+    expect(alert).toBeGreaterThan(0)
     expect(wrapper.find('[data-field="online"] .vk-overview-value').text())
       .toBe(`${online} / ${Object.keys(fixture.nodes).length}`)
+    // 告警数 > 0 → 总览额外显示「告警」项，且与卡片告警数一致
+    expect(wrapper.find('[data-field="alert"] .vk-overview-value').text()).toBe(String(alert))
+    wrapper.unmount()
+  })
+
+  it('底部摘要明确拆开 共/在线/告警/未知（不再含糊）', async () => {
+    const wrapper = await mountHome()
+    const summary = wrapper.find('[data-testid="home-summary"]')
+    expect(summary.exists()).toBe(true)
+    const text = summary.text()
+    expect(text).toContain('共')
+    expect(text).toContain('在线')
+    expect(text).toContain('告警')
+    expect(text).toContain('未知')
+    expect(text).not.toContain('口径见卡片状态')
     wrapper.unmount()
   })
 

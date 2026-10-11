@@ -33,9 +33,51 @@ SHOT_DIR.mkdir(exist_ok=True)
 NODES = FIXTURE['nodes']
 STATUSES = FIXTURE['statuses']
 NODE_COUNT = len(NODES)
-# fixture 里：4 台有状态且在线，2 台无任何状态（unknown）
-ONLINE_COUNT = sum(1 for s in STATUSES.values() if s.get('online'))
-UNKNOWN_COUNT = NODE_COUNT - len(STATUSES)
+
+# 状态口径与 src/v2/data/nodeStatus.ts 对齐：
+#   unknown=无状态 / offline=有状态但离线 / alert=在线且 CPU|内存|硬盘 达 warn(70)/crit(90)
+#   / online=在线且资源都 ok。四档互斥。
+WARN_PCT, CRIT_PCT = 70, 90
+
+
+def _level(pct):
+    if pct >= CRIT_PCT:
+        return 'crit'
+    if pct >= WARN_PCT:
+        return 'warn'
+    return 'ok'
+
+
+def _pct(used, total):
+    if not total or total <= 0:
+        return 0.0
+    return min(100.0, max(0.0, (used or 0) / total * 100))
+
+
+def _worst(status):
+    levels = (_level(status.get('cpu') or 0),
+              _level(_pct(status.get('ram'), status.get('ram_total'))),
+              _level(_pct(status.get('disk'), status.get('disk_total'))))
+    if 'crit' in levels:
+        return 'crit'
+    if 'warn' in levels:
+        return 'warn'
+    return 'ok'
+
+
+def _view_status(uuid):
+    s = STATUSES.get(uuid)
+    if not s:
+        return 'unknown'
+    if not s.get('online'):
+        return 'offline'
+    return 'online' if _worst(s) == 'ok' else 'alert'
+
+
+STATUS_BY_UUID = {u: _view_status(u) for u in NODES}
+ONLINE_COUNT = sum(1 for v in STATUS_BY_UUID.values() if v == 'online')
+ALERT_COUNT = sum(1 for v in STATUS_BY_UUID.values() if v == 'alert')
+UNKNOWN_COUNT = sum(1 for v in STATUS_BY_UUID.values() if v == 'unknown')
 # cpu 最高的节点（27.9%）——排序断言用
 TOP_CPU_UUID = max(STATUSES.items(), key=lambda kv: kv[1]['cpu'])[0]
 JP_UUID = next(u for u, n in NODES.items() if '日本' in n['name'])
@@ -132,11 +174,18 @@ def main():
               not missing and bool(status_text),
               f'缺失={missing} 状态文案={status_text!r}')
 
-        # 顶栏总览在线/总数
+        # 顶栏总览在线/总数（纯在线，不含告警）
         overview_online = pg.locator('[data-testid="overview"] [data-field="online"] .vk-overview-value').inner_text()
-        check('② 总览在线/总数文本正确',
+        check('② 总览在线/总数文本正确（纯在线，不含告警）',
               overview_online == f'{ONLINE_COUNT} / {NODE_COUNT}',
               f'实际 {overview_online!r} 期望 {ONLINE_COUNT} / {NODE_COUNT}')
+
+        # 告警 > 0 → 总览多显示一项「告警」
+        overview_alert = pg.locator('[data-testid="overview"] [data-field="alert"] .vk-overview-value')
+        check('② 总览显示「告警」项且数值正确',
+              ALERT_COUNT > 0 and overview_alert.count() == 1
+              and overview_alert.inner_text() == str(ALERT_COUNT),
+              f'告警项数={overview_alert.count()} 期望 {ALERT_COUNT}')
 
         # ③ 无控制台错误 / 无未捕获异常
         check('③ 快乐路径无控制台错误与未捕获异常',
@@ -154,16 +203,20 @@ def main():
         pg.fill('[data-testid="node-search"]', '')
         pg.wait_for_timeout(200)
 
-        # ⑤b 状态筛选：在线 → 4 张；未知 → 2 张
+        # ⑤b 状态筛选：在线 → 纯在线；告警 → 告警；未知 → 2 张
         pg.click('[data-testid="node-status-online"]')
         pg.wait_for_timeout(200)
         n_online = pg.locator('#vk-scene-mid .vk-node-card').count()
+        pg.click('[data-testid="node-status-alert"]')
+        pg.wait_for_timeout(200)
+        n_alert = pg.locator('#vk-scene-mid .vk-node-card').count()
         pg.click('[data-testid="node-status-unknown"]')
         pg.wait_for_timeout(200)
         n_unknown = pg.locator('#vk-scene-mid .vk-node-card').count()
-        check('⑤b 状态筛选「在线/未知」正确改变卡片集合',
-              n_online == ONLINE_COUNT and n_unknown == UNKNOWN_COUNT,
-              f'在线 {n_online}(期望 {ONLINE_COUNT}) 未知 {n_unknown}(期望 {UNKNOWN_COUNT})')
+        check('⑤b 状态筛选「在线/告警/未知」正确改变卡片集合',
+              n_online == ONLINE_COUNT and n_alert == ALERT_COUNT and n_unknown == UNKNOWN_COUNT,
+              f'在线 {n_online}(期望 {ONLINE_COUNT}) 告警 {n_alert}(期望 {ALERT_COUNT})'
+              f' 未知 {n_unknown}(期望 {UNKNOWN_COUNT})')
         pg.click('[data-testid="node-status-all"]')
         pg.wait_for_timeout(200)
 

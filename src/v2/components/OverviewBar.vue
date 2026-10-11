@@ -20,6 +20,10 @@ const stats = computed(() => buildOverviewStats(props.nodes))
       <span class="vk-overview-label">在线/总数</span>
       <span class="vk-overview-value">{{ stats.onlineText }}</span>
     </div>
+    <div v-if="stats.alert > 0" class="vk-overview-item" data-field="alert">
+      <span class="vk-overview-label">告警</span>
+      <span class="vk-overview-value">{{ stats.alert }}</span>
+    </div>
     <div class="vk-overview-item" data-field="cpu">
       <span class="vk-overview-label">平均 CPU</span>
       <span class="vk-overview-value">{{ stats.cpuText }}</span>
