@@ -16,8 +16,30 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  /* 整幅手绘场景底图(ListenHub 生成,专为 UI 构图:上天空/中远山栅栏/下大草场) */
+  /* 兜底：白天插画（首帧/切换空窗期间不至于露底），实际视觉由 .vk-scene-bg 按时间提供 */
   background: url('/images/v2-scene/ui-farm-bg.png') center top / cover no-repeat, var(--vk-sky-day);
+}
+
+/* ---- 场景底图：整幅手绘插画，按访客本地时间交叉淡化 ----
+ * 进入层始终存在（opacity 1，按 URL 换 key → 重新挂载并淡入），
+ * 离开层仅在过渡期间存在（淡出后移除）→ 两帧叠加即交叉淡化，非硬切。 */
+.vk-scene-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-position: center top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition-property: opacity;
+  transition-timing-function: linear;
+}
+
+.vk-scene-bg[data-bg='enter'] {
+  animation: vk-tint-in var(--vk-transition-ms) linear both;
+}
+
+.vk-scene-bg[data-bg='leave'] {
+  animation: vk-tint-out var(--vk-transition-ms) linear both;
 }
 
 /* ---- 天空：以视口为锚，占地平线以上的全部高度（首屏可见天空带） ---- */
@@ -201,24 +223,16 @@
   background: none;   /* 同上:地面不再铺色,避免盖住插画 */
 }
 
-/* ---- 夜：插画层压暗（远山/中景是手绘昼色，靠亮度滤镜入夜）；
-        近沿/草地仍走渐变冷色，保持整栈时间感。整栈 tint 照旧叠加。 ---- */
+/* ---- 夜：整幅底图已是夜色插画，各层不再另铺色（避免盖住插画）；
+        仅留远山/中景亮度微调与整栈 tint，保持整栈时间感。 ---- */
 .vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='mid'] .vk-layer-base {
-  filter: brightness(0.58) saturate(0.72);
+  filter: brightness(0.94) saturate(0.9);
 }
 
-.vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base {
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-grass-night) 84%, var(--vk-sky-hi)) 0%,
-    var(--vk-grass-night) 100%);
-}
-
+.vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: linear-gradient(180deg,
-    var(--vk-grass-night) 0%,
-    color-mix(in srgb, var(--vk-grass-night) 82%, var(--vk-wood-deep)) 60%,
-    color-mix(in srgb, var(--vk-soil-night) 40%, var(--vk-grass-night)) 100%);
+  background: none;   /* 夜间插画自带草地/坡沿，不再铺冷色渐变遮盖 */
 }
 
 /* 夜晚：太阳退为清冷月亮，云变薄 */

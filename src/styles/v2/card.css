@@ -305,6 +305,13 @@
   backdrop-filter: blur(3px);
 }
 
+/* 夜晚：半透明纸白面板加厚，保证面板文字在夜色场景之上仍清晰可读 */
+.vk-app[data-scene-time='night'] .vk-overview,
+.vk-app[data-scene-time='night'] .vk-toolbar {
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 84%, transparent);
+  box-shadow: var(--vk-shadow-2), 0 0 0 1px color-mix(in srgb, var(--vk-moss) 16%, transparent);
+}
+
 .vk-overview-item {
   display: flex;
   flex-direction: column;

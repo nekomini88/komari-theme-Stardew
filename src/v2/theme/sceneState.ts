@@ -63,6 +63,8 @@ export interface ScenePreset {
   timeTint: TintSpec
   /** 季节 tint（只改整栈 tint，不动其它层参数） */
   seasonTint: TintSpec
+  /** 场景底图 URL（按时间切换、季节素材优先；见 sceneBackgroundUrl） */
+  backgroundUrl: string
   /** 共享地面基线 */
   groundBaseline: typeof GROUND_BASELINE_LAYER
 }
@@ -81,11 +83,11 @@ const LAYER_COLORS: Record<TimeOfDay, Record<'far' | 'mid' | 'near' | 'ground', 
   night: { far: '#2f4a56', mid: '#5a4034', near: '#3f6b4c', ground: '#5a4034' },
 }
 
-/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜叠一层冷暗 */
+/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜叠一层轻冷色（夜间已由夜色插画承载，故压淡避免过暗） */
 const TIME_TINTS: Record<TimeOfDay, TintSpec> = {
   day: { color: '#7ec8f2', opacity: 0 },
   dusk: { color: '#e8a05c', opacity: 0.35 },
-  night: { color: '#1e2c4c', opacity: 0.22 },
+  night: { color: '#1e2c4c', opacity: 0.12 },
 }
 
 /** 季节 tint：只对整栈套一层，颜色取自母板的季节色 */
@@ -94,6 +96,36 @@ const SEASON_TINTS: Record<Season, TintSpec> = {
   summer: { color: '#f4d9a0', opacity: 0.06 },
   autumn: { color: '#d9c27a', opacity: 0.14 },
   winter: { color: '#6b8fa8', opacity: 0.18 },
+}
+
+/**
+ * 已接入的场景底图（整幅手绘田园插画，按访客本地时间切换）。
+ * 素材缺失的时段不登记 → 由 sceneBackgroundUrl 回退，接口原地保留。
+ */
+const SCENE_BG: Record<TimeOfDay, string> = {
+  day: '/images/v2-scene/ui-farm-bg.png',
+  dusk: '/images/v2-scene/ui-farm-dusk.png',
+  night: '/images/v2-scene/ui-farm-night.png',
+}
+
+/**
+ * 季节底图（覆盖整幅插画，仅用于白天时段：日出/黄昏/夜晚仍按光影变体切换，
+ * 让「时间光影」全年有效；季节则改变白天的田园面貌）。
+ */
+const SEASON_BG: Partial<Record<Season, string>> = {
+  autumn: '/images/v2-scene/ui-farm-autumn.png',
+  winter: '/images/v2-scene/ui-farm-winter.png',
+}
+
+/**
+ * 解析场景底图：
+ *  - 黄昏/夜晚 → 对应光影变体（季节不改变夜色）
+ *  - 白天 → 有季节素材则用季节图（秋/冬），否则用白天图（春/夏）
+ */
+export function sceneBackgroundUrl(time: TimeOfDay, season: Season): string {
+  if (time !== 'day')
+    return SCENE_BG[time]
+  return SEASON_BG[season] ?? SCENE_BG.day
 }
 
 /** 小时 → 时段（昼夜由真实时间驱动，保证场景自然切换） */
@@ -128,6 +160,7 @@ export function resolveScene(time: TimeOfDay, season: Season): ScenePreset {
     layerColors: { ...LAYER_COLORS[time] },
     timeTint: { ...TIME_TINTS[time] },
     seasonTint: { ...SEASON_TINTS[season] },
+    backgroundUrl: sceneBackgroundUrl(time, season),
     groundBaseline: GROUND_BASELINE_LAYER,
   }
 }

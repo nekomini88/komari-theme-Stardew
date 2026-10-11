@@ -8,6 +8,7 @@ import {
   GROUND_BASELINE_LAYER,
   layerOffset,
   resolveScene,
+  sceneBackgroundUrl,
   seasonFromMonth,
   SCENE_LAYERS,
   timeOfDayFromHour,
@@ -90,6 +91,19 @@ describe('时间/季节映射', () => {
     expect(seasonFromMonth(1)).toBe('winter')
     expect(seasonFromMonth(2)).toBe('winter')
   })
+
+  it('场景底图按时间切换（季节素材用于白天）', () => {
+    expect(sceneBackgroundUrl('day', 'summer')).toBe('/images/v2-scene/ui-farm-bg.png')
+    expect(sceneBackgroundUrl('day', 'spring')).toBe('/images/v2-scene/ui-farm-bg.png')
+    expect(sceneBackgroundUrl('dusk', 'spring')).toBe('/images/v2-scene/ui-farm-dusk.png')
+    expect(sceneBackgroundUrl('night', 'summer')).toBe('/images/v2-scene/ui-farm-night.png')
+    // 季节素材接入白天的乡村面貌（秋/冬），夜晚仍用夜色变体
+    expect(sceneBackgroundUrl('day', 'autumn')).toBe('/images/v2-scene/ui-farm-autumn.png')
+    expect(sceneBackgroundUrl('day', 'winter')).toBe('/images/v2-scene/ui-farm-winter.png')
+    expect(sceneBackgroundUrl('night', 'winter')).toBe('/images/v2-scene/ui-farm-night.png')
+    // resolveScene 必须带上同一底图，组件才能据此交叉淡化
+    expect(resolveScene('day', 'autumn').backgroundUrl).toBe(sceneBackgroundUrl('day', 'autumn'))
+  })
 })
 
 describe('SceneStack 组件：图层结构与交叉淡化行为', () => {
@@ -134,9 +148,30 @@ describe('SceneStack 组件：图层结构与交叉淡化行为', () => {
     wrapper.unmount()
   })
 
+  it('切换时段时场景底图交叉淡化（旧图淡出、新图淡入）', async () => {
+    const wrapper = mount(SceneStack, { props: { time: 'day', season: 'summer' } })
+    expect(wrapper.find('[data-bg="enter"]').attributes('style')).toContain('ui-farm-bg.png')
+
+    await wrapper.setProps({ time: 'night' })
+    await nextTick()
+
+    // 新图进入层 + 旧图离开层同帧共存 → 交叉淡化
+    expect(wrapper.find('[data-bg="enter"]').attributes('style')).toContain('ui-farm-night.png')
+    expect(wrapper.find('[data-bg="leave"]').exists()).toBe(true)
+    expect(wrapper.find('[data-bg="leave"]').attributes('style')).toContain('ui-farm-bg.png')
+    expect(wrapper.vm.leavingBgUrl).toContain('ui-farm-bg.png')
+
+    vi.advanceTimersByTime(TRANSITION_MS)
+    await nextTick()
+    expect(wrapper.find('[data-bg="leave"]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('离开层的动画时长 = 令牌 1.2s（view 侧同步）', () => {
     const sceneCss = readFileSync(resolve(root, 'src/styles/v2/scene.css'), 'utf8')
     expect(sceneCss).toContain('animation: vk-tint-in var(--vk-transition-ms)')
     expect(sceneCss).toContain('animation: vk-tint-out var(--vk-transition-ms)')
+    expect(sceneCss).toContain('.vk-scene-bg')
   })
 })
