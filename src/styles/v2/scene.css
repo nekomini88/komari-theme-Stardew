@@ -16,7 +16,8 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background: var(--vk-sky-day);
+  /* 整幅手绘场景底图(ListenHub 生成,专为 UI 构图:上天空/中远山栅栏/下大草场) */
+  background: url('/images/v2-scene/ui-farm-bg.png') center top / cover no-repeat, var(--vk-sky-day);
 }
 
 /* ---- 天空：以视口为锚，占地平线以上的全部高度（首屏可见天空带） ---- */
@@ -157,7 +158,7 @@
   top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
   height: var(--vk-scene-band-h);
   border-radius: 0;
-  background: url('/images/v2-scene/far-hills.png') center bottom / cover no-repeat;
+  background: none;   /* 已由整幅底图 ui-farm-bg.png 包含,避免重复绘制 */
 }
 
 /* 中景：手绘栅栏 + 树丛（1600×900，透明上方留白已抠为 alpha）。
@@ -169,7 +170,7 @@
   top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
   height: var(--vk-scene-band-h);
   border-radius: 0;
-  background: url('/images/v2-scene/mid-ground.png') center bottom / cover no-repeat;
+  background: none;   /* 已由整幅底图包含 */
 }
 
 /* 草沿：地平线处一条矮绿色坡沿（顶边柔圆），压在卡片网格顶沿之下，
@@ -192,12 +193,12 @@
 /* ---- 昼/昏：草地/近沿配色（远山与中景改用插画，不在此着色，避免覆盖 background-image） ---- */
 .vk-scene[data-time='day'] .vk-layer[data-layer='near'] .vk-layer-base,
 .vk-scene[data-time='dusk'] .vk-layer[data-layer='near'] .vk-layer-base {
-  background: linear-gradient(180deg, var(--vk-leaf) 0%, var(--vk-grass-day-lo) 100%);
+  background: none;   /* 整幅底图已含草地/坡沿;保留元素供时间/季节 tint 使用 */
 }
 
 .vk-scene[data-time='day'] .vk-layer[data-layer='ground'] .vk-layer-base,
 .vk-scene[data-time='dusk'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: linear-gradient(180deg, var(--vk-grass-hi) 0%, var(--vk-grass-day) 26%, var(--vk-grass-day-lo) 100%);
+  background: none;   /* 同上:地面不再铺色,避免盖住插画 */
 }
 
 /* ---- 夜：插画层压暗（远山/中景是手绘昼色，靠亮度滤镜入夜）；
