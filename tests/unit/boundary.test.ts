@@ -17,8 +17,13 @@ describe('boundary: spec.yaml and sources', () => {
     expect(json.short.length).toBeGreaterThan(0)
   })
 
-  it('header.vue must contain stardew theme option', () => {
+  // 原断言为「Header.vue 必须含 stardew」,但 header 的 day/night 切换在 512da73 已移除,
+  // Header.vue 自此不再出现 'stardew' → 断言过时导致 CI/Release 长期红。
+  // 改为守当前真实不变量:header 只保留 admin 入口,且用像素齿轮素材 + pixelated 渲染。
+  it('header must keep the admin entry rendered with the pixel gear asset', () => {
     const header = readFileSync('src/components/Header.vue', 'utf8')
-    expect(header).toContain('stardew')
+    expect(header).toContain('admin-gear.png')
+    expect(header).toContain('image-rendering: pixelated')
+    expect(header).not.toContain('<Icon v-if')       // 不能再回退成矢量图标
   })
 })
