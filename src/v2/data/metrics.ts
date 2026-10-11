@@ -130,6 +130,22 @@ export function formatLatency(ms: unknown): string {
   return `${Math.round(v)}ms`
 }
 
+/**
+ * ISO 时间戳 → 'YYYY-MM-DD'（到期时间用）。
+ * 空串/null/非法日期 → '—'。按 UTC 取日期，避免显示随运行环境时区漂移（结果稳定、可单测）。
+ */
+export function formatDate(input: unknown): string {
+  if (typeof input !== 'string' || input.trim() === '')
+    return '—'
+  const d = new Date(input)
+  if (Number.isNaN(d.getTime()))
+    return '—'
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 /** 计数 → 千分位字符串 */
 export function formatCount(n: unknown): string {
   const v = Math.round(toFiniteNumber(n))

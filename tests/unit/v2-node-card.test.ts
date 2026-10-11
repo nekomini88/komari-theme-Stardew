@@ -8,6 +8,7 @@ import { buildNodes } from '@/v2/data/nodeModel'
 import {
   formatBytes,
   formatBytesPerSecond,
+  formatDate,
   formatLatency,
   formatLoad,
   formatLoadPercent,
@@ -43,6 +44,7 @@ describe('NodeCard：真实 fixture 渲染关键指标（走 metrics 格式化�
     expect(text(w, 'uptime')).toBe(formatUptime(frankfurt.uptime))
     expect(text(w, 'latency')).toBe(formatLatency(frankfurt.latency))
     expect(text(w, 'traffic-down')).toBe(formatBytes(frankfurt.netTotalDown))
+    expect(text(w, 'expire')).toBe(formatDate(frankfurt.expiredAt))
   })
 
   it('具体数值抽查：CPU 文案带 %，名称/地区/系统在位', () => {
@@ -97,6 +99,36 @@ describe('NodeCard：状态用颜色 + 文字双重区分', () => {
     const w = mount(NodeCard, { props: { node: unknown } })
     expect(w.attributes('data-status')).toBe('unknown')
     expect(w.find('.vk-card-status').text()).toBe('未知')
+  })
+})
+
+describe('NodeCard：彩色标题栏 + 指标小图标 + Expire（原帖 mockup 对齐）', () => {
+  it('标题栏：名称唯一不重复，且带 left 图标 + 状态签', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    const head = w.find('.vk-card-head')
+    // 标题栏仅出现一次名称，且与节点名一致（不重复渲染）
+    expect(w.findAll('.vk-card-name').length).toBe(1)
+    expect(w.find('.vk-card-name').text()).toBe(frankfurt.name)
+    expect(head.find('.vk-card-head-icon').exists()).toBe(true)
+    expect(head.find('.vk-card-status').exists()).toBe(true)
+  })
+
+  it('每项指标行都带一个小图标（CPU/内存/硬盘 + 7 项明细）', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    // CPU/内存/硬盘三行各一个
+    expect(w.findAll('.vk-card-metric .vk-icon-inline').length).toBe(3)
+    // 明细 8 项（下行/上行/负载/在线/累计↓/累计↑/延迟/到期）各一个
+    expect(w.findAll('.vk-fact dt .vk-icon-inline').length).toBe(8)
+  })
+
+  it('Expire：有 expired_at 显示日期，缺失显示 —', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    expect(text(w, 'expire')).toBe(formatDate(frankfurt.expiredAt))
+    expect(text(w, 'expire')).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+
+    const none: Node = { ...frankfurt, expiredAt: null }
+    const w2 = mount(NodeCard, { props: { node: none } })
+    expect(text(w2, 'expire')).toBe('—')
   })
 })
 

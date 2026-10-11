@@ -2,18 +2,22 @@
 /**
  * NodeCard —— 节点卡片（住在 SceneStack 的 mid 层，ART_SYSTEM §2）
  *
- * 展示：名称 / 地区 / 在线状态 + CPU% / 内存% / 硬盘% / 上下行流量 / 负载 / 在线时长。
+ * 展示：彩色标题栏（图标 + 居中名称 + 状态）/ CPU% / 内存% / 硬盘% / 上下行 / 负载 /
+ *       在线时长 / 累计流量 / 延迟 / 到期时间（Expire）。
  * 约束：
  *  - 所有数值统一走 @/v2/data/metrics 的格式化函数，组件内不做任何自造格式。
- *  - 视觉全部取自母板/tokens：1px(#2b1d16→--vk-outline) 描边、硬边、无渐变/模糊/发光/半透明叠色。
- *  - 底部对齐共享 ground 基线 + 接触阴影（.vk-contact），不浮空。
+ *  - 视觉全部取自母板/tokens：柔和投影、圆角、无硬边像素描边（笔触平滑）。
+ *  - 标题栏主题色按 uuid 稳定映射到母板 --vk-accent-*，同一台每次同色。
+ *  - 小图标统一走 Iconify（@iconify/vue，仓内既有图标管线），不使用像素 sprite。
  *  - 状态用「颜色 + 文字」双重区分（nodeStatus.ts），不只靠颜色。
  */
+import { Icon } from '@iconify/vue'
 import type { Node } from '@/v2/data/types'
 import { computed } from 'vue'
 import {
   formatBytes,
   formatBytesPerSecond,
+  formatDate,
   formatLoad,
   formatLoadPercent,
   formatLatency,
@@ -52,6 +56,8 @@ const loadText = computed(() => formatLoad(node.value.load))
 const loadPctText = computed(() => formatLoadPercent(node.value.load, node.value.cpuCores))
 const uptimeText = computed(() => formatUptime(node.value.uptime))
 const latencyText = computed(() => formatLatency(node.value.latency))
+/** 到期时间：expired_at 缺失/非法 → '—' */
+const expireText = computed(() => formatDate(node.value.expiredAt))
 
 /** 各资源使用率等级（着色用） */
 const cpuLevel = computed(() => usageLevel(node.value.cpu))
@@ -77,7 +83,6 @@ const accent = computed(() => {
     h = (h * 31 + key.charCodeAt(i)) >>> 0
   return CARD_ACCENTS[h % CARD_ACCENTS.length]
 })
-
 </script>
 
 <template>
@@ -88,24 +93,28 @@ const accent = computed(() => {
     :style="{ '--vk-node-accent': accent }"
   >
     <header class="vk-card-head">
+      <span class="vk-card-head-icon" aria-hidden="true">
+        <Icon icon="tabler:server-2" :width="15" :height="15" />
+      </span>
       <span class="vk-card-name" :title="node.name">{{ node.name }}</span>
-      <div class="vk-card-meta">
-        <span v-if="node.region" class="vk-card-region" :title="node.region">{{ node.region }}</span>
-        <span class="vk-card-status" :data-status="viewStatus">{{ statusLabel }}</span>
-      </div>
+      <span class="vk-card-status" :data-status="viewStatus">{{ statusLabel }}</span>
     </header>
 
     <div class="vk-card-body">
       <ul class="vk-card-metrics">
       <li class="vk-card-metric" data-metric="cpu">
-        <span class="vk-metric-label">CPU</span>
+        <span class="vk-metric-label">
+          <Icon class="vk-icon-inline" icon="tabler:cpu" :width="13" :height="13" />CPU
+        </span>
         <span class="vk-metric-value" data-field="cpu">{{ cpuPctText }}</span>
         <span class="vk-meter" :data-level="cpuLevel">
           <span class="vk-meter-fill" :style="{ width: `${cpuPctValue}%` }" />
         </span>
       </li>
       <li class="vk-card-metric" data-metric="mem">
-        <span class="vk-metric-label">内存</span>
+        <span class="vk-metric-label">
+          <Icon class="vk-icon-inline" icon="tabler:memory" :width="13" :height="13" />内存
+        </span>
         <span class="vk-metric-value" data-field="mem">{{ memPctText }}</span>
         <span class="vk-meter" :data-level="memLevel">
           <span class="vk-meter-fill" :style="{ width: `${memPctValue}%` }" />
@@ -113,7 +122,9 @@ const accent = computed(() => {
         <span class="vk-metric-sub" data-field="mem-detail">{{ memText }}</span>
       </li>
       <li class="vk-card-metric" data-metric="disk">
-        <span class="vk-metric-label">硬盘</span>
+        <span class="vk-metric-label">
+          <Icon class="vk-icon-inline" icon="tabler:device-sd-card" :width="13" :height="13" />硬盘
+        </span>
         <span class="vk-metric-value" data-field="disk">{{ diskPctText }}</span>
         <span class="vk-meter" :data-level="diskLevel">
           <span class="vk-meter-fill" :style="{ width: `${diskPctValue}%` }" />
@@ -124,36 +135,41 @@ const accent = computed(() => {
 
     <dl class="vk-card-facts">
       <div class="vk-fact">
-        <dt>下行</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:arrow-down" :width="12" :height="12" />下行</dt>
         <dd data-field="net-in">{{ netInText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt>上行</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:arrow-up" :width="12" :height="12" />上行</dt>
         <dd data-field="net-out">{{ netOutText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt>负载</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:gauge" :width="12" :height="12" />负载</dt>
         <dd data-field="load">{{ loadText }} ({{ loadPctText }})</dd>
       </div>
       <div class="vk-fact">
-        <dt>在线</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:clock" :width="12" :height="12" />在线</dt>
         <dd data-field="uptime">{{ uptimeText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt>累计↓</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:download" :width="12" :height="12" />累计↓</dt>
         <dd data-field="traffic-down">{{ trafficDownText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt>累计↑</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:upload" :width="12" :height="12" />累计↑</dt>
         <dd data-field="traffic-up">{{ trafficUpText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt>延迟</dt>
+        <dt><Icon class="vk-icon-inline" icon="tabler:activity" :width="12" :height="12" />延迟</dt>
         <dd data-field="latency">{{ latencyText }}</dd>
+      </div>
+      <div class="vk-fact">
+        <dt><Icon class="vk-icon-inline" icon="tabler:calendar-event" :width="12" :height="12" />到期</dt>
+        <dd data-field="expire" :title="node.expiredAt ?? ''">{{ expireText }}</dd>
       </div>
     </dl>
 
     <footer class="vk-card-foot">
+      <span v-if="node.region" class="vk-card-region" :title="node.region">{{ node.region }}</span>
       <span class="vk-card-os" :title="node.os">{{ node.os }}</span>
     </footer>
     </div>

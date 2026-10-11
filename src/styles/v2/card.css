@@ -50,12 +50,14 @@
   background-color: var(--vk-paper-warm);
 }
 
-/* 顶部彩色标题栏：每台一个主题色，承节点名 + 地区/状态 */
+/* 顶部彩色标题栏：每台一个主题色，承「图标 + 居中节点名 + 状态」 */
 .vk-card-head {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--vk-space-2);
+  min-height: 34px;
   background-color: var(--vk-node-accent, var(--vk-moss-dark));
   background-image: linear-gradient(180deg,
     color-mix(in srgb, var(--vk-warm-hi) 22%, transparent) 0%,
@@ -64,11 +66,25 @@
   padding: var(--vk-space-2) var(--vk-space-3);
 }
 
-/* 名称：整行布局，超长省略且不撑坏卡片宽度 */
+/* 左端小图标（服务器），压在名称之下、状态之上 */
+.vk-card-head-icon {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  color: var(--vk-paper-cream);
+  opacity: 0.92;
+}
+
+/* 名称：绝对居中（左右对称留白，避开图标/状态签），超长省略且不撑坏卡片宽度 */
 .vk-card-name {
-  display: block;
-  min-width: 0;
-  text-align: left;
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  text-align: center;
   font-family: var(--vk-font-display);
   font-size: 13px;
   font-weight: 700;
@@ -86,11 +102,6 @@
   flex: 0 0 auto;
   gap: var(--vk-space-1);
   max-width: 55%;
-}
-
-.vk-card-region {
-  font-size: 15px;
-  line-height: 1;
 }
 
 /* 状态：圆角纸签，明面米底 + 主题色文字（颜色 + 文字双重区分） */
@@ -153,9 +164,20 @@
 
 .vk-metric-label {
   grid-area: label;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--vk-font-body);
   font-size: 11px;
   color: var(--vk-text-muted);
+  white-space: nowrap;
+}
+
+/* 行内小图标：细线，与文字基线对齐，统一取苔绿/次级色 */
+.vk-icon-inline {
+  flex: 0 0 auto;
+  color: var(--vk-moss);
+  vertical-align: -1px;
 }
 
 .vk-metric-value {
@@ -222,9 +244,16 @@
 }
 
 .vk-fact dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 11px;
   color: var(--vk-text-muted);
   flex: 0 0 auto;
+}
+
+.vk-fact dt .vk-icon-inline {
+  color: var(--vk-moss-dark);
 }
 
 .vk-fact dd {
@@ -236,8 +265,17 @@
 }
 
 .vk-card-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-2);
   border-top: var(--vk-border-hair);
   padding-top: var(--vk-space-1);
+}
+
+.vk-card-region {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .vk-card-os {
