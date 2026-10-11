@@ -1,0 +1,93 @@
+/**
+ * SceneStack 图层栈样式（ART_SYSTEM.md §2）
+ * sky(固定) / far 0.2 / mid 0.5 / near 0.8 / ground 1.0，ground 为共享基线。
+ * 过渡为 1.2s 交叉淡化（进入层淡入、离开层淡出），禁止硬切。
+ */
+
+.vk-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--vk-sky-day);
+}
+
+/* 天空：4 段实心色带（非 CSS 渐变） */
+.vk-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.vk-sky-band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 25%;
+}
+
+/* 视差层 */
+.vk-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* 每层占位色块（M4 用真实像素素材替换；本阶段纯 CSS 色块） */
+.vk-layer-base {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  border-top: var(--vk-outline-w) solid var(--vk-outline);
+}
+
+.vk-layer[data-layer='far'] .vk-layer-base {
+  bottom: 38%;
+  height: 16%;
+}
+
+.vk-layer[data-layer='mid'] .vk-layer-base {
+  bottom: 26%;
+  height: 14%;
+}
+
+.vk-layer[data-layer='near'] .vk-layer-base {
+  bottom: 20%;
+  height: 8%;
+}
+
+/* ground 是共享基线：所有站立元素底部对齐到 ground 顶边 */
+.vk-layer[data-layer='ground'] .vk-layer-base {
+  bottom: 0;
+  height: 22%;
+}
+
+/* 整栈 tint：进入/离开两层叠加做交叉淡化 */
+.vk-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition-property: opacity;
+  transition-timing-function: linear;
+}
+
+.vk-tint[data-tint$='-enter'] {
+  animation: vk-tint-in var(--vk-transition-ms) linear both;
+}
+
+.vk-tint[data-tint$='-leave'] {
+  animation: vk-tint-out var(--vk-transition-ms) linear both;
+}
+
+@keyframes vk-tint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes vk-tint-out {
+  to {
+    opacity: 0;
+  }
+}

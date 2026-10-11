@@ -1,0 +1,153 @@
+/**
+ * v2 设计令牌（ART_SYSTEM.md §1）
+ *
+ * 规则：
+ *  - 像素网格 1 逻辑 px = 4 屏幕 px（--vk-unit）
+ *  - 所有颜色取自 src/assets/palette.json 的 24 色母板（单测会扫描本目录校验）
+ *  - 描边单色 #2b1d16；阴影 = 基色降档硬阴影（右下），不用透明黑
+ *  - 禁止渐变 / 发光 / 模糊 / 半透明叠色（场景整栈 tint 除外）
+ */
+
+:root {
+  /* ---- 像素网格 ---- */
+  --vk-unit: 4px;
+  --vk-canvas-w: 1280px; /* 320 逻辑 px × 4 */
+  --vk-canvas-h: 720px; /* 180 逻辑 px × 4 */
+  --vk-outline-w: 4px; /* 1 逻辑 px 描边 = 4 屏幕 px */
+
+  /* ---- 母板取色（全部 ⊆ palette.json） ---- */
+  --vk-outline: #2b1d16;
+  --vk-brown-dark: #4a3529;
+  --vk-warm-hi: #f4d9a0;
+  --vk-sky-day: #7ec8f2;
+  --vk-sky-day-hi: #a6dcf7;
+  --vk-sky-day-lo: #4f9fd0;
+  --vk-hill-day: #6fae8c;
+  --vk-hill-day-hi: #8fc9a6;
+  --vk-hill-day-lo: #54896c;
+  --vk-grass-day: #7fc45a;
+  --vk-grass-day-hi: #9ed679;
+  --vk-grass-day-lo: #5f9c40;
+  --vk-soil-day: #a9764b;
+  --vk-soil-day-hi: #c4936a;
+  --vk-soil-day-lo: #835a38;
+  --vk-sky-night: #2b3f6b;
+  --vk-sky-night-hi: #3a548c;
+  --vk-sky-night-lo: #1e2c4c;
+  --vk-hill-night: #2f4a56;
+  --vk-grass-night: #3f6b4c;
+  --vk-soil-night: #5a4034;
+  --vk-dusk-tint: #e8a05c;
+  --vk-autumn-warm: #d9c27a;
+  --vk-winter-cool: #6b8fa8;
+
+  /* ---- 字体：像素字体做展示 + 正文可读字体 ---- */
+  --vk-font-pixel: 'Press Start 2P', 'PingFang SC', monospace;
+  --vk-font-body: ui-sans-serif, system-ui, 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
+
+  /* ---- 间距（4 的倍数网格） ---- */
+  --vk-space-1: 4px;
+  --vk-space-2: 8px;
+  --vk-space-3: 12px;
+  --vk-space-4: 16px;
+  --vk-space-6: 24px;
+  --vk-space-8: 32px;
+
+  /* ---- 圆角（像素风以直角为主） ---- */
+  --vk-radius-none: 0px;
+  --vk-radius-sm: 4px;
+  --vk-radius-md: 8px;
+
+  /* ---- 硬阴影（光源恒左上 45° → 阴影在右下；用基色降档，不用透明黑） ---- */
+  --vk-shadow-hard: 4px 4px 0 0 var(--vk-outline);
+  --vk-shadow-soft: 2px 2px 0 0 var(--vk-brown-dark);
+
+  /* ---- 面板/文字语义令牌 ---- */
+  --vk-panel-bg: var(--vk-warm-hi);
+  --vk-panel-border: var(--vk-outline);
+  --vk-text: var(--vk-outline);
+  --vk-text-muted: var(--vk-brown-dark);
+  --vk-accent: var(--vk-grass-day);
+  --vk-accent-hi: var(--vk-grass-day-hi);
+
+  /* ---- 场景过渡（ART_SYSTEM：1.2s 交叉淡化） ---- */
+  --vk-transition-ms: 1200ms;
+}
+
+/* ---- 工具类 ---- */
+.vk-pixel {
+  image-rendering: pixelated;
+}
+
+.vk-font-pixel {
+  font-family: var(--vk-font-pixel);
+}
+
+.vk-font-body {
+  font-family: var(--vk-font-body);
+}
+
+.vk-title {
+  margin: 0;
+  font-family: var(--vk-font-pixel);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vk-text);
+  letter-spacing: 0.02em;
+}
+
+.vk-panel {
+  background: var(--vk-panel-bg);
+  border: var(--vk-outline-w) solid var(--vk-panel-border);
+  border-radius: var(--vk-radius-none);
+  box-shadow: var(--vk-shadow-hard);
+  color: var(--vk-text);
+  font-family: var(--vk-font-body);
+  padding: var(--vk-space-4);
+}
+
+.vk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  background: var(--vk-accent);
+  color: var(--vk-text);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  border-radius: var(--vk-radius-none);
+  box-shadow: var(--vk-shadow-soft);
+  padding: var(--vk-space-2) var(--vk-space-3);
+  font-family: var(--vk-font-pixel);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vk-btn:hover {
+  background: var(--vk-accent-hi);
+}
+
+.vk-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.vk-btn:focus-visible {
+  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline-offset: 2px;
+}
+
+/* 接触阴影：落地元素底部的压暗椭圆（基色降档），避免浮空 */
+.vk-contact {
+  position: relative;
+}
+
+.vk-contact::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 70%;
+  height: 2px;
+  transform: translateX(-50%);
+  background: var(--vk-soil-day-lo);
+}

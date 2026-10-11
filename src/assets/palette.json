@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "name": "NekoVPS v2 母板",
+    "version": 1,
+    "count": 24,
+    "outline": "#2b1d16",
+    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。描边色单色 #2b1d16。"
+  },
+  "colors": [
+    { "id": "outline", "hex": "#2b1d16", "role": "描边/外轮廓（全系统单色）" },
+    { "id": "brown-dark", "hex": "#4a3529", "role": "棕色系降1档（内部结构线/阴影）" },
+    { "id": "warm-hi", "hex": "#f4d9a0", "role": "暖色高光（左上光源）" },
+    { "id": "sky-day", "hex": "#7ec8f2", "role": "昼·天基色" },
+    { "id": "sky-day-hi", "hex": "#a6dcf7", "role": "昼·天降1档（高光）" },
+    { "id": "sky-day-lo", "hex": "#4f9fd0", "role": "昼·天升1档（阴影）" },
+    { "id": "hill-day", "hex": "#6fae8c", "role": "昼·远山基色" },
+    { "id": "hill-day-hi", "hex": "#8fc9a6", "role": "昼·远山降1档" },
+    { "id": "hill-day-lo", "hex": "#54896c", "role": "昼·远山升1档" },
+    { "id": "grass-day", "hex": "#7fc45a", "role": "昼·草基色" },
+    { "id": "grass-day-hi", "hex": "#9ed679", "role": "昼·草降1档" },
+    { "id": "grass-day-lo", "hex": "#5f9c40", "role": "昼·草升1档" },
+    { "id": "soil-day", "hex": "#a9764b", "role": "昼·土基色" },
+    { "id": "soil-day-hi", "hex": "#c4936a", "role": "昼·土降1档" },
+    { "id": "soil-day-lo", "hex": "#835a38", "role": "昼·土升1档" },
+    { "id": "sky-night", "hex": "#2b3f6b", "role": "夜·天基色" },
+    { "id": "sky-night-hi", "hex": "#3a548c", "role": "夜·天降1档" },
+    { "id": "sky-night-lo", "hex": "#1e2c4c", "role": "夜·天升1档" },
+    { "id": "hill-night", "hex": "#2f4a56", "role": "夜·远山基色" },
+    { "id": "grass-night", "hex": "#3f6b4c", "role": "夜·草基色" },
+    { "id": "soil-night", "hex": "#5a4034", "role": "夜·土基色" },
+    { "id": "dusk-tint", "hex": "#e8a05c", "role": "黄昏·整栈统一叠加色" },
+    { "id": "autumn-warm", "hex": "#d9c27a", "role": "秋·季节 tint" },
+    { "id": "winter-cool", "hex": "#6b8fa8", "role": "冬·季节 tint" }
+  ]
+}

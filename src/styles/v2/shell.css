@@ -1,0 +1,103 @@
+/**
+ * 应用壳布局样式（ART_SYSTEM.md §3 功能面保留：顶栏 / 主区 / 页脚）
+ * 全部走 v2 令牌；星露谷式像素风：直角、4px 描边、右下硬阴影、无模糊/渐变。
+ */
+
+.vk-app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---- 顶栏 ---- */
+.vk-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--vk-soil-day-hi);
+  border-bottom: var(--vk-outline-w) solid var(--vk-outline);
+}
+
+.vk-topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-4);
+  max-width: var(--vk-canvas-w);
+  margin: 0 auto;
+  padding: var(--vk-space-3) var(--vk-space-4);
+}
+
+.vk-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  cursor: pointer;
+  color: var(--vk-text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.vk-brand-mark {
+  width: 24px;
+  height: 24px;
+  background: var(--vk-grass-day);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  box-shadow: var(--vk-shadow-soft);
+}
+
+.vk-nav {
+  display: flex;
+  gap: var(--vk-space-2);
+  margin-left: var(--vk-space-4);
+}
+
+.vk-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+}
+
+/* ---- 主区 ---- */
+.vk-main {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--vk-canvas-w);
+  margin: 0 auto;
+  padding: var(--vk-space-6) var(--vk-space-4);
+}
+
+/* ---- 页脚 ---- */
+.vk-footer {
+  border-top: var(--vk-outline-w) solid var(--vk-outline);
+  background: var(--vk-soil-day);
+  color: var(--vk-text);
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  text-align: center;
+  padding: var(--vk-space-4);
+}
+
+/* ---- 占位内容（本阶段无真实业务页；M2/M3 替换） ---- */
+.vk-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vk-space-3);
+}
+
+.vk-muted {
+  color: var(--vk-text-muted);
+  font-size: 13px;
+}
+
+.vk-tag {
+  display: inline-block;
+  font-family: var(--vk-font-pixel);
+  font-size: 9px;
+  background: var(--vk-sky-day-lo);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  padding: var(--vk-space-1) var(--vk-space-2);
+}
