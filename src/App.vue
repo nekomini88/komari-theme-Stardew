@@ -38,7 +38,12 @@ onUnmounted(() => {
 <template>
   <Provider>
     <div class="vk-app">
-      <SceneStack :time="sceneTime" :season="sceneSeason" />
+      <SceneStack :time="sceneTime" :season="sceneSeason">
+        <!-- mid 层槽位：首页节点卡片「住」在这里（ART_SYSTEM §2），底部对齐 ground 基线 -->
+        <template #mid>
+          <div id="vk-scene-mid" class="vk-mid-slot" data-scene-slot="mid" />
+        </template>
+      </SceneStack>
       <TopBar />
       <main class="vk-main">
         <RouterView />
