@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Arc, COBEOptions, Globe, Marker } from 'cobe'
 import type { NodeData } from '@/stores/nodes'
-import { Icon } from '@iconify/vue'
 import {
   useDocumentVisibility,
   useElementSize,
@@ -10,6 +9,7 @@ import {
 } from '@vueuse/core'
 import createGlobe from 'cobe'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
 import { getCoordByCode, getCountryCodeFromRegion } from '@/utils/geoHelper'
@@ -616,10 +616,10 @@ function formatRate(bytesPerSec: number): string {
             class="relative z-2 bg-background/40 rounded-lg py-0.5 px-1.5 text-xs zoom-80 items-start justify-center text-nowrap ring-1 ring-foreground/[0.06] shadow-sm"
           >
             <div class="text-green-600 flex flex-row items-center gap-0.5">
-              <Icon icon="tabler:chevron-up" width="12" height="12" /> {{ formatRate(rateFor(cluster.code).up) }}
+              <PixelIcon name="tabler:chevron-up" :size="12" /> {{ formatRate(rateFor(cluster.code).up) }}
             </div>
             <div class="text-blue-600 flex flex-row items-center gap-0.5">
-              <Icon icon="tabler:chevron-down" width="12" height="12" /> {{ formatRate(rateFor(cluster.code).down) }}
+              <PixelIcon name="tabler:chevron-down" :size="12" /> {{ formatRate(rateFor(cluster.code).down) }}
             </div>
           </div>
         </div>

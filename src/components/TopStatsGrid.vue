@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
 import * as financeHelper from '@/utils/financeHelper'
@@ -81,7 +81,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <Icon icon="tabler:coin" :width="28" :height="28" class="stardew-stat__icon-lucide" />
+      <PixelIcon name="tabler:coin" :size="28" class="stardew-stat__icon-lucide" />
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">
           剩余价值
@@ -93,7 +93,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
+      <PixelIcon name="traffic-total" :size="28" class="stardew-stat__icon-pixel" />
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">
           累计流量
@@ -105,7 +105,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/traffic.png" class="stardew-stat__icon" alt="">
+      <PixelIcon name="traffic-up" :size="28" class="stardew-stat__icon-pixel" />
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">
           实时上行
@@ -117,7 +117,7 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
     </div>
 
     <div class="stardew-wood-card stardew-stat">
-      <img src="/images/icons/download.png" class="stardew-stat__icon" alt="">
+      <PixelIcon name="traffic-down" :size="28" class="stardew-stat__icon-pixel" />
       <div class="stardew-stat__body">
         <div class="stardew-stat__label">
           实时下行
@@ -159,6 +159,13 @@ const fmtSpeed = (bytes: number) => formatBytesPerSecondSplit(bytes)
   border: 4px solid #6b4423 !important;
   border-radius: 10px !important;
   box-shadow: 5px 5px 0 #3e2723 !important;
+  image-rendering: pixelated;
+}
+
+.stardew-stat__icon-pixel {
+  width: 32px;
+  height: 32px;
+  flex: none;
   image-rendering: pixelated;
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { computed, onMounted, ref } from 'vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 
 interface VisitorGeoData {
   ip: string
@@ -346,7 +346,7 @@ onMounted(async () => {
             v-else
             class="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-emerald-500/10 text-emerald-600"
           >
-            <Icon :icon="item.icon" :width="14" :height="14" />
+            <PixelIcon :name="item.icon" :size="14" />
           </div>
           <div
             class="min-w-0 transition-[opacity,transform] duration-220 ease-[cubic-bezier(0.22,1,0.36,1)]"

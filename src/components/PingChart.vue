@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import dayjs from 'dayjs'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import VChart from 'vue-echarts'
+import PixelIcon from '@/components/PixelIcon.vue'
 import { Button } from '@/components/ui/button'
 import { Empty } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
@@ -695,7 +695,7 @@ onBeforeUnmount(() => {
                   >
                     <TooltipTrigger as-child>
                       <Button variant="ghost" size="icon-xs" class="text-slate-500" @click.stop="toggleTaskTooltip(task.id)">
-                        <Icon icon="carbon:information" :width="14" :height="14" />
+                        <PixelIcon name="carbon:information" :size="14" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent class="!rounded p-3">
@@ -788,7 +788,7 @@ onBeforeUnmount(() => {
               >
                 <TooltipTrigger as-child>
                   <Button variant="ghost" size="icon-xs" class="text-slate-500" @click.stop="toggleSmoothInfoTooltip">
-                    <Icon icon="carbon:information" :width="14" :height="14" />
+                    <PixelIcon name="carbon:information" :size="14" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

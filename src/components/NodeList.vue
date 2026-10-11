@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { NodeData } from '@/stores/nodes'
-import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import NodePingListCell from '@/components/NodePingListCell.vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import TrafficProgress from '@/components/TrafficProgress.vue'
 import { Badge } from '@/components/ui/badge'
 import { DataTooltip } from '@/components/ui/data-tooltip'
@@ -371,11 +371,11 @@ function getCustomTags(node: NodeData): Array<string> {
                   </div>
                   <template #content>
                     <span class="flex flex-row gap-0.5 items-center whitespace-nowrap">
-                      <Icon icon="tabler:chevron-up" width="12" height="12" />
+                      <PixelIcon name="tabler:chevron-up" :size="12" />
                       {{ formatBytes(node.net_total_up ?? 0) }}
                     </span>
                     <span class="flex flex-row gap-0.5 items-center whitespace-nowrap">
-                      <Icon icon="tabler:chevron-down" width="12" height="12" />
+                      <PixelIcon name="tabler:chevron-down" :size="12" />
                       {{ formatBytes(node.net_total_down ?? 0) }}
                     </span>
                   </template>
@@ -386,11 +386,11 @@ function getCustomTags(node: NodeData): Array<string> {
               <div v-else-if="col.key === 'rate'">
                 <div class="text-[10px] flex flex-col ">
                   <span class="text-green-600 flex flex-row gap-1 items-center">
-                    <Icon icon="tabler:chevron-up" width="12" height="12" />
+                    <PixelIcon name="tabler:chevron-up" :size="12" />
                     {{ formatBytesPerSecond(node.net_out ?? 0) }}
                   </span>
                   <span class="text-blue-600 flex flex-row gap-1 items-center">
-                    <Icon icon="tabler:chevron-down" width="12" height="12" />
+                    <PixelIcon name="tabler:chevron-down" :size="12" />
                     {{ formatBytesPerSecond(node.net_in ?? 0) }}
                   </span>
                 </div>
