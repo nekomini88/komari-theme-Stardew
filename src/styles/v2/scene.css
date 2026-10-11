@@ -34,6 +34,20 @@
   height: 26%;
 }
 
+/* 手绘天空插画：铺满天空区（底部对齐 → 地平线奶白过渡自然接远山）。
+   昼/昏显示；夜隐藏，露出上方 4 段色带的夜空，从而时间切换仍由状态机驱动。 */
+.vk-sky-img {
+  position: absolute;
+  inset: 0;
+  background: url('/images/v2-scene/sky.png') center bottom / cover no-repeat;
+  z-index: 3;
+  transition: opacity var(--vk-transition-ms) linear;
+}
+
+.vk-scene[data-time='night'] .vk-sky-img {
+  opacity: 0;
+}
+
 /* 地平线柔光：天空下缘一层奶白雾，让天空自然过渡到山丘 */
 .vk-sky::after {
   content: '';
@@ -134,22 +148,26 @@
   box-shadow: none;
 }
 
-/* 远山：宽扁圆顶，做起伏地平线 */
+/* 远山：手绘远山插画（1600×296，透明上方留白已裁掉、背景已抠为 alpha）。
+   band 用 cover + 底部对齐，宽度贴合视口、几乎不产生拉伸。 */
 .vk-layer[data-layer='far'] .vk-layer-base {
-  left: -14%;
-  right: -14%;
-  bottom: 52%;
-  height: 22%;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  left: 0;
+  right: 0;
+  bottom: 47%;
+  height: 26%;
+  border-radius: 0;
+  background: url('/images/v2-scene/far-hills.png') center bottom / cover no-repeat;
 }
 
-/* 近丘：更靠前一层丘陵，圆顶略高 */
+/* 中景：手绘栅栏 + 树丛（1600×900，透明上方留白已抠为 alpha）。
+   cover + 底部对齐 → 栅栏落在草地沿线，树冠向上生长。 */
 .vk-layer[data-layer='mid'] .vk-layer-base {
-  left: -10%;
-  right: -10%;
-  bottom: 40%;
-  height: 22%;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  left: 0;
+  right: 0;
+  bottom: 44%;
+  height: 50%;
+  border-radius: 0;
+  background: url('/images/v2-scene/mid-ground.png') center bottom / cover no-repeat;
 }
 
 /* 草沿：near 层一条矮绿色坡沿（顶边柔圆） */
@@ -168,17 +186,7 @@
   border-radius: 0;
 }
 
-/* ---- 昼/昏：山丘与草地配色（明亮清新暖色田园） ---- */
-.vk-scene[data-time='day'] .vk-layer[data-layer='far'] .vk-layer-base,
-.vk-scene[data-time='dusk'] .vk-layer[data-layer='far'] .vk-layer-base {
-  background: linear-gradient(180deg, var(--vk-hill-hi) 0%, var(--vk-hill-day) 62%, var(--vk-hill-day-lo) 100%);
-}
-
-.vk-scene[data-time='day'] .vk-layer[data-layer='mid'] .vk-layer-base,
-.vk-scene[data-time='dusk'] .vk-layer[data-layer='mid'] .vk-layer-base {
-  background: linear-gradient(180deg, var(--vk-leaf-hi) 0%, var(--vk-leaf) 46%, var(--vk-moss) 100%);
-}
-
+/* ---- 昼/昏：草地/近沿配色（远山与中景改用插画，不在此着色，避免覆盖 background-image） ---- */
 .vk-scene[data-time='day'] .vk-layer[data-layer='near'] .vk-layer-base,
 .vk-scene[data-time='dusk'] .vk-layer[data-layer='near'] .vk-layer-base {
   background: linear-gradient(180deg, var(--vk-leaf) 0%, var(--vk-grass-day-lo) 100%);
@@ -189,18 +197,11 @@
   background: linear-gradient(180deg, var(--vk-grass-hi) 0%, var(--vk-grass-day) 26%, var(--vk-grass-day-lo) 100%);
 }
 
-/* ---- 夜：整栈转为冷暗暗色田园（保留月光/云/山影，仍可读作田园） ---- */
-.vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base {
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-hill-night) 78%, var(--vk-sky-hi)) 0%,
-    var(--vk-hill-night) 60%,
-    color-mix(in srgb, var(--vk-hill-night) 78%, var(--vk-wood-deep)) 100%);
-}
-
+/* ---- 夜：插画层压暗（远山/中景是手绘昼色，靠亮度滤镜入夜）；
+        近沿/草地仍走渐变冷色，保持整栈时间感。整栈 tint 照旧叠加。 ---- */
+.vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='mid'] .vk-layer-base {
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-hill-night) 82%, var(--vk-grass-night)) 0%,
-    color-mix(in srgb, var(--vk-hill-night) 72%, var(--vk-wood-deep)) 100%);
+  filter: brightness(0.58) saturate(0.72);
 }
 
 .vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base {
@@ -235,22 +236,8 @@
   filter: blur(1.4px);
 }
 
-/* ---- 栅栏：near 层顶沿一段矮木栅栏（竖直桩 + 横档，平滑无像素描边） ---- */
-.vk-layer[data-layer='near'] .vk-layer-base::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 11px;
-  background: repeating-linear-gradient(90deg,
-    var(--vk-bark) 0 5px,
-    var(--vk-soil-hi) 5px 8px,
-    var(--vk-bark) 8px 13px,
-    var(--vk-soil) 13px 22px);
-  border-radius: 3px 3px 0 0;
-  opacity: 0.85;
-}
+/* ---- 栅栏已改由 mid 层的手绘插画提供（mid-ground.png 内含木栅栏），
+        故移除原 CSS 手搓栅栏条，避免与插画重影 ---- */
 
 /* ---- 田野：柔和土色小路 + 草叶纹理 + 小花点缀（平滑叠加，非硬边色块） ---- */
 .vk-layer[data-layer='ground'] .vk-layer-base::before {

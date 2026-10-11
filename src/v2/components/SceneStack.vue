@@ -69,7 +69,7 @@ defineExpose({
 
 <template>
   <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-transitioning="isTransitioning">
-    <!-- 天空：4 段色带，逐段渐变拼成平滑天空（随真实时间切换） -->
+    <!-- 天空：4 段色带（夜间/兜底）+ 手绘天空插画（昼间叠加，云在山影之上） -->
     <div class="vk-sky" data-layer="sky">
       <div
         v-for="(band, i) in scene.skyBands"
@@ -77,6 +77,9 @@ defineExpose({
         class="vk-sky-band"
         :style="bandStyle(i)"
       />
+      <!-- 手绘天空插画：昼/昏显示（自带云与地平线奶白过渡）；夜隐藏 → 露出色带夜空。
+           tint 仍是整栈叠加层（见下方 .vk-tint），与天空色带/各层无关地统一生效。 -->
+      <span class="vk-sky-img" />
       <!-- 太阳（左上，带光芒）/ 云（柔边白云）—— 田园场景要素 -->
       <span class="vk-sun" />
       <span class="vk-cloud vk-cloud-1" />
