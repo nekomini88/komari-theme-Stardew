@@ -295,7 +295,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--vk-space-4);
-  background-color: color-mix(in srgb, var(--vk-paper-cream) 88%, transparent);
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 52%, transparent);
+  backdrop-filter: blur(7px) saturate(1.06);
   border: 1px solid color-mix(in srgb, var(--vk-moss) 30%, transparent);
   border-radius: var(--vk-radius-lg);
   box-shadow: var(--vk-shadow-2);
@@ -445,4 +446,14 @@
 
 .vk-card-foot {
   padding-top: 2px;
+}
+
+
+/* ---- 落地接触阴影:让卡片"站在"田野上,而不是悬浮 ----
+   (视觉审阅连续两轮指出卡片悬浮;这里在卡片下方加一层朝下、偏土色的柔和阴影) */
+.vk-node-grid .vk-card {
+  box-shadow:
+    var(--vk-shadow-2),
+    0 12px 16px -10px color-mix(in srgb, var(--vk-soil-day) 42%, transparent),
+    0 2px 3px -1px color-mix(in srgb, var(--vk-soil-day) 26%, transparent);
 }

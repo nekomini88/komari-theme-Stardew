@@ -13,7 +13,8 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--vk-space-3);
-  background-color: color-mix(in srgb, var(--vk-paper-cream) 88%, transparent);
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 52%, transparent);
+  backdrop-filter: blur(7px) saturate(1.06);
   border: 1px solid color-mix(in srgb, var(--vk-moss) 30%, transparent);
   border-radius: var(--vk-radius-lg);
   box-shadow: var(--vk-shadow-2);
