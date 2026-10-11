@@ -22,7 +22,10 @@
   justify-content: center; /* 卡片行真正居中 */
   gap: var(--vk-space-4);
   padding: 0 var(--vk-space-4);
-  overflow-y: auto;
+  /* 卡片单行底部对齐 ground 基线（flex-end）后不应产生滚动条：
+     接触阴影 .vk-contact::after 会向下溢出 10px，用 visible 避免其触发滚动/裁切。
+     注意：visible 必须 x/y 同时为 visible（若一侧非 visible，visible 会被计算为 auto）。 */
+  overflow: visible;
   pointer-events: auto;
 }
 
@@ -37,9 +40,11 @@
 }
 
 /* ---- 节点卡片：米纸卡 ---- */
+/* 宽度 216px：1440 视口下 6 张 + 5×16 gap = 1376 ≤ 内容宽 1408，单行放得下，
+   避免换行导致第二行冲出 ground 基线（底部对齐靠槽位 flex-end）。 */
 .vk-node-card {
   position: relative;
-  width: 232px;
+  width: 216px;
   display: flex;
   flex-direction: column;
   gap: var(--vk-space-2);
