@@ -3,13 +3,14 @@
  * SceneStack —— 五层场景图层栈（ART_SYSTEM.md §2）
  *
  * - 单一状态源：props.time × props.season
- * - 五层结构：sky / far(0.2) / mid(0.5) / near(0.8) / ground(1.0)，带视差
+ * - 五层结构：sky / far(0.2) / mid(0.5) / near(0.8) / ground(1.0)
+ * - 场景覆盖整份文档高度（随内容自适应），故卡片网格/长列表滚动时场景始终在背后，不留空白带
  * - 变化 = 整栈套 tint + 换天空色带；时间 tint 与季节 tint 各自 1.2s 交叉淡化
  * - 所有角色/建筑共享 ground 基线（本组件把 ground 层暴露为具名插槽）
  */
 import type { Season, TimeOfDay, TintSpec } from '@/v2/theme/sceneState'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { layerOffset, resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
+import { computed } from 'vue'
+import { resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
 import { useCrossfade } from '@/v2/theme/useCrossfade'
 
 const props = withDefaults(defineProps<{ time?: TimeOfDay, season?: Season }>(), {
@@ -28,22 +29,9 @@ const seasonFade = useCrossfade(computed(() => scene.value.seasonTint), TRANSITI
 
 const isTransitioning = computed(() => timeFade.isTransitioning.value || seasonFade.isTransitioning.value)
 
-const scrollY = ref(0)
-function onScroll() {
-  scrollY.value = typeof window === 'undefined' ? 0 : window.scrollY
-}
-onMounted(() => {
-  onScroll()
-  window.addEventListener('scroll', onScroll, { passive: true })
-})
-onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
-})
-
 function layerStyle(parallax: number) {
   return {
     '--vk-layer-parallax': String(parallax),
-    'transform': `translate3d(0, ${layerOffset(scrollY.value, parallax)}px, 0)`,
     'zIndex': String(SCENE_Z[parallax] ?? 0),
   }
 }

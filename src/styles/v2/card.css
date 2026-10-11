@@ -1,50 +1,43 @@
 /**
- * v2 首页：顶部总览（木牌）+ 节点卡片（纸卡，住在 SceneStack mid 层）
+ * v2 首页：顶部总览（木牌）+ 节点卡片（纸卡，落在内容流、位于装饰场景之上）
  *
  * 木质感拟物：卡片 = 米纸卡（纸纹 + 柔和投影 + 圆角），总览 = 深色木牌。
  * 笔触平滑：无像素字体 / 无 image-rendering: pixelated / 无硬边深棕粗描边。
- * 卡片底部对齐共享 ground 基线（ground 顶边 = 距底 22%，见 scene.css），
- * 并用 .vk-contact（tokens.css）提供柔和落地投影，避免浮空。
+ * 卡片网格位于装饰场景层（SceneStack z-index 0）之上，ground/near 色带不会遮挡卡片；
+ * 网格随内容自适应高度，长列表正常滚动。
  * 取色全部走 tokens，本文件不出现裸 hex。
  */
 
-/* ---- mid 层容器：卡片「住」在场景里 ---- */
-.vk-mid-slot {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: var(--vk-home-top, 320px);
-  bottom: 22%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end; /* 卡片底部对齐基线，不上下浮动 */
-  align-content: flex-end;
-  justify-content: center; /* 卡片行真正居中 */
+/* ---- 节点卡片网格：内容流中的 3×2 居中网格，左右边界对齐上方总览/筛选容器 ----
+   网格宽度 = 内容容器宽（.vk-main 的 max-width 内区），故与上方容器左右严格对齐。
+   每张卡片填满所在列（width:100%），标题有足够宽度不被截断。
+   列数自适应：≥901px 3 列（6 节点 = 3×2）；≤900px 2 列；≤600px 单列。 */
+.vk-node-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--vk-space-4);
-  padding: 0 var(--vk-space-4);
-  /* 卡片单行底部对齐 ground 基线（flex-end）后不应产生滚动条：
-     接触阴影 .vk-contact::after 会向下溢出 10px，用 visible 避免其触发滚动/裁切。
-     注意：visible 必须 x/y 同时为 visible（若一侧非 visible，visible 会被计算为 auto）。 */
-  overflow: visible;
-  pointer-events: auto;
+  width: 100%;
+  align-items: stretch;
 }
 
-@media (max-width: 640px) {
-  .vk-mid-slot {
-    --vk-home-top: 600px;
+@media (max-width: 900px) {
+  .vk-node-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.vk-mid-slot .vk-node-card {
-  transform: translateY(0);
+@media (max-width: 600px) {
+  .vk-node-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ---- 节点卡片：米纸卡 ---- */
-/* 宽度 216px：1440 视口下 6 张 + 5×16 gap = 1376 ≤ 内容宽 1408，单行放得下，
-   避免换行导致第二行冲出 ground 基线（底部对齐靠槽位 flex-end）。 */
+/* 宽度填满网格列（minmax(0,1fr) 保证不撑破列宽），标题不再被截断。 */
 .vk-node-card {
   position: relative;
-  width: 216px;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--vk-space-2);

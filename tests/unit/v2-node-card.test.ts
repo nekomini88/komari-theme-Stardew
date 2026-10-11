@@ -115,6 +115,8 @@ describe('NodeCard：视觉契约（母板/tokens/接触阴影）', () => {
     const css = raw.replace(/\/\*[\s\S]*?\*\//g, '')
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/) // 不出现裸 hex，全部经令牌
     expect(css).not.toContain('image-rendering: pixelated')
-    expect(css).toContain('bottom: 22%') // 卡片底部对齐共享 ground 基线
+    // 新口径(照 DESIGN_REFERENCE §6):卡片改 3×2 grid 排布,不再用 bottom:22% 绝对定位贴 ground 基线
+    expect(css).toMatch(/display:\s*grid/)
+    expect(css).toMatch(/grid-template-columns:\s*repeat\(3/)
   })
 })

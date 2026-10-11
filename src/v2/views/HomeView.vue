@@ -8,7 +8,8 @@
  *  - 筛选/排序：全部复用 @/v2/data/nodeModel 纯函数（filterNodes / sortNodes / collectGroups），
  *    视图只持有用户输入，不自行实现第二套逻辑。
  *  - 三态（StatePlaceholder）：加载中 / 空（无节点）/ 错误（带重试，调 useClients().retry）。
- *  - 卡片「住进场景」：通过 Teleport 送入 SceneStack 的 mid 层槽位 #vk-scene-mid。
+ *  - 卡片网格：直接落在页面内容流里（容器 #vk-scene-mid），位于装饰场景层（z-index 0）之上，
+ *    不再住进固定的场景槽位 —— 这样 ground/near 色带永远盖不住卡片，容器高度随内容自适应。
  */
 import type { Node, SortDir, SortKey } from '@/v2/data/types'
 import type { StatusFilter } from '@/v2/data/nodeModel'
@@ -108,13 +109,13 @@ const noMatch = computed(() => nodes.value.length > 0 && visibleNodes.value.leng
       detail="试试清空搜索或切换筛选条件"
     />
 
-    <!-- 卡片住进 SceneStack mid 层（#vk-scene-mid 由 App.vue 在场景中提供） -->
-    <Teleport v-if="!noMatch" to="#vk-scene-mid">
+    <!-- 卡片网格：正常内容流中（在装饰场景之上），id 保持 #vk-scene-mid 供 e2e/探针选择 -->
+    <div v-if="!noMatch" id="vk-scene-mid" class="vk-node-grid" data-scene-slot="mid">
       <NodeCard
         v-for="n in visibleNodes"
         :key="n.uuid"
         :node="n"
       />
-    </Teleport>
+    </div>
   </section>
 </template>
