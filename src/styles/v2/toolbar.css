@@ -7,19 +7,19 @@
  * 状态信息以「标记 + 文字」双重表达，不只靠颜色。
  */
 
-/* ---- 工具栏：浅色木牌 ---- */
+/* ---- 工具栏：半透明清新纸白面板 ---- */
 .vk-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--vk-space-3);
-  background-color: var(--vk-wood-light);
-  background-image: var(--vk-wood-grain), var(--vk-wood-face);
-  border: var(--vk-border-soft);
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vk-moss) 30%, transparent);
   border-radius: var(--vk-radius-lg);
-  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
-  color: var(--vk-text-on-wood);
+  box-shadow: var(--vk-shadow-2);
+  color: var(--vk-text);
   padding: var(--vk-space-3) var(--vk-space-4);
+  backdrop-filter: blur(3px);
 }
 
 .vk-field {
@@ -36,7 +36,7 @@
 .vk-field-label {
   font-family: var(--vk-font-body);
   font-size: 11px;
-  color: var(--vk-text-on-wood);
+  color: var(--vk-text-muted);
 }
 
 .vk-input,

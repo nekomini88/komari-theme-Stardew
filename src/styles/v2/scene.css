@@ -1,8 +1,12 @@
 /**
- * SceneStack 图层栈样式（ART_SYSTEM.md §3）
- * sky(固定) / far 0.2 / mid 0.5 / near 0.8 / ground 1.0，ground 为共享基线。
- * 手绘平滑：地面/色块用柔和平滑色带（圆角 + 柔和边 + 内高光），无硬边像素带。
- * 过渡为 1.2s 交叉淡化（进入层淡入、离开层淡出），禁止硬切。
+ * SceneStack 图层栈样式（田园场景版）
+ *
+ * 目标：清新治愈的平滑田园场景 —— 天空渐变 + 太阳/云 + 远山近丘 + 一条木栅栏 + 草地田野。
+ * 卡片所在层（ground）是一片柔软的绿色田野，卡片像立在农场的告示牌。
+ *
+ * 分层：sky(固定,仅上半) / far 0.2(远山) / mid 0.5(近丘) / near 0.8(栅栏草沿) / ground 1.0(田野·共享基线)。
+ * 过渡：1.2s 交叉淡化（进入层淡入、离开层淡出），禁止硬切。
+ * 取色：天空色带由组件内联（随真实时间渐变）；本文件用母板色 + color-mix 做平滑山丘/草地/栅栏，无像素硬边。
  */
 
 .vk-scene {
@@ -11,65 +15,204 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background: var(--vk-sky-day);
+  background: var(--vk-grass-day);
 }
 
-/* 天空：4 段实心色带（纯色块，平滑无硬描边） */
+/* ---- 天空：仅占上半，色带由组件内联为平滑渐变；此处加太阳/云/地平线雾 ---- */
 .vk-sky {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto 0;
+  height: 34%;
+  overflow: hidden;
 }
 
 .vk-sky-band {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 25%;
+  height: 26%;
 }
 
-/* 视差层 */
+/* 太阳（左上）：暖色光晕，夜间退为月光 */
+.vk-sky::before {
+  content: '';
+  position: absolute;
+  left: 11%;
+  top: 8%;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    var(--vk-warm-hi) 0%,
+    color-mix(in srgb, var(--vk-honey-hi) 66%, transparent) 40%,
+    transparent 70%);
+  opacity: 0.92;
+}
+
+.vk-scene[data-time='night'] .vk-sky::before {
+  background: radial-gradient(circle at center,
+    color-mix(in srgb, var(--vk-sky-hi) 70%, transparent) 0%,
+    color-mix(in srgb, var(--vk-sky-hi) 26%, transparent) 42%,
+    transparent 72%);
+  opacity: 0.7;
+}
+
+/* 云：多层柔和径向渐变（平滑，非像素块） */
+.vk-sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(64px 26px at 22% 34%, color-mix(in srgb, var(--vk-paper-cream) 82%, transparent), transparent 72%),
+    radial-gradient(96px 32px at 44% 20%, color-mix(in srgb, var(--vk-paper-cream) 78%, transparent), transparent 74%),
+    radial-gradient(72px 24px at 74% 40%, color-mix(in srgb, var(--vk-paper-cream) 74%, transparent), transparent 72%),
+    radial-gradient(120px 30px at 88% 16%, color-mix(in srgb, var(--vk-paper-cream) 70%, transparent), transparent 76%);
+  opacity: 0.85;
+}
+
+.vk-scene[data-time='night'] .vk-sky::after {
+  opacity: 0.18;
+}
+
+/* ---- 视差层（无背景，背景由下面按时间给到 .vk-layer-base） ---- */
 .vk-layer {
   position: absolute;
   inset: 0;
   will-change: transform;
 }
 
-/* 每层占位色块：柔和平滑色带（M4 用手绘插画素材替换；本阶段纯 CSS 色块） */
+/* 每层基块：默认干净，具体背景见下方 data-time 规则 */
 .vk-layer-base {
   position: absolute;
   left: 0;
   right: 0;
   display: block;
-  border-top: var(--vk-border-soft);
-  border-radius: var(--vk-radius-xl) var(--vk-radius-xl) 0 0;
-  box-shadow: var(--vk-inset-hi);
-}
-
-.vk-layer[data-layer='far'] .vk-layer-base {
-  bottom: 38%;
-  height: 16%;
-}
-
-.vk-layer[data-layer='mid'] .vk-layer-base {
-  bottom: 26%;
-  height: 14%;
-}
-
-.vk-layer[data-layer='near'] .vk-layer-base {
-  bottom: 20%;
-  height: 8%;
-}
-
-/* ground 是共享基线：所有站立元素底部对齐到 ground 顶边 */
-.vk-layer[data-layer='ground'] .vk-layer-base {
-  bottom: 0;
-  height: 22%;
-  border-top: none;
-  border-radius: 0;
+  border: none;
   box-shadow: none;
 }
 
-/* 整栈 tint：进入/离开两层叠加做交叉淡化 */
+/* 远山：宽扁圆顶（平滑弧顶，读作起伏丘陵） */
+.vk-layer[data-layer='far'] .vk-layer-base {
+  left: -12%;
+  right: -12%;
+  bottom: 66%;
+  height: 18%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* 近丘：更靠前一层丘陵 */
+.vk-layer[data-layer='mid'] .vk-layer-base {
+  left: -8%;
+  right: -8%;
+  bottom: 60%;
+  height: 16%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* 近沿：栅栏与草沿（一条矮带，顶边柔圆） */
+.vk-layer[data-layer='near'] .vk-layer-base {
+  left: -6%;
+  right: -6%;
+  bottom: 56%;
+  height: 9%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* 田野：卡片所在层，占下半程，作为共享基线 */
+.vk-layer[data-layer='ground'] .vk-layer-base {
+  bottom: 0;
+  height: 60%;
+  border-radius: 0;
+}
+
+/* ---- 昼/昏：山丘与草地配色（清新暖色田园） ---- */
+.vk-scene[data-time='day'] .vk-layer[data-layer='far'] .vk-layer-base,
+.vk-scene[data-time='dusk'] .vk-layer[data-layer='far'] .vk-layer-base {
+  background: linear-gradient(180deg, var(--vk-hill-hi) 0%, var(--vk-hill-day) 58%, var(--vk-hill-day-lo) 100%);
+}
+
+.vk-scene[data-time='day'] .vk-layer[data-layer='mid'] .vk-layer-base,
+.vk-scene[data-time='dusk'] .vk-layer[data-layer='mid'] .vk-layer-base {
+  background: linear-gradient(180deg, var(--vk-moss) 0%, var(--vk-moss-dark) 100%);
+}
+
+.vk-scene[data-time='day'] .vk-layer[data-layer='near'] .vk-layer-base,
+.vk-scene[data-time='dusk'] .vk-layer[data-layer='near'] .vk-layer-base {
+  background: linear-gradient(180deg, var(--vk-leaf-hi) 0%, var(--vk-leaf) 100%);
+}
+
+.vk-scene[data-time='day'] .vk-layer[data-layer='ground'] .vk-layer-base,
+.vk-scene[data-time='dusk'] .vk-layer[data-layer='ground'] .vk-layer-base {
+  background: linear-gradient(180deg, var(--vk-grass-hi) 0%, var(--vk-grass-day) 26%, var(--vk-grass-lo) 100%);
+}
+
+/* ---- 夜：整栈转为冷暗暗色田园 ---- */
+.vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--vk-hill-night) 78%, var(--vk-sky-hi)) 0%,
+    var(--vk-hill-night) 60%,
+    color-mix(in srgb, var(--vk-hill-night) 78%, var(--vk-wood-deep)) 100%);
+}
+
+.vk-scene[data-time='night'] .vk-layer[data-layer='mid'] .vk-layer-base {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--vk-hill-night) 82%, var(--vk-grass-night)) 0%,
+    color-mix(in srgb, var(--vk-hill-night) 72%, var(--vk-wood-deep)) 100%);
+}
+
+.vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--vk-grass-night) 84%, var(--vk-sky-hi)) 0%,
+    var(--vk-grass-night) 100%);
+}
+
+.vk-scene[data-time='night'] .vk-layer[data-layer='ground'] .vk-layer-base {
+  background: linear-gradient(180deg,
+    var(--vk-grass-night) 0%,
+    color-mix(in srgb, var(--vk-grass-night) 82%, var(--vk-wood-deep)) 60%,
+    color-mix(in srgb, var(--vk-soil-night) 40%, var(--vk-grass-night)) 100%);
+}
+
+/* ---- 栅栏：near 层顶沿一段木栅栏（竖直桩 + 横档，平滑无像素描边） ---- */
+.vk-layer[data-layer='near'] .vk-layer-base::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12px;
+  background: repeating-linear-gradient(90deg,
+    var(--vk-bark) 0 6px,
+    var(--vk-soil-hi) 6px 9px,
+    var(--vk-bark) 9px 15px,
+    var(--vk-soil) 15px 24px);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.9;
+}
+
+/* ---- 田野：一条柔和土色小路 + 轻草纹（平滑叠加，非硬边色块） ---- */
+.vk-layer[data-layer='ground'] .vk-layer-base::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(102deg,
+    transparent 6%,
+    color-mix(in srgb, var(--vk-soil-hi) 46%, transparent) 22%,
+    color-mix(in srgb, var(--vk-soil) 40%, transparent) 34%,
+    transparent 52%);
+  opacity: 0.5;
+}
+
+.vk-layer[data-layer='ground'] .vk-layer-base::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40% 60% at 18% 12%, color-mix(in srgb, var(--vk-grass-hi) 34%, transparent), transparent 70%),
+    radial-gradient(46% 70% at 82% 22%, color-mix(in srgb, var(--vk-grass-lo) 30%, transparent), transparent 72%);
+}
+
+/* ---- 整栈 tint：进入/离开两层叠加做交叉淡化 ---- */
 .vk-tint {
   position: absolute;
   inset: 0;

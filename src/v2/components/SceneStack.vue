@@ -46,6 +46,17 @@ function tintStyle(t: TintSpec | null) {
   }
 }
 
+/** 天空色带：每段从自己的色平滑过渡到下一段，四段拼出无硬缝的整片渐变天空 */
+function bandStyle(i: number) {
+  const bands = scene.value.skyBands
+  const c0 = bands[i]!
+  const c1 = bands[i + 1] ?? c0
+  return {
+    background: `linear-gradient(180deg, ${c0} 0%, ${c1} 100%)`,
+    top: `${i * 25}%`,
+  }
+}
+
 defineExpose({
   scene,
   isTransitioning,
@@ -58,17 +69,17 @@ defineExpose({
 
 <template>
   <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-transitioning="isTransitioning">
-    <!-- 天空：4 段色带（非 CSS 渐变） -->
+    <!-- 天空：4 段色带，逐段渐变拼成平滑天空（随真实时间切换） -->
     <div class="vk-sky" data-layer="sky">
       <div
         v-for="(band, i) in scene.skyBands"
         :key="`band-${i}`"
         class="vk-sky-band"
-        :style="{ background: band, top: `${i * 25}%` }"
+        :style="bandStyle(i)"
       />
     </div>
 
-    <!-- 视差层：far / mid / near / ground -->
+    <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
     <div
       v-for="layer in contentLayers"
       :key="layer.id"
@@ -77,7 +88,7 @@ defineExpose({
       :data-parallax="layer.parallax"
       :style="layerStyle(layer.parallax)"
     >
-      <span class="vk-layer-base" :style="{ background: scene.layerColors[layer.id as 'far' | 'mid' | 'near' | 'ground'] }" />
+      <span class="vk-layer-base" />
       <slot :name="layer.id" />
     </div>
 

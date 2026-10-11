@@ -47,6 +47,28 @@
   --vk-dusk-tint: #e8a05c;
   --vk-autumn-warm: #d9c27a;
 
+  /* ---- 田园场景色阶（昼：天空/远山/草地/泥土；夜：对应暗色）---- */
+  --vk-sky-hi: #a6dcf7;
+  --vk-hill-hi: #8fc9a6;
+  --vk-grass-hi: #9ed679;
+  --vk-grass-lo: #5f9c40;
+  --vk-soil: #a9764b;
+  --vk-soil-hi: #c4936a;
+  --vk-soil-lo: #835a38;
+  --vk-hill-night: #2f4a56;
+  --vk-grass-night: #3f6b4c;
+  --vk-soil-night: #5a4034;
+
+  /* ---- 卡片顶部彩色标题栏：每台一个主题色（取母板，明快可辨、承米色字）---- */
+  --vk-accent-1: #4e6b39; /* 苔绿·暗 */
+  --vk-accent-2: #4f9fd0; /* 晴空蓝 */
+  --vk-accent-3: #d99a4e; /* 蜜橘 */
+  --vk-accent-4: #54896c; /* 山丘青 */
+  --vk-accent-5: #8a5a34; /* 树皮棕 */
+  --vk-accent-6: #6b8e4e; /* 苔绿 */
+  --vk-accent-7: #7a5230; /* 木中棕 */
+  --vk-accent-8: #e8a05c; /* 黄昏橙 */
+
   /* ---- 暖色阴影基色（柔和投影一律用它，绝不用纯黑） ---- */
   --vk-shadow-warm: var(--vk-wood-deep);
 
@@ -168,29 +190,28 @@
   padding: var(--vk-space-4);
 }
 
-/* ---- 按钮：蜜色木片 ---- */
+/* ---- 按钮：清新圆角纸片（奶白面 + 叶绿描边 + 柔和投影，不再木片）---- */
 .vk-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--vk-space-2);
-  background-color: var(--vk-wood-light);
-  background-image: var(--vk-wood-face);
-  color: var(--vk-text-on-wood);
-  border: var(--vk-border-soft);
-  border-radius: var(--vk-radius-sm);
-  box-shadow: var(--vk-shadow-1), var(--vk-inset-hi);
+  background-color: var(--vk-paper-cream);
+  color: var(--vk-text);
+  border: 1px solid color-mix(in srgb, var(--vk-moss) 42%, transparent);
+  border-radius: var(--vk-radius-pill);
+  box-shadow: var(--vk-shadow-1);
   padding: var(--vk-space-2) var(--vk-space-4);
   font-family: var(--vk-font-display);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }
 
 .vk-btn:hover {
-  filter: brightness(1.06);
-  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  background-color: color-mix(in srgb, var(--vk-leaf-hi) 26%, var(--vk-paper-cream));
+  box-shadow: var(--vk-shadow-2);
 }
 
 .vk-btn:active {

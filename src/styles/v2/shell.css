@@ -1,6 +1,6 @@
 /**
- * 应用壳布局样式（ART_SYSTEM.md §2 功能面保留：顶栏 / 主区 / 页脚）
- * 木质感拟物：顶栏/页脚 = 深色木牌（木纹 + 柔和投影 + 蜜色内高光），笔画平滑。
+ * 应用壳布局样式（清新田园版：顶栏 / 主区 / 页脚）
+ * 顶栏/页脚 = 半透明奶白条 + 柔和投影 + 叶绿描边，与场景协调（不再厚重木牌）。
  * 取色全部走 tokens（--vk-*），本文件不出现裸 hex。
  */
 
@@ -12,16 +12,16 @@
   min-height: 100vh;
 }
 
-/* ---- 顶栏：深色木牌 ---- */
+/* ---- 顶栏：半透明奶白条 ---- */
 .vk-topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: var(--vk-wood-dark);
-  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
-  border-bottom: var(--vk-border-soft);
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 86%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--vk-moss) 28%, transparent);
   box-shadow: var(--vk-shadow-1);
-  color: var(--vk-text-on-dark);
+  color: var(--vk-text);
+  backdrop-filter: blur(6px);
 }
 
 .vk-topbar-inner {
@@ -38,25 +38,25 @@
   align-items: center;
   gap: var(--vk-space-2);
   cursor: pointer;
-  color: var(--vk-text-on-dark);
+  color: var(--vk-text);
   background: none;
   border: none;
   padding: 0;
 }
 
 .vk-brand .vk-title {
-  color: var(--vk-text-on-dark);
+  color: var(--vk-moss-dark);
 }
 
-/* 品牌木牌标记：圆角木片 + 左上蜜色高光 */
+/* 品牌标记：圆角草绿叶片 */
 .vk-brand-mark {
   width: 26px;
   height: 26px;
   border-radius: var(--vk-radius-sm);
-  background-color: var(--vk-wood-light);
-  background-image: var(--vk-wood-face);
-  border: var(--vk-border-soft);
-  box-shadow: var(--vk-shadow-1), var(--vk-inset-hi);
+  background-color: var(--vk-leaf);
+  background-image: linear-gradient(180deg, var(--vk-leaf-hi), var(--vk-leaf));
+  border: 1px solid color-mix(in srgb, var(--vk-moss-dark) 46%, transparent);
+  box-shadow: var(--vk-shadow-1);
 }
 
 .vk-nav {
@@ -83,11 +83,10 @@
   padding: var(--vk-space-6) var(--vk-space-4);
 }
 
-/* ---- 页脚：深色木牌 ---- */
+/* ---- 页脚：浅色草原条 ---- */
 .vk-footer {
-  background-color: var(--vk-wood-dark);
-  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
-  border-top: var(--vk-border-soft);
+  background-color: color-mix(in srgb, var(--vk-moss-dark) 88%, var(--vk-wood-deep));
+  border-top: 1px solid color-mix(in srgb, var(--vk-moss) 40%, transparent);
   color: var(--vk-text-on-dark);
   font-family: var(--vk-font-body);
   font-size: 13px;
@@ -120,7 +119,7 @@
   padding: var(--vk-space-1) var(--vk-space-3);
 }
 
-/* ---- 首页工具栏辅助文字对比度提升（木牌面上保证 ≥4.5:1） ---- */
+/* ---- 工具栏辅助文字对比度 ---- */
 .vk-toolbar .vk-input::placeholder {
   color: var(--vk-text-muted);
   opacity: 1;
@@ -130,7 +129,7 @@
   color: var(--vk-text);
 }
 
-/* ---- 返回顶部：游戏内木牌告示牌（替代旧现代白圆角浮钮） ---- */
+/* ---- 返回顶部：清新圆角浮钮（非木牌，不厚重） ---- */
 .vk-backtop {
   position: fixed;
   right: max(22px, env(safe-area-inset-right, 0px));
@@ -144,11 +143,11 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--vk-text-on-dark);
-  background-color: var(--vk-wood-dark);
-  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
-  border: var(--vk-border-soft);
-  border-radius: var(--vk-radius-sm);
-  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  background-color: var(--vk-moss-dark);
+  background-image: linear-gradient(180deg, var(--vk-moss), var(--vk-moss-dark));
+  border: 1px solid color-mix(in srgb, var(--vk-moss) 40%, transparent);
+  border-radius: var(--vk-radius-pill);
+  box-shadow: var(--vk-shadow-2);
   cursor: pointer;
   transition: filter 120ms ease, transform 120ms ease;
 }

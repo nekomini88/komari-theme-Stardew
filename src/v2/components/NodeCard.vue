@@ -57,6 +57,27 @@ const latencyText = computed(() => formatLatency(node.value.latency))
 const cpuLevel = computed(() => usageLevel(node.value.cpu))
 const memLevel = computed(() => usageLevel(percentValue(node.value.ram, node.value.ramTotal)))
 const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.value.diskTotal)))
+
+/** 顶部彩色标题栏主题色：按 uuid 稳定映射到 8 个母板色令牌（每台一个色，可辨且不串色） */
+const CARD_ACCENTS = [
+  'var(--vk-accent-1)',
+  'var(--vk-accent-2)',
+  'var(--vk-accent-3)',
+  'var(--vk-accent-4)',
+  'var(--vk-accent-5)',
+  'var(--vk-accent-6)',
+  'var(--vk-accent-7)',
+  'var(--vk-accent-8)',
+] as const
+
+const accent = computed(() => {
+  const key = node.value.uuid || node.value.name
+  let h = 0
+  for (let i = 0; i < key.length; i++)
+    h = (h * 31 + key.charCodeAt(i)) >>> 0
+  return CARD_ACCENTS[h % CARD_ACCENTS.length]
+})
+
 </script>
 
 <template>
@@ -64,6 +85,7 @@ const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.v
     class="vk-node-card vk-contact"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
+    :style="{ '--vk-node-accent': accent }"
   >
     <header class="vk-card-head">
       <span class="vk-card-name" :title="node.name">{{ node.name }}</span>
@@ -73,7 +95,8 @@ const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.v
       </div>
     </header>
 
-    <ul class="vk-card-metrics">
+    <div class="vk-card-body">
+      <ul class="vk-card-metrics">
       <li class="vk-card-metric" data-metric="cpu">
         <span class="vk-metric-label">CPU</span>
         <span class="vk-metric-value" data-field="cpu">{{ cpuPctText }}</span>
@@ -133,5 +156,6 @@ const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.v
     <footer class="vk-card-foot">
       <span class="vk-card-os" :title="node.os">{{ node.os }}</span>
     </footer>
+    </div>
   </article>
 </template>
