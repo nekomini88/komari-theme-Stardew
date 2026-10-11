@@ -63,6 +63,8 @@
 
 /* ---- 主区 ---- */
 .vk-main {
+  position: relative;
+  z-index: 1; /* 压过 fixed 场景层（z-index:0），保证首页头部控件不被卡片遮挡/可点 */
   flex: 1 1 auto;
   width: 100%;
   max-width: var(--vk-canvas-w);

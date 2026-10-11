@@ -7,19 +7,32 @@
  */
 
 /* ---- mid 层容器：卡片「住」在场景里 ---- */
+/* 卡片层：从首页头部（标题/总览/工具栏）下方开始铺排，
+ * 否则卡片会盖住总览/工具栏导致控件不可点（桌面 6 张节点时实测被完全遮挡）。
+ * 节点过多时在层内纵向滚动；层整体 pointer-events:none 由 .vk-scene 提供，
+ * 此处恢复卡片交互。 */
 .vk-mid-slot {
   position: absolute;
   left: 0;
   right: 0;
-  /* ground 层顶边 = 22%（scene.css: ground base bottom:0 height:22%）→ 共享基线 */
+  /* 头部高度（标题 + 总览 + 工具栏）在桌面约 300px，移动端纵向叠放约 570px */
+  top: var(--vk-home-top, 320px);
   bottom: 22%;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end; /* 卡片底部对齐基线，不上下浮动 */
+  align-content: flex-end;
   justify-content: center;
   gap: var(--vk-space-4);
   padding: 0 var(--vk-space-4);
+  overflow-y: auto;
   pointer-events: auto; /* 场景整体 pointer-events:none，卡片恢复交互 */
+}
+
+@media (max-width: 640px) {
+  .vk-mid-slot {
+    --vk-home-top: 600px;
+  }
 }
 
 /* mid 层基色块会挡住卡片背景；卡片自带面板底色，此处仅保证基线不遮卡片 */
