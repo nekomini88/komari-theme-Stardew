@@ -168,15 +168,43 @@ export interface FilterOptions {
   group?: string
   /** 附加搜索词 */
   query?: string
+  /** 状态筛选：all 不筛 / online / offline(有状态但离线) / unknown(无状态) */
+  status?: StatusFilter
 }
 
-/** 筛选：在线 / 分组 / 搜索组合（AND） */
+/** 状态筛选项（与 UI 控件一一对应） */
+export type StatusFilter = 'all' | 'online' | 'offline' | 'unknown'
+
+export const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
+  all: '全部',
+  online: '在线',
+  offline: '离线',
+  unknown: '未知',
+}
+
+/** 状态筛选（纯函数）：all 原样返回；其余按 online/hasStatus 组合判定 */
+export function filterByStatus(nodes: readonly Node[] | null | undefined, status: StatusFilter): Node[] {
+  const list = Array.isArray(nodes) ? nodes : []
+  if (!status || status === 'all')
+    return [...list]
+  return list.filter((n) => {
+    if (status === 'online')
+      return n.online
+    if (status === 'offline')
+      return !n.online && n.hasStatus
+    return !n.hasStatus // unknown
+  })
+}
+
+/** 筛选：在线 / 分组 / 搜索 / 状态组合（AND） */
 export function filterNodes(nodes: readonly Node[] | null | undefined, opts: FilterOptions = {}): Node[] {
   let list = searchNodes(nodes, opts.query ?? '')
   if (opts.onlineOnly)
     list = list.filter(n => n.online)
   if (opts.group)
     list = list.filter(n => n.group === opts.group)
+  if (opts.status && opts.status !== 'all')
+    list = filterByStatus(list, opts.status)
   return list
 }
 

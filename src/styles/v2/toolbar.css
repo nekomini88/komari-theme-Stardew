@@ -1,0 +1,158 @@
+/**
+ * v2 首页工具栏（搜索/排序/分组/状态筛选）与三态占位块样式
+ *
+ * 像素风：直角、硬边描边/硬阴影，无渐变/模糊/发光；取色全部走 tokens（--vk-*），
+ * 本文件不出现裸 hex。状态信息以「标记 + 文字」双重表达，不只靠颜色。
+ */
+
+/* ---- 工具栏 ---- */
+.vk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--vk-space-3);
+  background: var(--vk-panel-bg);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  box-shadow: var(--vk-shadow-hard);
+  color: var(--vk-text);
+  padding: var(--vk-space-3) var(--vk-space-4);
+}
+
+.vk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vk-field-search {
+  flex: 1 1 200px;
+  min-width: 160px;
+}
+
+.vk-field-label {
+  font-family: var(--vk-font-pixel);
+  font-size: 8px;
+  color: var(--vk-text-muted);
+}
+
+.vk-input,
+.vk-select {
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  color: var(--vk-text);
+  background: var(--vk-warm-hi);
+  border: 2px solid var(--vk-outline);
+  border-radius: var(--vk-radius-none);
+  padding: var(--vk-space-1) var(--vk-space-2);
+  image-rendering: pixelated;
+}
+
+.vk-input:focus-visible,
+.vk-select:focus-visible {
+  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline-offset: 2px;
+}
+
+.vk-dir-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---- 状态筛选按钮组（颜色 + 文字） ---- */
+.vk-status-filter {
+  display: flex;
+  gap: 2px;
+}
+
+.vk-status-btn {
+  font-family: var(--vk-font-pixel);
+  font-size: 8px;
+  line-height: 1;
+  padding: var(--vk-space-2) var(--vk-space-2);
+  background: var(--vk-warm-hi);
+  color: var(--vk-text);
+  border: 2px solid var(--vk-outline);
+  border-radius: var(--vk-radius-none);
+  cursor: pointer;
+}
+
+.vk-status-btn[data-status='online'] {
+  background: var(--vk-grass-day-lo);
+}
+
+.vk-status-btn[data-status='offline'] {
+  background: var(--vk-brown-dark);
+  color: var(--vk-warm-hi);
+}
+
+.vk-status-btn[data-status='unknown'] {
+  background: var(--vk-hill-day-lo);
+  color: var(--vk-warm-hi);
+}
+
+.vk-status-btn[data-active='true'] {
+  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline-offset: 1px;
+  font-weight: 700;
+}
+
+.vk-toolbar-count {
+  margin: 0 0 var(--vk-space-1) 0;
+  font-family: var(--vk-font-pixel);
+  font-size: 8px;
+  color: var(--vk-text-muted);
+  align-self: flex-end;
+}
+
+/* ---- 三态占位块 ---- */
+.vk-state {
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-3);
+  background: var(--vk-panel-bg);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  box-shadow: var(--vk-shadow-hard);
+  color: var(--vk-text);
+  padding: var(--vk-space-6) var(--vk-space-4);
+}
+
+.vk-state-mark {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  background: var(--vk-brown-dark);
+  border: 2px solid var(--vk-outline);
+}
+
+.vk-state-mark[data-state='loading'] {
+  background: var(--vk-sky-day-lo);
+}
+
+.vk-state-mark[data-state='empty'] {
+  background: var(--vk-hill-day-lo);
+}
+
+.vk-state-mark[data-state='error'] {
+  background: var(--vk-dusk-tint);
+}
+
+.vk-state-body {
+  flex: 1 1 auto;
+}
+
+.vk-state-text {
+  margin: 0;
+  font-family: var(--vk-font-pixel);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.vk-state-detail {
+  margin: var(--vk-space-1) 0 0;
+  font-size: 12px;
+  color: var(--vk-text-muted);
+}
+
+.vk-state-retry {
+  flex: 0 0 auto;
+}
