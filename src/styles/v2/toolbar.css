@@ -166,3 +166,27 @@
 .vk-state-retry {
   flex: 0 0 auto;
 }
+
+/* ---- 紧凑化层：工具栏更薄，给手绘场景让出可见横带 ---- */
+.vk-toolbar {
+  align-items: center;
+  gap: var(--vk-space-2);
+  padding: 6px var(--vk-space-4);
+}
+
+.vk-field {
+  gap: 2px;
+}
+
+.vk-input,
+.vk-select {
+  padding: 5px 10px;
+}
+
+.vk-status-btn {
+  padding: 5px 10px;
+}
+
+.vk-field-label {
+  font-size: 10.5px;
+}

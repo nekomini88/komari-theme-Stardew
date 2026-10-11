@@ -80,7 +80,7 @@
   width: 100%;
   max-width: var(--vk-canvas-w);
   margin: 0 auto;
-  padding: var(--vk-space-6) var(--vk-space-4);
+  padding: var(--vk-space-3) var(--vk-space-4) var(--vk-space-4);
 }
 
 /* ---- 页脚：浅色草原条 ---- */

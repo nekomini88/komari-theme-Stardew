@@ -8,13 +8,16 @@
  */
 
 /* ---- 节点卡片网格：内容流中的 3×2 居中网格，左右边界对齐上方总览/筛选容器 ----
-   列数自适应：≥901px 3 列（6 节点 = 3×2）；≤900px 2 列；≤600px 单列。 */
+   列数自适应：≥901px 3 列（6 节点 = 3×2）；≤900px 2 列；≤600px 单列。
+   上留白 = 场景露台带：在卡片网格上方让出手绘天空/远山/栅栏的可见横带，
+   使卡片「站在地面（ground 基线 = 网格顶）」上，而不是反过来盖满整屏。 */
 .vk-node-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--vk-space-4);
   width: 100%;
   align-items: stretch;
+  margin-top: var(--vk-scene-reveal);
 }
 
 @media (max-width: 900px) {
@@ -330,7 +333,12 @@
 .vk-home {
   display: flex;
   flex-direction: column;
-  gap: var(--vk-space-4);
+  gap: var(--vk-space-2);
+  /* 内容列收窄于画布：左右让出手绘田园场景（远山/草地）的可见区，
+     卡片不再「墙」式盖满整屏宽度 */
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
 /* 「节点总览」标题：清新圆角铭牌，压在田园场景之上仍清晰 */
@@ -351,4 +359,90 @@
   font-size: 13px;
   font-weight: 600;
   text-shadow: 0 1px 2px color-mix(in srgb, var(--vk-paper-cream) 70%, transparent);
+}
+
+/* ============================================================
+ * 紧凑化层（v2 场景可见性一轮）
+ *
+ * 目的：把「总览 + 筛选」压到更薄、把卡片行高收紧，使 1440×900 首屏内
+ *       6 张卡片完整可见，并让卡片网格上方/下方留出手绘场景（远山/栅栏/草地）
+ *       的可见横带 —— 卡片「站在地面」而非盖满整屏。
+ * 约束：只调尺寸/间距；字段、指标行、功能语义一律不动；字色对比度不降。
+ * ============================================================ */
+
+/* ---- 顶部总览：更薄（padding/gap 收紧，字号不缩到影响可读） ---- */
+.vk-overview {
+  gap: var(--vk-space-2);
+  padding: 6px var(--vk-space-4);
+}
+
+.vk-overview-item {
+  gap: 0;
+  min-width: 72px;
+}
+
+.vk-overview-value {
+  font-size: 14px;
+}
+
+.vk-overview-sub {
+  font-size: 10.5px;
+}
+
+/* ---- 「节点总览」铭牌：更扁 ---- */
+.vk-home .vk-title {
+  padding: 4px var(--vk-space-4);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---- 汇总行：更紧 ---- */
+.vk-home-hint {
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* ---- 卡片标题栏：更薄 ---- */
+.vk-card-head {
+  min-height: 28px;
+  padding: 5px var(--vk-space-3);
+}
+
+/* ---- 卡片主体：内边距/行距收紧（指标行数不变） ---- */
+.vk-card-body {
+  gap: 5px;
+  padding: 8px 10px;
+}
+
+.vk-card-metrics {
+  gap: 4px;
+}
+
+.vk-card-metric {
+  gap: 1px var(--vk-space-2);
+}
+
+/* 进度条：略薄，仍可辨 */
+.vk-meter {
+  height: 6px;
+}
+
+/* ---- 事实网格：2 列 → 3 列（8 项全部保留，只改排布密度） ---- */
+.vk-card-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px var(--vk-space-2);
+  padding-top: 5px;
+}
+
+.vk-fact dt {
+  gap: 2px;
+  font-size: 10.5px;
+}
+
+.vk-fact dd {
+  font-size: 10.5px;
+}
+
+.vk-card-foot {
+  padding-top: 2px;
 }
