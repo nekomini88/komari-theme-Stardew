@@ -1,0 +1,95 @@
+/**
+ * v2 图表样式（历史曲线 / 延迟曲线，ART_SYSTEM §1）
+ *
+ * 硬边像素风：直角、1px 硬描边、无渐变/模糊/发光/半透明叠色。
+ * 曲线 / 网格 / 轴全部取色自母板令牌（--vk-*，见 tokens.css），本文件不出现裸 hex。
+ * 卡内嵌入时不自带 ground 定位，避免破坏 SceneStack 的 ground 对齐与接触阴影。
+ */
+
+.vk-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vk-space-1);
+  margin: 0;
+}
+
+.vk-chart-title {
+  margin: 0;
+  font-family: var(--vk-font-pixel);
+  font-size: 8px;
+  line-height: 1.4;
+  color: var(--vk-text-muted);
+}
+
+.vk-chart-plot {
+  position: relative;
+  background: var(--vk-warm-hi);
+  border: 2px solid var(--vk-outline);
+  image-rendering: pixelated;
+}
+
+.vk-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* SVG 图元取色：全部经令牌，硬边 crispEdges（像素风不加抗锯齿） */
+.vk-chart-frame {
+  fill: none;
+  stroke: var(--vk-outline);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.vk-chart-grid {
+  stroke: var(--vk-brown-dark);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.vk-chart-line {
+  fill: none;
+  stroke: var(--vk-grass-day-lo);
+  stroke-width: 2;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  shape-rendering: crispEdges;
+}
+
+.vk-chart-line[data-series='ping'] {
+  stroke: var(--vk-hill-day);
+}
+
+.vk-chart-dot {
+  fill: var(--vk-outline);
+  shape-rendering: crispEdges;
+}
+
+/* 空态占位：与母板同色的纯 CSS 块（M4 再换插画） */
+.vk-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vk-space-1);
+  min-height: 48px;
+  padding: var(--vk-space-2);
+  background: var(--vk-warm-hi);
+  color: var(--vk-text-muted);
+  font-size: 10px;
+}
+
+.vk-chart-empty-mark {
+  width: 8px;
+  height: 8px;
+  background: var(--vk-brown-dark);
+}
+
+.vk-chart-axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--vk-font-pixel);
+  font-size: 8px;
+  line-height: 1.4;
+  color: var(--vk-text-muted);
+}
