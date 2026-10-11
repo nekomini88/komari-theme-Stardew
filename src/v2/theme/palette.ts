@@ -1,5 +1,5 @@
 /**
- * 母板访问层 —— 24 色母板（src/assets/palette.json）的唯一读取入口。
+ * 母板访问层 —— 38 色母板（src/assets/palette.json）的唯一读取入口。
  * 设计令牌、SceneStack 与素材校验都通过这里取色，保证「取色 ⊆ 母板」可被单测强制。
  */
 import paletteData from '@/assets/palette.json'

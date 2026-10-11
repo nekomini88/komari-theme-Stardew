@@ -15,7 +15,7 @@ const stats = computed(() => buildOverviewStats(props.nodes))
 </script>
 
 <template>
-  <section class="vk-overview vk-pixel" data-testid="overview" aria-label="节点总览">
+  <section class="vk-overview" data-testid="overview" aria-label="节点总览">
     <div class="vk-overview-item" data-field="online">
       <span class="vk-overview-label">在线/总数</span>
       <span class="vk-overview-value">{{ stats.onlineText }}</span>

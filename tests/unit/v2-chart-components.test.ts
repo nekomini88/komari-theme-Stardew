@@ -96,13 +96,12 @@ describe('PingChart：延迟曲线（丢包断点）', () => {
   })
 })
 
-describe('chart.css：像素风取色契约（母板令牌，无渐变/模糊）', () => {
-  it('不含裸 hex / 渐变 / 模糊，且用 crispEdges 硬边', () => {
-    const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'chart.css'), 'utf8')
+describe('chart.css：手绘平滑取色契约（母板令牌，无裸 hex）', () => {
+  it('不含裸 hex，已去 crispEdges 硬边，取色走 var(--vk-*)', () => {
+    const raw = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'chart.css'), 'utf8')
+    const css = raw.replace(/\/\*[\s\S]*?\*\//g, '')
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
-    expect(css).not.toMatch(/gradient\s*\(/)
-    expect(css).not.toMatch(/blur\s*\(/)
-    expect(css).toContain('crispEdges')
-    expect(css).toContain('var(--vk-outline)')
+    expect(css).not.toContain('crispEdges')      // 平滑笔触：无硬边渲染
+    expect(css).toMatch(/var\(--vk-/)            // 取色一律经母板令牌（新口径下不再限定某个具体令牌）
   })
 })

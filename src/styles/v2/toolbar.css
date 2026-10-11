@@ -1,27 +1,31 @@
 /**
  * v2 首页工具栏（搜索/排序/分组/状态筛选）与三态占位块样式
  *
- * 像素风：直角、硬边描边/硬阴影，无渐变/模糊/发光；取色全部走 tokens（--vk-*），
- * 本文件不出现裸 hex。状态信息以「标记 + 文字」双重表达，不只靠颜色。
+ * 木质感拟物：工具栏 = 浅色木牌（木纹面 + 柔和投影 + 圆角），输入框/按钮 = 纸片与木片。
+ * 笔触平滑：无像素字体、无 image-rendering: pixelated、无硬边粗描边。
+ * 取色全部走 tokens（--vk-*），本文件不出现裸 hex。
+ * 状态信息以「标记 + 文字」双重表达，不只靠颜色。
  */
 
-/* ---- 工具栏 ---- */
+/* ---- 工具栏：浅色木牌 ---- */
 .vk-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--vk-space-3);
-  background: var(--vk-panel-bg);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-hard);
-  color: var(--vk-text);
+  background-color: var(--vk-wood-light);
+  background-image: var(--vk-wood-grain), var(--vk-wood-face);
+  border: var(--vk-border-soft);
+  border-radius: var(--vk-radius-lg);
+  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  color: var(--vk-text-on-wood);
   padding: var(--vk-space-3) var(--vk-space-4);
 }
 
 .vk-field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .vk-field-search {
@@ -30,26 +34,26 @@
 }
 
 .vk-field-label {
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
-  color: var(--vk-text-muted);
+  font-family: var(--vk-font-body);
+  font-size: 11px;
+  color: var(--vk-text-on-wood);
 }
 
 .vk-input,
 .vk-select {
   font-family: var(--vk-font-body);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--vk-text);
-  background: var(--vk-warm-hi);
-  border: 2px solid var(--vk-outline);
-  border-radius: var(--vk-radius-none);
-  padding: var(--vk-space-1) var(--vk-space-2);
-  image-rendering: pixelated;
+  background-color: var(--vk-paper-cream);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-sm);
+  box-shadow: var(--vk-inset-lo);
+  padding: var(--vk-space-2) var(--vk-space-3);
 }
 
 .vk-input:focus-visible,
 .vk-select:focus-visible {
-  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline: 2px solid color-mix(in srgb, var(--vk-honey) 80%, transparent);
   outline-offset: 2px;
 }
 
@@ -58,82 +62,87 @@
   cursor: not-allowed;
 }
 
-/* ---- 状态筛选按钮组（颜色 + 文字） ---- */
+/* ---- 状态筛选按钮组（颜色 + 文字，圆角纸签） ---- */
 .vk-status-filter {
   display: flex;
-  gap: 2px;
+  gap: var(--vk-space-1);
 }
 
 .vk-status-btn {
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1;
-  padding: var(--vk-space-2) var(--vk-space-2);
-  background: var(--vk-warm-hi);
+  padding: var(--vk-space-2) var(--vk-space-3);
+  background-color: var(--vk-paper-warm);
   color: var(--vk-text);
-  border: 2px solid var(--vk-outline);
-  border-radius: var(--vk-radius-none);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-pill);
   cursor: pointer;
 }
 
 .vk-status-btn[data-status='online'] {
-  background: var(--vk-grass-day-lo);
+  background-color: var(--vk-moss-dark);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-status-btn[data-status='offline'] {
-  background: var(--vk-brown-dark);
-  color: var(--vk-warm-hi);
+  background-color: var(--vk-wood-dark);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-status-btn[data-status='unknown'] {
-  background: var(--vk-hill-day-lo);
-  color: var(--vk-warm-hi);
+  background-color: var(--vk-wood-mid);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-status-btn[data-active='true'] {
-  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline: 2px solid color-mix(in srgb, var(--vk-honey) 80%, transparent);
   outline-offset: 1px;
   font-weight: 700;
 }
 
 .vk-toolbar-count {
   margin: 0 0 var(--vk-space-1) 0;
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
-  color: var(--vk-text-muted);
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  color: var(--vk-text);
   align-self: flex-end;
 }
 
-/* ---- 三态占位块 ---- */
+/* ---- 三态占位块：米纸卡 ---- */
 .vk-state {
   display: flex;
   align-items: center;
   gap: var(--vk-space-3);
-  background: var(--vk-panel-bg);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-hard);
+  background-color: var(--vk-paper-cream);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-md);
+  box-shadow: var(--vk-shadow-2);
   color: var(--vk-text);
   padding: var(--vk-space-6) var(--vk-space-4);
 }
 
 .vk-state-mark {
   flex: 0 0 auto;
-  width: 16px;
-  height: 16px;
-  background: var(--vk-brown-dark);
-  border: 2px solid var(--vk-outline);
+  width: 18px;
+  height: 18px;
+  border-radius: var(--vk-radius-pill);
+  background-color: var(--vk-wood-mid);
+  border: var(--vk-border-hair);
 }
 
 .vk-state-mark[data-state='loading'] {
-  background: var(--vk-sky-day-lo);
+  background-color: var(--vk-honey);
 }
 
 .vk-state-mark[data-state='empty'] {
-  background: var(--vk-hill-day-lo);
+  background-color: var(--vk-moss);
 }
 
 .vk-state-mark[data-state='error'] {
-  background: var(--vk-dusk-tint);
+  background-color: var(--vk-dusk-tint);
 }
 
 .vk-state-body {
@@ -142,8 +151,9 @@
 
 .vk-state-text {
   margin: 0;
-  font-family: var(--vk-font-pixel);
-  font-size: 10px;
+  font-family: var(--vk-font-display);
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.6;
 }
 

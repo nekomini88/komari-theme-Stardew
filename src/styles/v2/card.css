@@ -1,32 +1,29 @@
 /**
- * v2 首页：顶部总览 + 节点卡片（住在 SceneStack mid 层）
+ * v2 首页：顶部总览（木牌）+ 节点卡片（纸卡，住在 SceneStack mid 层）
  *
- * 全部取色/间距/阴影走 tokens（母板），无渐变/模糊/发光/半透明叠色。
+ * 木质感拟物：卡片 = 米纸卡（纸纹 + 柔和投影 + 圆角），总览 = 深色木牌。
+ * 笔触平滑：无像素字体 / 无 image-rendering: pixelated / 无硬边深棕粗描边。
  * 卡片底部对齐共享 ground 基线（ground 顶边 = 距底 22%，见 scene.css），
- * 并用 .vk-contact（tokens.css）提供接触阴影，避免浮空。
+ * 并用 .vk-contact（tokens.css）提供柔和落地投影，避免浮空。
+ * 取色全部走 tokens，本文件不出现裸 hex。
  */
 
 /* ---- mid 层容器：卡片「住」在场景里 ---- */
-/* 卡片层：从首页头部（标题/总览/工具栏）下方开始铺排，
- * 否则卡片会盖住总览/工具栏导致控件不可点（桌面 6 张节点时实测被完全遮挡）。
- * 节点过多时在层内纵向滚动；层整体 pointer-events:none 由 .vk-scene 提供，
- * 此处恢复卡片交互。 */
 .vk-mid-slot {
   position: absolute;
   left: 0;
   right: 0;
-  /* 头部高度（标题 + 总览 + 工具栏）在桌面约 300px，移动端纵向叠放约 570px */
   top: var(--vk-home-top, 320px);
   bottom: 22%;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end; /* 卡片底部对齐基线，不上下浮动 */
   align-content: flex-end;
-  justify-content: center;
+  justify-content: center; /* 卡片行真正居中 */
   gap: var(--vk-space-4);
   padding: 0 var(--vk-space-4);
   overflow-y: auto;
-  pointer-events: auto; /* 场景整体 pointer-events:none，卡片恢复交互 */
+  pointer-events: auto;
 }
 
 @media (max-width: 640px) {
@@ -35,30 +32,31 @@
   }
 }
 
-/* mid 层基色块会挡住卡片背景；卡片自带面板底色，此处仅保证基线不遮卡片 */
 .vk-mid-slot .vk-node-card {
   transform: translateY(0);
 }
 
-/* ---- 节点卡片 ---- */
+/* ---- 节点卡片：米纸卡 ---- */
 .vk-node-card {
   position: relative;
   width: 232px;
   display: flex;
   flex-direction: column;
   gap: var(--vk-space-2);
-  background: var(--vk-panel-bg);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-hard);
+  background-color: var(--vk-paper-cream);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-md);
+  box-shadow: var(--vk-shadow-2);
   color: var(--vk-text);
   font-family: var(--vk-font-body);
   font-size: 12px;
   padding: var(--vk-space-3);
-  image-rendering: pixelated;
 }
 
 .vk-node-card[data-status='offline'] {
-  background: var(--vk-warm-hi);
+  background-color: var(--vk-paper-warm);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
   opacity: 1;
 }
 
@@ -74,15 +72,15 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-family: var(--vk-font-pixel);
-  font-size: 10px;
+  font-family: var(--vk-font-display);
+  font-size: 13px;
+  font-weight: 700;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 地区 + 状态徽标的次级行：同样居中 */
 .vk-card-meta {
   display: flex;
   align-items: center;
@@ -92,37 +90,40 @@
 }
 
 .vk-card-region {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
 }
 
-/* 状态：颜色 + 文字，双重区分 */
+/* 状态：圆角纸签，「颜色 + 文字」双重区分，文字对比度 ≥4.5:1 */
 .vk-card-status {
   flex: 0 0 auto;
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
+  font-family: var(--vk-font-body);
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1;
-  padding: 3px 6px;
-  border: var(--vk-space-1) solid var(--vk-outline);
-  color: var(--vk-text);
+  padding: 4px 9px;
+  border-radius: var(--vk-radius-pill);
+  border: var(--vk-border-hair);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-card-status[data-status='online'] {
-  background: var(--vk-grass-day);
+  background-color: var(--vk-moss-dark);
 }
 
 .vk-card-status[data-status='alert'] {
-  background: var(--vk-dusk-tint);
+  background-color: var(--vk-honey);
+  color: var(--vk-text-on-wood);
 }
 
 .vk-card-status[data-status='offline'] {
-  background: var(--vk-brown-dark);
-  color: var(--vk-warm-hi);
+  background-color: var(--vk-wood-dark);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-card-status[data-status='unknown'] {
-  background: var(--vk-hill-day-lo);
-  color: var(--vk-warm-hi);
+  background-color: var(--vk-wood-mid);
+  color: var(--vk-text-on-dark);
 }
 
 /* 指标列表 */
@@ -132,7 +133,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--vk-space-1);
+  gap: var(--vk-space-2);
 }
 
 .vk-card-metric {
@@ -143,52 +144,59 @@
     'meter meter'
     'sub sub';
   align-items: center;
-  gap: 2px var(--vk-space-2);
+  gap: 3px var(--vk-space-2);
 }
 
 .vk-metric-label {
   grid-area: label;
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
+  font-family: var(--vk-font-body);
+  font-size: 11px;
   color: var(--vk-text-muted);
 }
 
 .vk-metric-value {
   grid-area: value;
-  font-family: var(--vk-font-pixel);
-  font-size: 9px;
+  font-family: var(--vk-font-display);
+  font-size: 12px;
+  font-weight: 600;
   text-align: right;
 }
 
 .vk-metric-sub {
   grid-area: sub;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--vk-text-muted);
 }
 
-/* 进度条：直角硬边，无渐变 */
+/* 进度条：圆角纸槽 + 叶绿填充，柔和内阴影 */
 .vk-meter {
   grid-area: meter;
   position: relative;
   display: block;
   height: 10px;
-  background: var(--vk-warm-hi);
-  border: 2px solid var(--vk-outline);
-  image-rendering: pixelated;
+  border-radius: var(--vk-radius-pill);
+  background-color: var(--vk-paper-warm);
+  border: var(--vk-border-hair);
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--vk-wood-deep) 14%, transparent);
+  overflow: hidden;
 }
 
 .vk-meter-fill {
   display: block;
   height: 100%;
-  background: var(--vk-grass-day);
+  border-radius: var(--vk-radius-pill);
+  background-color: var(--vk-leaf);
+  background-image: linear-gradient(180deg, var(--vk-leaf-hi), var(--vk-leaf));
 }
 
 .vk-meter[data-level='warn'] .vk-meter-fill {
-  background: var(--vk-autumn-warm);
+  background-color: var(--vk-honey);
+  background-image: linear-gradient(180deg, var(--vk-honey-hi), var(--vk-honey));
 }
 
 .vk-meter[data-level='crit'] .vk-meter-fill {
-  background: var(--vk-dusk-tint);
+  background-color: var(--vk-dusk-tint);
+  background-image: linear-gradient(180deg, var(--vk-warm-hi), var(--vk-dusk-tint));
 }
 
 /* 事实网格 */
@@ -198,7 +206,7 @@
   gap: var(--vk-space-1) var(--vk-space-2);
   margin: 0;
   padding: var(--vk-space-2) 0 0;
-  border-top: 2px solid var(--vk-outline);
+  border-top: var(--vk-border-hair);
 }
 
 .vk-fact {
@@ -210,26 +218,26 @@
 }
 
 .vk-fact dt {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--vk-text-muted);
   flex: 0 0 auto;
 }
 
 .vk-fact dd {
   margin: 0;
-  font-size: 10px;
+  font-size: 11px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .vk-card-foot {
-  border-top: 2px solid var(--vk-outline);
+  border-top: var(--vk-border-hair);
   padding-top: var(--vk-space-1);
 }
 
 .vk-card-os {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--vk-text-muted);
   display: block;
   overflow: hidden;
@@ -237,15 +245,17 @@
   white-space: nowrap;
 }
 
-/* ---- 顶部总览 ---- */
+/* ---- 顶部总览：深色木牌 ---- */
 .vk-overview {
   display: flex;
   flex-wrap: wrap;
   gap: var(--vk-space-4);
-  background: var(--vk-panel-bg);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-hard);
-  color: var(--vk-text);
+  background-color: var(--vk-wood-dark);
+  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
+  border: var(--vk-border-soft);
+  border-radius: var(--vk-radius-lg);
+  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  color: var(--vk-text-on-dark);
   padding: var(--vk-space-3) var(--vk-space-4);
 }
 
@@ -257,19 +267,21 @@
 }
 
 .vk-overview-label {
-  font-family: var(--vk-font-pixel);
-  font-size: 8px;
-  color: var(--vk-text-muted);
+  font-family: var(--vk-font-body);
+  font-size: 11px;
+  color: var(--vk-warm-hi);
 }
 
 .vk-overview-value {
-  font-family: var(--vk-font-pixel);
-  font-size: 12px;
+  font-family: var(--vk-font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--vk-paper-cream);
 }
 
 .vk-overview-sub {
-  font-size: 10px;
-  color: var(--vk-text-muted);
+  font-size: 11px;
+  color: var(--vk-paper-deep);
 }
 
 /* ---- 首页主区排版 ---- */
@@ -279,19 +291,21 @@
   gap: var(--vk-space-4);
 }
 
-/* 「节点总览」标题：压在彩色场景之上，改用面板底色的实心铭牌保证对比度
- * （描边 + 硬阴影，无渐变/半透明；取色全部走 tokens） */
+/* 「节点总览」标题：压在彩色场景之上，用米纸铭牌保证对比度（≥11:1） */
 .vk-home .vk-title {
   align-self: flex-start;
   display: inline-block;
-  background: var(--vk-panel-bg);
+  background-color: var(--vk-paper-cream);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
   color: var(--vk-text);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-hard);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-md);
+  box-shadow: var(--vk-shadow-2);
   padding: var(--vk-space-2) var(--vk-space-4);
 }
 
 .vk-home-hint {
-  color: var(--vk-text-muted);
+  color: var(--vk-text-on-dark);
   font-size: 13px;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--vk-wood-deep) 45%, transparent);
 }

@@ -108,7 +108,7 @@ function toggleDir() {
     <label class="vk-field">
       <span class="vk-field-label">分组</span>
       <select class="vk-select" data-testid="node-group" :value="group" @change="onGroup">
-        <option value="">全部</option>
+        <option value="">全部分组</option>
         <option v-for="g in groups" :key="g" :value="g">
           {{ g }}
         </option>

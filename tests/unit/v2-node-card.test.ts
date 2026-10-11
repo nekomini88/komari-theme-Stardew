@@ -101,20 +101,20 @@ describe('NodeCard：状态用颜色 + 文字双重区分', () => {
 })
 
 describe('NodeCard：视觉契约（母板/tokens/接触阴影）', () => {
-  it('卡片带 vk-contact（接触阴影）与 vk-pixel（像素化），并有 uuid 锚点', () => {
+  it('卡片带 vk-contact（接触阴影），不再带像素类，并有 uuid 锚点', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const card = w.find('.vk-node-card')
     expect(card.classes()).toContain('vk-contact')
-    expect(card.classes()).toContain('vk-pixel')
+    expect(card.classes()).not.toContain('vk-pixel')
     expect(card.attributes('data-node-id')).toBe(frankfurt.uuid)
   })
 
-  it('card.css：无渐变/模糊/发光，取色仅走 var(--vk-*)（母板令牌）', () => {
-    const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
-    expect(css).not.toMatch(/gradient\s*\(/)
-    expect(css).not.toMatch(/blur\s*\(/)
+  it('card.css：无裸 hex，取色仅走 var(--vk-*)（母板令牌），且已去像素化', () => {
+    const raw = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+    // 只断言"真实声明"，注释里说明性的提及（如"已去 image-rendering: pixelated"）不算违规
+    const css = raw.replace(/\/\*[\s\S]*?\*\//g, '')
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/) // 不出现裸 hex，全部经令牌
-    expect(css).toContain('image-rendering: pixelated')
-    expect(css).toContain('bottom: 22%') // 对齐 ground 顶边（共享基线）
+    expect(css).not.toContain('image-rendering: pixelated')
+    expect(css).toContain('bottom: 22%') // 卡片底部对齐共享 ground 基线
   })
 })

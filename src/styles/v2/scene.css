@@ -1,6 +1,7 @@
 /**
- * SceneStack 图层栈样式（ART_SYSTEM.md §2）
+ * SceneStack 图层栈样式（ART_SYSTEM.md §3）
  * sky(固定) / far 0.2 / mid 0.5 / near 0.8 / ground 1.0，ground 为共享基线。
+ * 手绘平滑：地面/色块用柔和平滑色带（圆角 + 柔和边 + 内高光），无硬边像素带。
  * 过渡为 1.2s 交叉淡化（进入层淡入、离开层淡出），禁止硬切。
  */
 
@@ -13,7 +14,7 @@
   background: var(--vk-sky-day);
 }
 
-/* 天空：4 段实心色带（非 CSS 渐变） */
+/* 天空：4 段实心色带（纯色块，平滑无硬描边） */
 .vk-sky {
   position: absolute;
   inset: 0;
@@ -33,13 +34,15 @@
   will-change: transform;
 }
 
-/* 每层占位色块（M4 用真实像素素材替换；本阶段纯 CSS 色块） */
+/* 每层占位色块：柔和平滑色带（M4 用手绘插画素材替换；本阶段纯 CSS 色块） */
 .vk-layer-base {
   position: absolute;
   left: 0;
   right: 0;
   display: block;
-  border-top: var(--vk-outline-w) solid var(--vk-outline);
+  border-top: var(--vk-border-soft);
+  border-radius: var(--vk-radius-xl) var(--vk-radius-xl) 0 0;
+  box-shadow: var(--vk-inset-hi);
 }
 
 .vk-layer[data-layer='far'] .vk-layer-base {
@@ -61,6 +64,9 @@
 .vk-layer[data-layer='ground'] .vk-layer-base {
   bottom: 0;
   height: 22%;
+  border-top: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* 整栈 tint：进入/离开两层叠加做交叉淡化 */

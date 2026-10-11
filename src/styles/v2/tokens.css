@@ -1,51 +1,97 @@
 /**
- * v2 设计令牌（ART_SYSTEM.md §1）
+ * v2 设计令牌（ART_SYSTEM.md §1 · 木质感拟物 + 手绘平滑）
  *
  * 规则：
- *  - 像素网格 1 逻辑 px = 4 屏幕 px（--vk-unit）
- *  - 所有颜色取自 src/assets/palette.json 的 24 色母板（单测会扫描本目录校验）
- *  - 描边单色 #2b1d16；阴影 = 基色降档硬阴影（右下），不用透明黑
- *  - 禁止渐变 / 发光 / 模糊 / 半透明叠色（场景整栈 tint 除外）
+ *  - 所有颜色取自 src/assets/palette.json 的 38 色母板；本文件出现的 hex 必须是母板色（单测扫描本目录校验）
+ *  - 材质：木纹（wood grain）作招牌/顶栏/工具条；纸纹（paper fiber）作卡片/内嵌区块
+ *  - 笔触平滑：禁用像素字体、crispEdges、image-rendering: pixelated；允许渐变/纹理/柔和投影
+ *  - 投影：多层低透明度 + 暖色（--vk-shadow-warm），不用纯黑；圆角阶梯统一
+ *  - 相机光照恒为左上 45°：受光面用蜜色高光 inset，背光面落暖阴影
  */
 
 :root {
-  /* ---- 像素网格 ---- */
-  --vk-unit: 4px;
-  --vk-canvas-w: 1280px; /* 320 逻辑 px × 4 */
-  --vk-canvas-h: 720px; /* 180 逻辑 px × 4 */
-  --vk-outline-w: 4px; /* 1 逻辑 px 描边 = 4 屏幕 px */
-
-  /* ---- 母板取色（全部 ⊆ palette.json） ---- */
+  /* ---- 母板取色（全部 ⊆ palette.json）—— 木材层次 ---- */
+  --vk-wood-deep: #3d2a1a;
+  --vk-wood-dark: #5c3d22;
+  --vk-wood-mid: #7a5230;
+  --vk-bark: #8a5a34;
+  --vk-wood: #a9764b; /* = soil-day 木纹基色 */
+  --vk-wood-light: #c4936a; /* = soil-day-hi 木牌亮面 */
   --vk-outline: #2b1d16;
   --vk-brown-dark: #4a3529;
+  --vk-ink-soft: #55392a;
+
+  /* ---- 蜜色高光 ---- */
+  --vk-honey: #d99a4e;
+  --vk-honey-hi: #f2c574;
   --vk-warm-hi: #f4d9a0;
+
+  /* ---- 纸卡色阶 ---- */
+  --vk-paper-cream: #f7ecd3;
+  --vk-paper-warm: #f0e1bf;
+  --vk-paper-deep: #d9c49a;
+
+  /* ---- 苔绿 / 叶绿 ---- */
+  --vk-moss: #6b8e4e;
+  --vk-moss-dark: #4e6b39;
+  --vk-leaf: #7fa851;
+  --vk-leaf-hi: #9cc46b;
+
+  /* ---- 场景/图表沿用的母板色 ---- */
   --vk-sky-day: #7ec8f2;
-  --vk-sky-day-hi: #a6dcf7;
   --vk-sky-day-lo: #4f9fd0;
   --vk-hill-day: #6fae8c;
-  --vk-hill-day-hi: #8fc9a6;
   --vk-hill-day-lo: #54896c;
   --vk-grass-day: #7fc45a;
-  --vk-grass-day-hi: #9ed679;
   --vk-grass-day-lo: #5f9c40;
-  --vk-soil-day: #a9764b;
-  --vk-soil-day-hi: #c4936a;
-  --vk-soil-day-lo: #835a38;
-  --vk-sky-night: #2b3f6b;
-  --vk-sky-night-hi: #3a548c;
-  --vk-sky-night-lo: #1e2c4c;
-  --vk-hill-night: #2f4a56;
-  --vk-grass-night: #3f6b4c;
-  --vk-soil-night: #5a4034;
   --vk-dusk-tint: #e8a05c;
   --vk-autumn-warm: #d9c27a;
-  --vk-winter-cool: #6b8fa8;
 
-  /* ---- 字体：像素字体做展示 + 正文可读字体 ---- */
-  --vk-font-pixel: 'Press Start 2P', 'PingFang SC', monospace;
-  --vk-font-body: ui-sans-serif, system-ui, 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
+  /* ---- 暖色阴影基色（柔和投影一律用它，绝不用纯黑） ---- */
+  --vk-shadow-warm: var(--vk-wood-deep);
 
-  /* ---- 间距（4 的倍数网格） ---- */
+  /* ---- 圆角阶梯 ---- */
+  --vk-radius-xs: 6px;
+  --vk-radius-sm: 10px;
+  --vk-radius-md: 16px;
+  --vk-radius-lg: 22px;
+  --vk-radius-xl: 30px;
+  --vk-radius-pill: 999px;
+
+  /* ---- 柔和投影配方（多层低透明度 + 暖色；位移向下，模拟左上来光） ---- */
+  --vk-shadow-1:
+    0 1px 2px color-mix(in srgb, var(--vk-shadow-warm) 16%, transparent),
+    0 2px 6px color-mix(in srgb, var(--vk-shadow-warm) 10%, transparent);
+  --vk-shadow-2:
+    0 2px 4px color-mix(in srgb, var(--vk-shadow-warm) 14%, transparent),
+    0 8px 20px color-mix(in srgb, var(--vk-shadow-warm) 16%, transparent);
+  --vk-shadow-3:
+    0 4px 10px color-mix(in srgb, var(--vk-shadow-warm) 16%, transparent),
+    0 18px 44px color-mix(in srgb, var(--vk-shadow-warm) 20%, transparent);
+  /* 左上 45° 受光：顶部 1px 蜜色内高光 */
+  --vk-inset-hi: inset 0 1px 0 color-mix(in srgb, var(--vk-honey-hi) 60%, transparent);
+  --vk-inset-lo: inset 0 -2px 0 color-mix(in srgb, var(--vk-wood-deep) 14%, transparent);
+
+  /* ---- 柔和边（低透明度木色，不是硬边像素描边） ---- */
+  --vk-border-soft: 1px solid color-mix(in srgb, var(--vk-wood-deep) 20%, transparent);
+  --vk-border-hair: 1px solid color-mix(in srgb, var(--vk-wood-deep) 12%, transparent);
+
+  /* ---- 材质纹理（渐变构成，允许） ---- */
+  --vk-wood-face: linear-gradient(180deg, var(--vk-wood-light) 0%, var(--vk-wood) 55%, var(--vk-bark) 100%);
+  --vk-wood-plank: linear-gradient(180deg, var(--vk-wood-dark) 0%, #5c3d22 100%);
+  --vk-wood-grain:
+    repeating-linear-gradient(93deg, color-mix(in srgb, var(--vk-wood-dark) 10%, transparent) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(88deg, color-mix(in srgb, var(--vk-bark) 8%, transparent) 0 1px, transparent 1px 22px);
+  --vk-paper-face: linear-gradient(180deg, var(--vk-paper-cream) 0%, var(--vk-paper-warm) 100%);
+  --vk-paper-fiber:
+    radial-gradient(120% 80% at 28% 18%, color-mix(in srgb, var(--vk-paper-deep) 34%, transparent), transparent 46%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-paper-deep) 16%, transparent) 0 1px, transparent 1px 7px);
+
+  /* ---- 字体：平滑人文体栈（明确禁用像素字体） ---- */
+  --vk-font-display: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --vk-font-body: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* ---- 间距 ---- */
   --vk-space-1: 4px;
   --vk-space-2: 8px;
   --vk-space-3: 12px;
@@ -53,34 +99,25 @@
   --vk-space-6: 24px;
   --vk-space-8: 32px;
 
-  /* ---- 圆角（像素风以直角为主） ---- */
-  --vk-radius-none: 0px;
-  --vk-radius-sm: 4px;
-  --vk-radius-md: 8px;
+  /* ---- 画布 ---- */
+  --vk-canvas-w: 1280px;
 
-  /* ---- 硬阴影（光源恒左上 45° → 阴影在右下；用基色降档，不用透明黑） ---- */
-  --vk-shadow-hard: 4px 4px 0 0 var(--vk-outline);
-  --vk-shadow-soft: 2px 2px 0 0 var(--vk-brown-dark);
+  /* ---- 语义令牌 ---- */
+  --vk-text: var(--vk-wood-deep); /* 于米纸 ≥11:1 */
+  --vk-text-muted: var(--vk-ink-soft); /* 于米纸 ≥7:1 */
+  --vk-text-on-wood: var(--vk-wood-deep); /* 于木牌亮面 ≥4.9:1 */
+  --vk-text-on-dark: var(--vk-paper-cream); /* 于深木 ≥8:1 */
+  --vk-panel-bg: var(--vk-paper-cream);
+  --vk-accent: var(--vk-honey);
+  --vk-accent-hi: var(--vk-honey-hi);
 
-  /* ---- 面板/文字语义令牌 ---- */
-  --vk-panel-bg: var(--vk-warm-hi);
-  --vk-panel-border: var(--vk-outline);
-  --vk-text: var(--vk-outline);
-  --vk-text-muted: var(--vk-brown-dark);
-  --vk-accent: var(--vk-grass-day);
-  --vk-accent-hi: var(--vk-grass-day-hi);
-
-  /* ---- 场景过渡（ART_SYSTEM：1.2s 交叉淡化） ---- */
+  /* ---- 场景过渡（ART_SYSTEM：1.2s 交叉淡化，令牌名保持稳定） ---- */
   --vk-transition-ms: 1200ms;
 }
 
-/* ---- 工具类 ---- */
-.vk-pixel {
-  image-rendering: pixelated;
-}
-
-.vk-font-pixel {
-  font-family: var(--vk-font-pixel);
+/* ---- 工具类：字体（平滑人文体，无像素字体） ---- */
+.vk-font-display {
+  font-family: var(--vk-font-display);
 }
 
 .vk-font-body {
@@ -89,54 +126,84 @@
 
 .vk-title {
   margin: 0;
-  font-family: var(--vk-font-pixel);
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: var(--vk-font-display);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
   color: var(--vk-text);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
+/* ---- 木牌（招牌/工具条）：木纹面 + 柔和投影 + 左上高光 ---- */
+.vk-wood {
+  background-color: var(--vk-wood);
+  background-image: var(--vk-wood-grain), var(--vk-wood-face);
+  border: var(--vk-border-soft);
+  border-radius: var(--vk-radius-lg);
+  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  color: var(--vk-text-on-wood);
+  font-family: var(--vk-font-body);
+}
+
+/* ---- 纸卡：纸纹面 + 柔和投影 ---- */
+.vk-paper {
+  background-color: var(--vk-paper-cream);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-md);
+  box-shadow: var(--vk-shadow-2);
+  color: var(--vk-text);
+  font-family: var(--vk-font-body);
+}
+
+/* ---- 通用面板（沿用旧类名，改走纸卡语言） ---- */
 .vk-panel {
-  background: var(--vk-panel-bg);
-  border: var(--vk-outline-w) solid var(--vk-panel-border);
-  border-radius: var(--vk-radius-none);
-  box-shadow: var(--vk-shadow-hard);
+  background-color: var(--vk-panel-bg);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
+  border: var(--vk-border-hair);
+  border-radius: var(--vk-radius-md);
+  box-shadow: var(--vk-shadow-2);
   color: var(--vk-text);
   font-family: var(--vk-font-body);
   padding: var(--vk-space-4);
 }
 
+/* ---- 按钮：蜜色木片 ---- */
 .vk-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--vk-space-2);
-  background: var(--vk-accent);
-  color: var(--vk-text);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  border-radius: var(--vk-radius-none);
-  box-shadow: var(--vk-shadow-soft);
-  padding: var(--vk-space-2) var(--vk-space-3);
-  font-family: var(--vk-font-pixel);
-  font-size: 10px;
-  line-height: 1;
+  background-color: var(--vk-wood-light);
+  background-image: var(--vk-wood-face);
+  color: var(--vk-text-on-wood);
+  border: var(--vk-border-soft);
+  border-radius: var(--vk-radius-sm);
+  box-shadow: var(--vk-shadow-1), var(--vk-inset-hi);
+  padding: var(--vk-space-2) var(--vk-space-4);
+  font-family: var(--vk-font-display);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
 }
 
 .vk-btn:hover {
-  background: var(--vk-accent-hi);
+  filter: brightness(1.06);
+  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
 }
 
 .vk-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
+  transform: translateY(1px);
+  box-shadow: var(--vk-shadow-1);
 }
 
 .vk-btn:focus-visible {
-  outline: var(--vk-outline-w) solid var(--vk-outline);
+  outline: 2px solid color-mix(in srgb, var(--vk-honey) 80%, transparent);
   outline-offset: 2px;
 }
 
-/* 接触阴影：落地元素底部的压暗椭圆（基色降档），避免浮空 */
+/* ---- 接触阴影：落地元素的柔和椭圆投影（渐变构成，非硬边像素带） ---- */
 .vk-contact {
   position: relative;
 }
@@ -145,9 +212,11 @@
   content: '';
   position: absolute;
   left: 50%;
-  bottom: -2px;
-  width: 70%;
-  height: 2px;
+  bottom: -10px;
+  width: 82%;
+  height: 18px;
   transform: translateX(-50%);
-  background: var(--vk-soil-day-lo);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--vk-shadow-warm) 26%, transparent), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }

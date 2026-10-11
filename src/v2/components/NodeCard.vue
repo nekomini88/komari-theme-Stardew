@@ -61,7 +61,7 @@ const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.v
 
 <template>
   <article
-    class="vk-node-card vk-contact vk-pixel"
+    class="vk-node-card vk-contact"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
   >

@@ -1,6 +1,7 @@
 /**
- * 应用壳布局样式（ART_SYSTEM.md §3 功能面保留：顶栏 / 主区 / 页脚）
- * 全部走 v2 令牌；星露谷式像素风：直角、4px 描边、右下硬阴影、无模糊/渐变。
+ * 应用壳布局样式（ART_SYSTEM.md §2 功能面保留：顶栏 / 主区 / 页脚）
+ * 木质感拟物：顶栏/页脚 = 深色木牌（木纹 + 柔和投影 + 蜜色内高光），笔画平滑。
+ * 取色全部走 tokens（--vk-*），本文件不出现裸 hex。
  */
 
 .vk-app {
@@ -11,13 +12,16 @@
   min-height: 100vh;
 }
 
-/* ---- 顶栏 ---- */
+/* ---- 顶栏：深色木牌 ---- */
 .vk-topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--vk-soil-day-hi);
-  border-bottom: var(--vk-outline-w) solid var(--vk-outline);
+  background-color: var(--vk-wood-dark);
+  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
+  border-bottom: var(--vk-border-soft);
+  box-shadow: var(--vk-shadow-1);
+  color: var(--vk-text-on-dark);
 }
 
 .vk-topbar-inner {
@@ -34,18 +38,25 @@
   align-items: center;
   gap: var(--vk-space-2);
   cursor: pointer;
-  color: var(--vk-text);
+  color: var(--vk-text-on-dark);
   background: none;
   border: none;
   padding: 0;
 }
 
+.vk-brand .vk-title {
+  color: var(--vk-text-on-dark);
+}
+
+/* 品牌木牌标记：圆角木片 + 左上蜜色高光 */
 .vk-brand-mark {
-  width: 24px;
-  height: 24px;
-  background: var(--vk-grass-day);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  box-shadow: var(--vk-shadow-soft);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--vk-radius-sm);
+  background-color: var(--vk-wood-light);
+  background-image: var(--vk-wood-face);
+  border: var(--vk-border-soft);
+  box-shadow: var(--vk-shadow-1), var(--vk-inset-hi);
 }
 
 .vk-nav {
@@ -64,7 +75,7 @@
 /* ---- 主区 ---- */
 .vk-main {
   position: relative;
-  z-index: 1; /* 压过 fixed 场景层（z-index:0），保证首页头部控件不被卡片遮挡/可点 */
+  z-index: 1;
   flex: 1 1 auto;
   width: 100%;
   max-width: var(--vk-canvas-w);
@@ -72,18 +83,20 @@
   padding: var(--vk-space-6) var(--vk-space-4);
 }
 
-/* ---- 页脚 ---- */
+/* ---- 页脚：深色木牌 ---- */
 .vk-footer {
-  border-top: var(--vk-outline-w) solid var(--vk-outline);
-  background: var(--vk-soil-day);
-  color: var(--vk-text);
+  background-color: var(--vk-wood-dark);
+  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
+  border-top: var(--vk-border-soft);
+  color: var(--vk-text-on-dark);
   font-family: var(--vk-font-body);
-  font-size: 12px;
+  font-size: 13px;
   text-align: center;
   padding: var(--vk-space-4);
+  box-shadow: var(--vk-shadow-1);
 }
 
-/* ---- 占位内容（本阶段无真实业务页；M2/M3 替换） ---- */
+/* ---- 占位内容 ---- */
 .vk-placeholder {
   display: flex;
   flex-direction: column;
@@ -95,22 +108,68 @@
   font-size: 13px;
 }
 
+/* 标签：纸片 chip */
 .vk-tag {
   display: inline-block;
-  font-family: var(--vk-font-pixel);
-  font-size: 9px;
-  background: var(--vk-sky-day-lo);
-  border: var(--vk-outline-w) solid var(--vk-outline);
-  padding: var(--vk-space-1) var(--vk-space-2);
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  border-radius: var(--vk-radius-pill);
+  background-color: var(--vk-paper-warm);
+  color: var(--vk-text);
+  border: var(--vk-border-hair);
+  padding: var(--vk-space-1) var(--vk-space-3);
 }
 
-/* ---- 首页工具栏辅助文字对比度提升（ART_SYSTEM：无渐变/半透明，取色走 tokens） ----
- * 选择器提升一级特异性，确保压过 toolbar.css 中的基础规则，与导入顺序无关。 */
+/* ---- 首页工具栏辅助文字对比度提升（木牌面上保证 ≥4.5:1） ---- */
 .vk-toolbar .vk-input::placeholder {
   color: var(--vk-text-muted);
-  opacity: 1; /* Firefox 默认给占位符降透明度，这里恢复实色以提对比度 */
+  opacity: 1;
 }
 
 .vk-toolbar .vk-toolbar-count {
-  color: var(--vk-text); /* 由 --vk-text-muted 提升到最深正文色 #2b1d16 */
+  color: var(--vk-text);
+}
+
+/* ---- 返回顶部：游戏内木牌告示牌（替代旧现代白圆角浮钮） ---- */
+.vk-backtop {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-1);
+  padding: var(--vk-space-2) var(--vk-space-3);
+  font-family: var(--vk-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vk-text-on-dark);
+  background-color: var(--vk-wood-dark);
+  background-image: var(--vk-wood-grain), var(--vk-wood-plank);
+  border: var(--vk-border-soft);
+  border-radius: var(--vk-radius-sm);
+  box-shadow: var(--vk-shadow-2), var(--vk-inset-hi);
+  cursor: pointer;
+  transition: filter 120ms ease, transform 120ms ease;
+}
+
+.vk-backtop:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.vk-backtop:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--vk-honey) 80%, transparent);
+  outline-offset: 2px;
+}
+
+.vk-backtop-fade-enter-active,
+.vk-backtop-fade-leave-active {
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.vk-backtop-fade-enter-from,
+.vk-backtop-fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }

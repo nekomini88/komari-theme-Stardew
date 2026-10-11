@@ -13,6 +13,7 @@ import Provider from '@/components/Provider.vue'
 import { destroyInitManager, initApp } from '@/utils/init'
 import { seasonFromMonth, timeOfDayFromHour } from '@/v2/theme/sceneState'
 import AppFooter from '@/v2/components/AppFooter.vue'
+import BackToTop from '@/v2/components/BackToTop.vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
 import TopBar from '@/v2/components/TopBar.vue'
 
@@ -49,6 +50,7 @@ onUnmounted(() => {
         <RouterView />
       </main>
       <AppFooter />
+      <BackToTop />
       <Toaster position="top-center" rich-colors close-button />
     </div>
   </Provider>

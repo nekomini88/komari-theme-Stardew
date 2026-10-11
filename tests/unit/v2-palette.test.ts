@@ -13,15 +13,15 @@ function hexesIn(text: string): string[] {
   return (text.match(HEX_RE) ?? []).map(h => h.toLowerCase())
 }
 
-describe('v2 母板结构（ART_SYSTEM §1.2）', () => {
-  it('母板恰好 24 色，且 meta.count 一致', () => {
-    expect(PALETTE).toHaveLength(24)
-    expect(PALETTE_META.count).toBe(24)
+describe('v2 母板结构（ART_SYSTEM §1 材质色阶）', () => {
+  it('母板恰好 38 色，且 meta.count 一致', () => {
+    expect(PALETTE).toHaveLength(38)
+    expect(PALETTE_META.count).toBe(38)
   })
 
-  it('24 色唯一且均为合法 6 位 hex', () => {
+  it('38 色唯一且均为合法 6 位 hex', () => {
     const hexes = PALETTE.map(c => c.hex)
-    expect(new Set(hexes).size).toBe(24)
+    expect(new Set(hexes).size).toBe(38)
     for (const h of hexes) {
       expect(h).toMatch(/^#[0-9a-f]{6}$/)
     }
@@ -53,11 +53,10 @@ describe('v2 设计令牌/CSS 取色 ⊆ 母板（ART_SYSTEM §1.2 / §1.4）', 
     expect(offenders).toEqual([])
   })
 
-  it('v2 CSS 禁止渐变/模糊/发光（ART_SYSTEM §1.4）', () => {
+  it('v2 CSS 允许渐变/纹理/柔和投影（木质感拟物），但仍不出现裸 hex 之外的颜色', () => {
     for (const file of cssFiles) {
       const text = readFileSync(resolve(v2StyleDir, file), 'utf8')
-      expect(text).not.toMatch(/gradient\s*\(/)
-      expect(text).not.toMatch(/blur\s*\(/)
+      // 新口径：渐变/纹理/软阴影是被允许的表现手段
       expect(text).not.toContain('box-shadow: 0 0')
     }
   })

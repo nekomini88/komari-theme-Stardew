@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * HistoryChart —— 历史/延迟曲线（像素风，硬边、无渐变/模糊/发光）
+ * HistoryChart —— 历史/延迟曲线（手绘平滑，圆角抗锯齿笔触）
  *
  * 计算全部下沉到 @/v2/data/history 的纯函数（buildChartModel / toPathD / gridLines）：
  *  - 空数据 → 占位块（data-testid="chart-empty"），不画 SVG
@@ -94,16 +94,15 @@ const ariaLabel = computed(() => {
           :data-series="seriesKind"
           :d="toPathD(seg)"
         />
-        <!-- 单点：方块标记（像素风不用圆） -->
-        <rect
+        <!-- 单点：圆点标记（手绘平滑笔触） -->
+        <circle
           v-for="(p, i) in model.points"
           v-show="model.single"
           :key="`pt-${i}`"
           class="vk-chart-dot"
-          :x="p.x - 2"
-          :y="p.y - 2"
-          width="4"
-          height="4"
+          :cx="p.x"
+          :cy="p.y"
+          r="3"
         />
       </svg>
     </div>

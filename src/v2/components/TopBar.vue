@@ -44,7 +44,7 @@ function goAdmin() {
   <header class="vk-topbar">
     <div class="vk-topbar-inner">
       <button class="vk-brand" type="button" @click="router.push('/')">
-        <span class="vk-brand-mark vk-pixel" aria-hidden="true" />
+        <span class="vk-brand-mark" aria-hidden="true" />
         <span class="vk-title">{{ sitename }}</span>
       </button>
 

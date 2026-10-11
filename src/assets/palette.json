@@ -1,15 +1,34 @@
 {
   "meta": {
-    "name": "NekoVPS v2 母板",
-    "version": 1,
-    "count": 24,
+    "name": "NekoVPS v2 母板（木质感拟物 + 手绘平滑）",
+    "version": 2,
+    "count": 38,
     "outline": "#2b1d16",
-    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。描边色单色 #2b1d16。"
+    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。"
   },
   "colors": [
-    { "id": "outline", "hex": "#2b1d16", "role": "描边/外轮廓（全系统单色）" },
-    { "id": "brown-dark", "hex": "#4a3529", "role": "棕色系降1档（内部结构线/阴影）" },
+    { "id": "outline", "hex": "#2b1d16", "role": "最深文字/极轻分隔（原描边色，转为柔和文字色）" },
+    { "id": "brown-dark", "hex": "#4a3529", "role": "棕色系降1档（旧结构线，现作暖阴影基色）" },
     { "id": "warm-hi", "hex": "#f4d9a0", "role": "暖色高光（左上光源）" },
+
+    { "id": "wood-deep", "hex": "#3d2a1a", "role": "木材·深（正文/木牌暗面/柔和阴影基色）" },
+    { "id": "wood-dark", "hex": "#5c3d22", "role": "木材·暗（木牌主色/顶栏页脚）" },
+    { "id": "wood-mid", "hex": "#7a5230", "role": "木材·中（木板层次）" },
+    { "id": "bark", "hex": "#8a5a34", "role": "树皮（木牌中亮面）" },
+    { "id": "ink-soft", "hex": "#55392a", "role": "柔和次级文字（对比度 ≥7:1 于米纸）" },
+
+    { "id": "honey", "hex": "#d99a4e", "role": "蜜色主色（按钮/告警木牌面）" },
+    { "id": "honey-hi", "hex": "#f2c574", "role": "蜜色高光（左上 45° 受光面）" },
+
+    { "id": "paper-cream", "hex": "#f7ecd3", "role": "纸卡·米纸底（主卡片/正文底）" },
+    { "id": "paper-warm", "hex": "#f0e1bf", "role": "纸卡·暖纸底（内嵌区块/进度轨道）" },
+    { "id": "paper-deep", "hex": "#d9c49a", "role": "纸卡·深（纸纹纤维/木牌受光面）" },
+
+    { "id": "moss", "hex": "#6b8e4e", "role": "苔绿（次级强调/正常态）" },
+    { "id": "moss-dark", "hex": "#4e6b39", "role": "苔绿·暗（在线徽标底，承白字）" },
+    { "id": "leaf", "hex": "#7fa851", "role": "叶绿（进度条/曲线）" },
+    { "id": "leaf-hi", "hex": "#9cc46b", "role": "叶绿·亮（高光）" },
+
     { "id": "sky-day", "hex": "#7ec8f2", "role": "昼·天基色" },
     { "id": "sky-day-hi", "hex": "#a6dcf7", "role": "昼·天降1档（高光）" },
     { "id": "sky-day-lo", "hex": "#4f9fd0", "role": "昼·天升1档（阴影）" },
@@ -19,8 +38,8 @@
     { "id": "grass-day", "hex": "#7fc45a", "role": "昼·草基色" },
     { "id": "grass-day-hi", "hex": "#9ed679", "role": "昼·草降1档" },
     { "id": "grass-day-lo", "hex": "#5f9c40", "role": "昼·草升1档" },
-    { "id": "soil-day", "hex": "#a9764b", "role": "昼·土基色" },
-    { "id": "soil-day-hi", "hex": "#c4936a", "role": "昼·土降1档" },
+    { "id": "soil-day", "hex": "#a9764b", "role": "昼·土基色（亦作木纹基色）" },
+    { "id": "soil-day-hi", "hex": "#c4936a", "role": "昼·土降1档（木牌亮面）" },
     { "id": "soil-day-lo", "hex": "#835a38", "role": "昼·土升1档" },
     { "id": "sky-night", "hex": "#2b3f6b", "role": "夜·天基色" },
     { "id": "sky-night-hi", "hex": "#3a548c", "role": "夜·天降1档" },

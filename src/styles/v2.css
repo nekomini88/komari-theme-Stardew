@@ -1,9 +1,9 @@
 /**
  * v2 全局样式入口（替代旧主题的 main.css 分层链）。
+ * 木质感拟物 + 手绘平滑：不再引入像素字体（press-start-2p / vt323），改用平滑人文体栈。
  * 旧 main.css / visual-styles.css / matte-pixel.css 等仍保留在磁盘上供旧组件与旧测试使用，
- * 但在 v2 应用壳中不再被引入；旧组件将在 M2/M3 随业务页一并移除。
+ * 但在 v2 应用壳中不再被引入。
  */
-@import '@fontsource/press-start-2p/400.css';
 @import 'tailwindcss';
 @import './v2/tokens.css';
 @import './v2/scene.css';
