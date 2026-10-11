@@ -103,3 +103,14 @@
   border: var(--vk-outline-w) solid var(--vk-outline);
   padding: var(--vk-space-1) var(--vk-space-2);
 }
+
+/* ---- 首页工具栏辅助文字对比度提升（ART_SYSTEM：无渐变/半透明，取色走 tokens） ----
+ * 选择器提升一级特异性，确保压过 toolbar.css 中的基础规则，与导入顺序无关。 */
+.vk-toolbar .vk-input::placeholder {
+  color: var(--vk-text-muted);
+  opacity: 1; /* Firefox 默认给占位符降透明度，这里恢复实色以提对比度 */
+}
+
+.vk-toolbar .vk-toolbar-count {
+  color: var(--vk-text); /* 由 --vk-text-muted 提升到最深正文色 #2b1d16 */
+}

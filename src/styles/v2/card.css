@@ -64,26 +64,31 @@
 
 .vk-card-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--vk-space-2);
-}
-
-.vk-card-title {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: var(--vk-space-1);
-  min-width: 0;
 }
 
+/* 名称：整行布局居中（非 padding 凑），超长省略且不撑坏卡片宽度 */
 .vk-card-name {
+  display: block;
+  width: 100%;
+  text-align: center;
   font-family: var(--vk-font-pixel);
   font-size: 10px;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 132px;
+}
+
+/* 地区 + 状态徽标的次级行：同样居中 */
+.vk-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vk-space-2);
+  max-width: 100%;
 }
 
 .vk-card-region {
@@ -272,6 +277,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--vk-space-4);
+}
+
+/* 「节点总览」标题：压在彩色场景之上，改用面板底色的实心铭牌保证对比度
+ * （描边 + 硬阴影，无渐变/半透明；取色全部走 tokens） */
+.vk-home .vk-title {
+  align-self: flex-start;
+  display: inline-block;
+  background: var(--vk-panel-bg);
+  color: var(--vk-text);
+  border: var(--vk-outline-w) solid var(--vk-outline);
+  box-shadow: var(--vk-shadow-hard);
+  padding: var(--vk-space-2) var(--vk-space-4);
 }
 
 .vk-home-hint {

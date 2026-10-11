@@ -66,11 +66,11 @@ const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.v
     :data-status="viewStatus"
   >
     <header class="vk-card-head">
-      <div class="vk-card-title">
-        <span class="vk-card-name" :title="node.name">{{ node.name }}</span>
+      <span class="vk-card-name" :title="node.name">{{ node.name }}</span>
+      <div class="vk-card-meta">
         <span v-if="node.region" class="vk-card-region" :title="node.region">{{ node.region }}</span>
+        <span class="vk-card-status" :data-status="viewStatus">{{ statusLabel }}</span>
       </div>
-      <span class="vk-card-status" :data-status="viewStatus">{{ statusLabel }}</span>
     </header>
 
     <ul class="vk-card-metrics">
