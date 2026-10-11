@@ -133,8 +133,8 @@
 /* ---- 返回顶部：游戏内木牌告示牌（替代旧现代白圆角浮钮） ---- */
 .vk-backtop {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  right: max(22px, env(safe-area-inset-right, 0px));
+  bottom: max(22px, env(safe-area-inset-bottom, 0px));
   z-index: 9999;
   display: inline-flex;
   align-items: center;
