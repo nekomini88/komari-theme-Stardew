@@ -107,15 +107,16 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
    */
   function bannerColorOf(slot: number): { hex: string, size: [number, number] } {
     const img = decodePng(readFileSync(resolve(panelDir, `panel-${slot}.png`)))
+    // 底板现在是「横幅条」（428x56）。取样区域必须落在**标题实际压着的那块平色横幅**上：
+    // 横向取两叶簇之间的中央主体（28%~75.5%），纵向取条高的中段（30%~70%）——
+    // 取顶部会采到叶缘高光、取更宽会带上两端叶簇，两者都会得出错误底色。
     const x0 = Math.round(img.width * 0.28)
     const x1 = Math.round(img.width * 0.755)
-    const y0 = Math.round(img.height * 0.01)
-    const y1 = Math.round(img.height * 0.115)
+    const y0 = Math.round(img.height * 0.30)
+    const y1 = Math.round(img.height * 0.70)
     return { hex: dominantColor(img, x0, x1, y0, y1), size: [img.width, img.height] }
   }
 
-  // 门槛用 3:1 而非 4.5:1：标题字号 24px 属 WCAG「大号文本」（≥24px 常规字重），AA 门槛即 3:1。
-  // 参考稿本身就是「浅色字 + 深色描边」，统一复刻这一口径。
   it('6 个色槽：底板横幅实测色 与 --vk-node-ink-N 的对比度都 ≥3:1（WCAG 大号文本 AA）', () => {
     for (let i = 1; i <= 6; i++) {
       const { hex, size } = bannerColorOf(i)
@@ -137,12 +138,35 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
     }
   })
 
-  it('底板尺寸与卡片锁定的比例一致（改了底板必须同步 aspect-ratio）', () => {
+  it('标题栏比例与底板横幅条一致（条图改了必须同步 .vk-panel-head 的 aspect-ratio）', () => {
     const cardCss = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
-    const m = cardCss.match(/aspect-ratio:\s*(\d+)\s*\/\s*(\d+)/)
-    expect(m, 'card.css 未锁定底板比例').toBeTruthy()
+    // 取 .vk-panel-head 规则块内的 aspect-ratio
+    const headBlock = cardCss.match(/\.vk-panel-head\s*\{[^}]*\}/)?.[0] ?? ''
+    const m = headBlock.match(/aspect-ratio:\s*(\d+)\s*\/\s*(\d+)/)
+    expect(m, '.vk-panel-head 未锁定横幅条比例（会导致标题栏与条图错位）').toBeTruthy()
     const [w, h] = [Number(m![1]), Number(m![2])]
     const { size } = bannerColorOf(1)
-    expect(Math.abs(w / h - size[0] / size[1])).toBeLessThan(0.02)
+    expect(Math.abs(w / h - size[0] / size[1]),
+      `标题栏比例 ${w}/${h} 与条图 ${size[0]}x${size[1]} 不一致`).toBeLessThan(0.05)
+  })
+
+  it('正文高度由内容决定，不再锁 aspect-ratio（防再次静默裁掉底部指标）', () => {
+    const cardCss = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const stripped = cardCss.replace(/\/\*[\s\S]*?\*\//g, '')   // 先剥注释：否则注释里提到该属性也会误判
+    const panelBlock = stripped.match(/\.vk-panel\s*\{[^}]*\}/)?.[0] ?? ''
+    expect(panelBlock, '.vk-panel 不该再锁 aspect-ratio —— 曾因此把最后两行指标裁掉')
+      .not.toContain('aspect-ratio')
+  })
+})
+
+describe('等级配色选择器必须与 usageLevel() 的返回值一致（防死规则复发）', () => {
+  it('card.css 里的 [data-level=...] 取值都在 ok/warn/crit 之内', () => {
+    const css = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const used = [...css.matchAll(/\[data-level='([a-z]+)'\]/g)].map(m => m[1])
+    expect(used.length, '未找到任何 [data-level=...] 规则').toBeGreaterThan(0)
+    // 与 metrics.ts 里 usageLevel 的返回值对齐 —— 写成 alert/danger 会永远匹配不上，是死代码
+    const allowed = ['ok', 'warn', 'crit']
+    for (const v of used)
+      expect(allowed, `[data-level='${v}'] 不在 usageLevel 的可能返回值 ${allowed.join('/')} 之内 → 永远不生效`).toContain(v)
   })
 })

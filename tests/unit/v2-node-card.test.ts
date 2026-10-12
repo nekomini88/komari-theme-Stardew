@@ -134,12 +134,12 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     const segs = w.findAll('.vk-seg')
     const colors = segs.map(s => (s.attributes('style') ?? '').match(/--vk-seg-color:\s*var\((--vk-[a-z-]+)\)/)?.[1])
     expect(colors).toEqual([
-      '--vk-leaf', // CPU
-      '--vk-leaf', // Memory
-      '--vk-leaf', // Disk
+      '--vk-ref-leaf', // CPU
+      '--vk-ref-leaf', // Memory
+      '--vk-ref-leaf', // Disk
       '--vk-honey', // Load ← 橙
-      '--vk-leaf', // Latency
-      '--vk-leaf', // Packet Loss
+      '--vk-ref-leaf', // Latency
+      '--vk-ref-leaf', // Packet Loss
     ])
   })
 

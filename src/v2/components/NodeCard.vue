@@ -102,7 +102,8 @@ const flagCode = computed(() => {
 })
 
 /** 进度条颜色：Load 用橙，其余用绿（对齐参考稿） */
-const GREEN = 'var(--vk-leaf)'
+/* 进度条绿：参考稿实测为高饱和亮绿 #2a9708（此前用旧母板的 --vk-leaf #7fa851，偏灰、与参考稿不一致） */
+const GREEN = 'var(--vk-ref-leaf)'
 const ORANGE = 'var(--vk-honey)'
 
 defineExpose({ viewStatus, statusLabel })

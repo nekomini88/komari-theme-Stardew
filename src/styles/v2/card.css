@@ -37,52 +37,74 @@
 
 /* ---------- 面板 ---------- */
 .vk-panel {
-  font-family: var(--vk-font-body);
   position: relative;
   display: flex;
   flex-direction: column;
-  /* 参考稿美术底板当背景：横幅叶藤、纸底、角上盆栽/向日葵、外框全部来自原图 →
-     这是「完美复刻」的关键，CSS 只负责叠内容，不再手搓边框/叶边。
-     底板 428×394，故锁同比例，避免拉伸导致叶片与装饰变形。 */
-  aspect-ratio: 428 / 394;
-  /* 兜底纸色：底图按比例绘制，卡片比底板高时底部自然延续纸色（底板正文本就是平色纸，接缝不可见） */
-  background-color: var(--vk-ref-paper);
+  /* 落一次基准字号：否则容器继承 16px（非像素字设计尺寸 12 的整数倍），
+     将来任何没显式设字号的文本都会以 16px 渲染 → 像素格被插值 */
+  font-family: var(--vk-font-body);
+  font-size: var(--vk-fs-sm);
+  /* 正文高度由内容决定 —— 不再锁 aspect-ratio。
+     （曾锁 428/394，导致正文比卡片高 113px 被 overflow:hidden 静默裁掉最后两行指标） */
+  background-color: var(--vk-panel-paper);
+  /* 横幅条（含左上盆栽）：宽度 100%、高度按比例 → 与 .vk-panel-head 的 aspect-ratio 对齐 */
   background-image: var(--vk-panel-art);
   background-repeat: no-repeat;
-  /* 【关键】不写 100% 100%：那会在卡片实际高度 ≠ 底板比例时把底图**纵向拉伸**，
-     叶片与盆栽/向日葵随之变形。100% auto + 顶对齐 = 永不拉伸。 */
   background-size: 100% auto;
   background-position: top center;
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
-  /* 像素风投影：硬位移不用 blur */
   box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
   overflow: hidden;
 }
 
-/* ---------- ① 标题栏：内容层（叶藤横幅由美术底板提供，这里不再画背景/叶边） ---------- */
+/* 右下向日葵角饰：锚定到卡片角（不再依赖卡片比例与底板一致） */
+.vk-panel::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 45px;
+  height: 72px;
+  background-image: var(--vk-panel-sunflower);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+/* ---------- ① 标题栏：内容层（叶藤横幅由横幅条提供） ---------- */
 .vk-panel-head {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  /* 高度与美术底板的横幅对齐（横幅占底板 49/394 = 12.4%），文字才能落在横幅正中 */
-  flex: 0 0 12.4%;
-  padding: 0 18px;
+  justify-content: center;
+  /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
+  width: 100%;
+  aspect-ratio: 428 / 56;
+  flex: 0 0 auto;
+  padding: 0 16px;
   color: var(--vk-node-ink, var(--vk-panel-head-ink));
   background: none;
   border: none;
 }
 
 .vk-panel-head-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   flex: none;
   align-items: center;
 }
 
 .vk-panel-name {
-  flex: 1 1 auto;
-  margin: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  /* 两端各留 58px 净空：横幅左侧是 32px 图标、右侧是国旗(22px)+状态点(12px)，
+     名称过长时否则会压到它们；max-width 对称收窄以保证仍然居中 */
+  max-width: calc(100% - 116px);
+  margin: 0 auto;
   overflow: hidden;
   /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
      像素字只能取 12 的整数倍，12px 明显偏小（与横幅不相称），故取 24px（= 设计尺寸 2×） */
@@ -104,6 +126,10 @@
 }
 
 .vk-panel-flag {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -120,6 +146,10 @@
 
 /* 状态灯 */
 .vk-panel-dot {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   flex: none;
   width: 12px;
   height: 12px;
@@ -146,7 +176,8 @@
 .vk-panel-body {
   display: flex;
   flex-direction: column;
-  padding: 16px 18px 18px;
+  /* 留白按参考稿密度收紧（参考稿单面板 428x394 内含系统行 + 6 行指标） */
+  padding: 10px 16px 12px;
   color: var(--vk-panel-text);
 }
 
@@ -155,8 +186,8 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  margin: 0 0 12px;
-  padding: 0 0 12px;
+  margin: 0 0 6px;
+  padding: 0 0 6px;
   font-size: var(--vk-fs-sm);
   line-height: var(--vk-lh);
   /* 参考稿是虚线分隔，不是实线 */
@@ -178,8 +209,8 @@
 .vk-panel-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding: 10px 0;
+  gap: 12px;
+  padding: 5px 0;
 }
 
 .vk-panel-row + .vk-panel-row {
@@ -192,7 +223,7 @@
   grid-template-areas:
     'icon label value'
     'bar  bar   bar';
-  gap: 4px 8px;
+  gap: 1px 8px;
   align-items: center;
   min-width: 0;
   font-size: var(--vk-fs-sm);
@@ -222,8 +253,8 @@
   grid-area: bar;
   position: relative;
   display: block;
-  height: calc(var(--vk-seg-h) + 2px);
-  margin-top: 5px;
+  height: calc(var(--vk-seg-h) + 1px);
+  margin-top: 3px;
   overflow: hidden;
   background: var(--vk-paper-warm);
   border: 1px solid var(--vk-panel-border);
@@ -241,5 +272,7 @@
   box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
 }
 
-.vk-seg[data-level='alert'] { --vk-seg-color: var(--vk-honey); }
-.vk-seg[data-level='danger'] { --vk-seg-color: var(--vk-bark); }
+/* 等级警示色：选择器必须与 usageLevel() 的返回值一致（ok/warn/crit）。
+   此前写成 alert/danger → 永远匹配不上，整条规则是死代码（实测抓出）。 */
+.vk-seg[data-level='warn'] { --vk-seg-color: var(--vk-honey); }
+.vk-seg[data-level='crit'] { --vk-seg-color: var(--vk-bar-crit); }
