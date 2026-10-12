@@ -1,22 +1,39 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import SceneStack from '@/v2/components/SceneStack.vue'
 import {
   cropField,
+  cropPlots,
   faunaPlan,
+  FIELD_COLS,
+  FIELD_ROWS,
   hashSeed,
   mulberry32,
   seasonHasFruit,
   seasonIsSnowy,
 } from '@/v2/theme/life'
+import type { CropStage } from '@/v2/theme/life'
 import type { Season } from '@/v2/theme/sceneState'
 
 const root = resolve(__dirname, '..', '..')
 const lifeSrc = readFileSync(resolve(root, 'src/v2/components/SceneLife.vue'), 'utf8')
 
 const SEASONS: Season[] = ['spring', 'summer', 'autumn', 'winter']
+
+/**
+ * 新美术口径（用户明确要求）：场景装饰美术**一律使用 ListenHub 生成的透明 PNG 插画**，
+ * 落在 `/images/v2-life/*.png`；**不得再用内联 SVG / CSS 手搓图形**。
+ * 本表即「生长阶段 → 阶段插画」的唯一契约，UI 与单测共享。
+ */
+const STAGE_IMG: Record<CropStage, string> = {
+  sprout: '/images/v2-life/crop-sprout.png',
+  grow: '/images/v2-life/crop-grow.png',
+  fruit: '/images/v2-life/crop-fruit.png',
+  wither: '/images/v2-life/crop-wither.png',
+}
+const CROP_IMG_RE = /^\/images\/v2-life\/crop-(sprout|grow|fruit|wither)\.png$/
 
 describe('场景生态纯逻辑：确定性伪随机（生命周期与动物彩蛋）', () => {
   it('FNV-1a 哈希与 mulberry32 都是确定性的', () => {
@@ -117,21 +134,64 @@ describe('SceneStack 集成生态层（内联 SVG/CSS，不遮挡卡片）', () 
   })
 })
 
-describe('SceneLife 样式口径：平滑插画 / 生长循环 / reduced-motion', () => {
-  it('生长循环四阶段关键帧齐备', () => {
-    for (const k of ['vk-st-sprout', 'vk-st-leaf', 'vk-st-fruit', 'vk-st-wither', 'vk-crop-sway', 'vk-fauna-cross']) {
-      expect(lifeSrc).toContain(`@keyframes ${k}`)
+describe('SceneLife 美术口径：ListenHub PNG 插画 / 生长循环 / reduced-motion', () => {
+  it('生长循环四阶段各引用一张 /images/v2-life/ 阶段插画，且素材文件真实存在', () => {
+    for (const [stage, src] of Object.entries(STAGE_IMG)) {
+      // 组件内 STAGE_IMG 映射必须逐条引用对应 PNG（春嫩芽 / 夏生长 / 秋结果 / 冬枯萎）
+      expect(lifeSrc).toContain(`${stage}: '${src}',`)
+      // 且不得残留旧的 @keyframes vk-st-* 手搓生长图元
+      expect(lifeSrc).not.toContain(`@keyframes vk-st-${stage}`)
+      // 引用的素材必须真的躺在 public/images/v2-life/ 下（部署后即 /images/v2-life/）
+      expect(existsSync(resolve(root, `public${src}`))).toBe(true)
+    }
+  })
+
+  it('四阶段贴图与季节挂钩（春萌发 / 夏生长 / 秋结果 / 冬枯萎）', () => {
+    const primary: Array<[Season, CropStage]> = [
+      ['spring', 'sprout'],
+      ['summer', 'grow'],
+      ['autumn', 'fruit'],
+      ['winter', 'wither'],
+    ]
+    for (const [season, stage] of primary) {
+      const stages = new Set(cropPlots(season).map(c => c.stage))
+      expect(stages.has(stage)).toBe(true)
+      // 该季主阶段必须能落到对应的 PNG 素材
+      expect(lifeSrc).toContain(STAGE_IMG[stage])
+    }
+    // 两侧各一列 × 四排成畦 → 8 株
+    expect(cropPlots('summer')).toHaveLength(FIELD_ROWS * FIELD_COLS * 2)
+  })
+
+  it('场景美术一律用 PNG 素材：含 /images/v2-life/ 且不含内联 <svg> 手搓图形', () => {
+    // 必须通过 <img> 引用 ListenHub 生成的插画
+    expect(lifeSrc).toContain('<img')
+    expect(lifeSrc).toContain(':src="STAGE_IMG[')
+    expect(lifeSrc).toMatch(/\/images\/v2-life\/[a-z-]+\.png/)
+    // 不得再用内联 SVG 手搓装饰图形
+    expect(lifeSrc).not.toContain('<svg')
+    expect(lifeSrc).not.toContain('</svg>')
+    expect(lifeSrc).not.toMatch(/<path\b|<circle\b|<polygon\b|<rect\b/)
+  })
+
+  it('渲染出的作物全部指向 /images/v2-life/ 阶段贴图（无内联 SVG 图元）', () => {
+    for (const season of SEASONS) {
+      const wrapper = mount(SceneStack, { props: { time: 'day', season } })
+      const imgs = wrapper.findAll('.vk-crop-img')
+      expect(imgs.length).toBeGreaterThan(0)
+      const srcs = imgs.map(img => img.attributes('src') ?? '')
+      for (const src of srcs) {
+        expect(src).toMatch(CROP_IMG_RE)
+      }
+      // 渲染结果里不得出现任何 svg 装饰
+      expect(wrapper.find('.vk-life svg').exists()).toBe(false)
+      wrapper.unmount()
     }
   })
 
   it('尊重 prefers-reduced-motion（动画关闭 → 退化静态）', () => {
     expect(lifeSrc).toContain('prefers-reduced-motion: reduce')
     expect(lifeSrc).toContain('animation: none !important')
-  })
-
-  it('用 SVG 绘制（非位图、无新依赖）：包含 svg 且不含 background-image 位图', () => {
-    expect(lifeSrc).toContain('<svg')
-    expect(lifeSrc).not.toMatch(/\.png|\.webp|\.jpg/)
   })
 
   it('站立基线落在卡片网格上方的露台带（min(37vh,336px)）', () => {

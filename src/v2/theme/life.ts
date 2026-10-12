@@ -117,9 +117,10 @@ export function cropField(season: Season, count = 10): CropSpec[] {
   return out
 }
 
-/** 田块布局常量（供 UI 与单测共享，避免模板里出现魔数） */
+/** 田块布局常量（供 UI 与单测共享，避免模板里出现魔数）。
+ *  每株作物现在是**一整行 ListenHub 手绘插画**（宽幅田垄贴图），故每侧一列、四排成畦。 */
 export const FIELD_ROWS = 4
-export const FIELD_COLS = 2
+export const FIELD_COLS = 1
 
 /**
  * 单株「田块作物」的确定性排布（用于卡片两侧可见草场上的成排田地）。
