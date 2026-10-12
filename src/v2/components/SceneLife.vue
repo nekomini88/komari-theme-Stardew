@@ -1,21 +1,29 @@
 <script setup lang="ts">
 /**
- * SceneLife —— 场景生态层：植物生长循环 + 随机动物彩蛋（DESIGN_REFERENCE §4/§5）。
+ * SceneLife —— 场景生态层：田地作物生长循环 + 动物彩蛋（DESIGN_REFERENCE §4/§5）。
  *
  * - 全部为**内联 SVG + CSS 动画**（平滑手绘感，无位图、无新依赖）。
  * - 摆放/时机来自 @/v2/theme/life 的**确定性伪随机**（按季节播种）→ 刷新不乱跳。
- * - 挂在 SceneStack 的 ground 图层内，永远位于卡片内容层（.vk-main, z-index 1）之下，
- *   且作物/动物都站在「卡片网格上方的露台带」基线（--vk-life-line）上 → 不遮挡卡片。
- * - 尊重 prefers-reduced-motion：动画关闭 → 植物退化为静态阶段，动物不现身。
+ * - 挂在 SceneStack 的 ground 图层内，永远位于卡片内容层（.vk-main, z-index 1）之下。
+ *
+ * 可见性口径（本轮重点）：
+ *   ① 田地：作物贴着**内容列左右两侧的可见草场**成排种下（每侧 4 排 × 2 株 = 24 株），
+ *      尺寸放大（~46×92 SVG）、加深描边、按阶段给不同轮廓（苗/长成/结果/枯），
+ *      一眼能看出生长阶段；田块锚在内容列左右边缘之外 → 与卡片矩形无重叠。
+ *   ② 动物：鹿/兔/鸟放大到可辨认尺度（scale 1.3..1.75，~60px 高），
+ *      沿地平线带（卡片网格之所以上的露台带）横穿 → 全宽可见且不压卡片。
+ *
+ * 尊重 prefers-reduced-motion：动画关闭 → 植物退化为静态阶段，动物不现身。
  */
 import { computed } from 'vue'
 import type { Season, TimeOfDay } from '@/v2/theme/sceneState'
-import { cropField, faunaPlan } from '@/v2/theme/life'
+import { cropPlots, faunaPlan } from '@/v2/theme/life'
+import type { FieldCrop } from '@/v2/theme/life'
 
 const props = withDefaults(defineProps<{
   season?: Season
   time?: TimeOfDay
-  /** 彩蛋取证：为真时把一只动物钉在画面里（截图/探针用），不影响默认低频行为 */
+  /** 彩蛋取证：为真时把动物钉在画面里（截图/探针用），不影响默认低频行为 */
   force?: boolean
 }>(), {
   season: 'summer',
@@ -23,70 +31,95 @@ const props = withDefaults(defineProps<{
   force: false,
 })
 
-const crops = computed(() => cropField(props.season))
+/** 两侧田块作物（确定性） */
+const cropRows = computed(() => cropPlots(props.season))
+const leftField = computed(() => cropRows.value.filter(c => c.side === 'left'))
+const rightField = computed(() => cropRows.value.filter(c => c.side === 'right'))
 const fauna = computed(() => faunaPlan(props.season))
 
 /** 夜/昏仍显示生态，但夜里更安静：动物只在白天露面 */
 const showFauna = computed(() => props.time === 'day' || props.force)
 
-const cropStyle = (c: { x: number, scale: number, delay: number, swayDur: number, lift: number }) => ({
-  left: `${c.x}%`,
+/** 田垄基线（距视口顶）：远排高、近排低 → 成排田地的纵深。行数 = life.ts FIELD_ROWS */
+const ROW_TOP = ['47vh', '59vh', '71vh', '84vh'] as const
+/** 株列横向锚点（田块内 px，贴内容列一侧） */
+const COL_LEFT = [31, 92] as const
+
+const fieldCropStyle = (c: FieldCrop) => ({
+  top: ROW_TOP[c.row] ?? '59vh',
+  left: `${COL_LEFT[c.col] ?? 31}px`,
   '--vk-crop-scale': String(c.scale),
   '--vk-crop-delay': `${c.delay}s`,
   '--vk-crop-sway': `${c.swayDur}s`,
-  '--vk-crop-lift': `${c.lift}px`,
 })
 
-const faunaStyle = (f: { delay: number, duration: number, y: number, scale: number }) => ({
+const faunaStyle = (f: { id: number, delay: number, duration: number, y: number, scale: number }) => ({
   '--vk-fauna-delay': `${f.delay}s`,
   '--vk-fauna-dur': `${f.duration}s`,
   '--vk-fauna-lift': `${f.y}px`,
   '--vk-fauna-scale': String(f.scale),
+  /* 取证用的钉住位置：不同动物错开，便于一眼同框 */
+  '--vk-fauna-pin': `${20 + f.id * 32}vw`,
 })
 </script>
 
 <template>
   <div class="vk-life" data-life="plants+fauna" :data-season="season" aria-hidden="true">
-    <!-- ============ 植物生长循环：萌发 → 生长 → 结果 → 枯萎 ============ -->
+    <!-- ============ 田地：作物生长循环（萌发 → 生长 → 结果 → 枯萎）============
+         左右各一块成畦田地，锚在内容列左右边缘之外 → 与卡片无重叠。 -->
     <div
-      v-for="c in crops"
-      :key="`crop-${c.id}`"
-      class="vk-crop"
-      data-life-part="crop"
-      :data-stage="c.stage"
-      :data-season="season"
-      :style="cropStyle(c)"
+      v-for="side in (['left', 'right'] as const)"
+      :key="`field-${side}`"
+      class="vk-field"
+      :class="`vk-field--${side}`"
+      :data-field-side="side"
     >
-      <div class="vk-crop-sway">
-        <svg class="vk-crop-svg" viewBox="0 0 40 64" preserveAspectRatio="xMidYMax meet">
-          <ellipse class="vk-p-soil" cx="20" cy="60" rx="11" ry="3.4" />
-          <!-- 萌发 -->
-          <g class="vk-p-sprout">
-            <path class="vk-p-stem" d="M20 60C20 55 20 52 20 49" />
-            <path class="vk-p-blade" d="M20 52C15 51 12.5 48 12 44.6C16 45.2 18.8 48 20 51Z" />
-            <path class="vk-p-blade" d="M20 52C25 51 27.5 48 28 44.6C24 45.2 21.2 48 20 51Z" />
-          </g>
-          <!-- 生长 -->
-          <g class="vk-p-leaf">
-            <path class="vk-p-stem" d="M20 60C20 50 19.6 40 20 30" />
-            <path class="vk-p-blade" d="M20 46C14 45 10.5 41 10 36.6C15 37.6 18.6 41 20 45Z" />
-            <path class="vk-p-blade" d="M20 46C26 45 29.5 41 30 36.6C25 37.6 21.4 41 20 45Z" />
-            <path class="vk-p-blade" d="M20 37C15 36 12 33 11.5 29C16 30 19 33 20 36Z" />
-            <path class="vk-p-blade" d="M20 37C25 36 28 33 28.5 29C24 30 21 33 20 36Z" />
-          </g>
-          <!-- 结果 -->
-          <g class="vk-p-fruit">
-            <circle cx="15" cy="34" r="4.2" />
-            <circle cx="25" cy="36" r="3.8" />
-            <circle cx="20" cy="26.5" r="4.4" />
-          </g>
-          <!-- 枯萎（冬覆雪） -->
-          <g class="vk-p-wither">
-            <path class="vk-p-dry" d="M20 60C20 53 17 47 12 43" />
-            <path class="vk-p-dry" d="M20 60C20 54 24 48 29 44" />
-            <path class="vk-p-snow" d="M20 60C20 53 17 47 12 43C17 42.2 20.6 44.6 22.8 47.4C25.6 45 30 44 32 47C28 48 25 51.4 24 55.4Z" />
-          </g>
-        </svg>
+      <div
+        v-for="c in (side === 'left' ? leftField : rightField)"
+        :key="`crop-${side}-${c.id}`"
+        class="vk-crop"
+        data-life-part="crop"
+        :data-side="side"
+        :data-stage="c.stage"
+        :data-season="season"
+        :style="fieldCropStyle(c)"
+      >
+        <div class="vk-crop-sway">
+          <svg class="vk-crop-svg" viewBox="0 0 46 92" preserveAspectRatio="xMidYMax meet">
+            <!-- 田垄土堆（深描边 → 与草色区分） -->
+            <ellipse class="vk-p-soil" cx="23" cy="88" rx="15" ry="4.6" />
+            <path class="vk-p-ridge" d="M10 86Q23 92 36 86" />
+            <!-- 萌发 -->
+            <g class="vk-p-sprout">
+              <path class="vk-p-stem" d="M23 88C23 80 23 75 23 69" />
+              <path class="vk-p-blade" d="M23 74C17.5 72.5 14 68.5 13.5 63.5C18.5 64.5 22 68.5 23 73Z" />
+              <path class="vk-p-blade" d="M23 74C28.5 72.5 32 68.5 32.5 63.5C27.5 64.5 24 68.5 23 73Z" />
+            </g>
+            <!-- 生长 -->
+            <g class="vk-p-leaf">
+              <path class="vk-p-stem" d="M23 88C23 68 22.6 46 23 21" />
+              <path class="vk-p-blade" d="M23 68C16 66 11.5 61 11 54.5C17 56 21.5 61 23 67Z" />
+              <path class="vk-p-blade" d="M23 68C30 66 34.5 61 35 54.5C29 56 24.5 61 23 67Z" />
+              <path class="vk-p-blade" d="M23 53C16.5 51.5 12.5 47 12 41C17.5 42.5 21.5 47 23 52Z" />
+              <path class="vk-p-blade" d="M23 53C29.5 51.5 33.5 47 34 41C28.5 42.5 24.5 47 23 52Z" />
+              <path class="vk-p-blade" d="M23 38C17.8 36.6 14.8 33 14.3 28C18.8 29 21.7 32.6 23 37Z" />
+              <path class="vk-p-blade" d="M23 38C28.2 36.6 31.2 33 31.7 28C27.2 29 24.3 32.6 23 37Z" />
+            </g>
+            <!-- 结果（硕大果实 → 一眼区分） -->
+            <g class="vk-p-fruit">
+              <circle cx="14.5" cy="47" r="6.2" />
+              <circle cx="31.5" cy="53" r="5.4" />
+              <circle cx="23" cy="31" r="6.6" />
+            </g>
+            <!-- 枯萎（冬覆雪） -->
+            <g class="vk-p-wither">
+              <path class="vk-p-dry" d="M23 88C23 74 19 64 12 55" />
+              <path class="vk-p-dry" d="M23 88C23 76 28 66 35 57" />
+              <path class="vk-p-dry" d="M23 88C23 78 23 68 23 57" />
+              <path class="vk-p-snow" d="M23 88C23 74 19 64 12 55C19 53 24 56 27 60C31 56 37 55 40 59C34 61 30 66 28.5 72Z" />
+            </g>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -143,27 +176,45 @@ const faunaStyle = (f: { delay: number, duration: number, y: number, scale: numb
 <style>
 /* ============================ 生态层容器 ============================
    挂在 ground 图层内（inset:0），子元素按视口坐标绝对定位。
-   --vk-life-line：作物/动物的站立基线 —— 位于「卡片网格上方的露台带」，
+   --vk-life-line：动物横穿的地平线带基线 —— 位于「卡片网格上方的露台带」，
    取 min(37vh, 336px)：在 1440×900 下 336px 落在首行卡片顶（343px）之上，
-   故生态图元绝不与卡片矩形相交；再叠加 .vk-scene(z0) < .vk-main(z1) 的层级保证，
-   任何尺寸下都不会遮挡卡片文字。 */
+   故动物图元绝不与卡片矩形相交；再叠加 .vk-scene(z0) < .vk-main(z1) 的层级保证。
+   --vk-field-half / --vk-field-gap：内容列（.vk-home max-width:1180px）半宽与间隙。
+   两侧田块锚在「内容列左右边缘之外」→ 作物只落在可见草场上，与卡片无重叠。 */
 .vk-life {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 5;
   --vk-life-line: min(37vh, 336px);
+  --vk-field-half: 590px;
+  --vk-field-gap: 6px;
+}
+
+/* ---------------- 田块（左右各一块） ---------------- */
+.vk-field {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 124px;
+}
+
+.vk-field--left {
+  right: calc(50% + var(--vk-field-half) + var(--vk-field-gap));
+}
+
+.vk-field--right {
+  left: calc(50% + var(--vk-field-half) + var(--vk-field-gap));
 }
 
 /* ---------------- 作物 ---------------- */
 .vk-crop {
   position: absolute;
-  top: var(--vk-life-line);
-  /* 站在基线上（图元向上生长），并做轻微前后层次抬升 */
-  transform: translate(-50%, calc(-100% + var(--vk-crop-lift, 0px))) scale(var(--vk-crop-scale, 1));
   transform-origin: 50% 100%;
-  width: 40px;
-  height: 64px;
+  /* 站在该排基线（图元向上生长），并整体放大到可辨认尺度 */
+  transform: translate(-50%, -100%) scale(var(--vk-crop-scale, 1));
+  width: 46px;
+  height: 92px;
   will-change: transform;
 }
 
@@ -180,40 +231,57 @@ const faunaStyle = (f: { delay: number, duration: number, y: number, scale: numb
   width: 100%;
   height: 100%;
   overflow: visible;
+  /* 投影把作物从草地上「拎」出来，保证与背景有区分度 */
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--vk-wood-deep) 34%, transparent));
 }
 
+/* 田垄土堆：深色描边 + 亮面，明确「这是田地里的作物」 */
 .vk-p-soil {
-  fill: var(--vk-soil-lo);
-  opacity: 0.62;
+  fill: var(--vk-soil);
+  stroke: color-mix(in srgb, var(--vk-wood-deep) 52%, transparent);
+  stroke-width: 1.6;
+  opacity: 0.92;
+}
+
+.vk-p-ridge {
+  fill: none;
+  stroke: color-mix(in srgb, var(--vk-soil-lo) 78%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .vk-p-stem {
   fill: none;
   stroke: var(--vk-moss-dark);
-  stroke-width: 2.4;
+  stroke-width: 3.1;
   stroke-linecap: round;
 }
 
 .vk-p-dry {
   fill: none;
-  stroke: var(--vk-soil);
-  stroke-width: 2.2;
+  stroke: var(--vk-bark);
+  stroke-width: 2.8;
   stroke-linecap: round;
 }
 
 .vk-p-blade {
   fill: var(--vk-crop-leaf, var(--vk-leaf));
-  stroke: color-mix(in srgb, var(--vk-moss-dark) 46%, transparent);
-  stroke-width: 0.7;
+  stroke: color-mix(in srgb, var(--vk-wood-deep) 66%, transparent);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
 }
 
 .vk-p-fruit {
   fill: var(--vk-crop-fruit, var(--vk-honey));
-  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--vk-wood-deep) 26%, transparent));
+  stroke: color-mix(in srgb, var(--vk-wood-deep) 58%, transparent);
+  stroke-width: 1.1;
+  filter: drop-shadow(0 1.4px 1.2px color-mix(in srgb, var(--vk-wood-deep) 44%, transparent));
 }
 
 .vk-p-snow {
   fill: var(--vk-paper-cream);
+  stroke: color-mix(in srgb, var(--vk-ink-soft) 44%, transparent);
+  stroke-width: 0.9;
   opacity: 0;
 }
 
@@ -300,11 +368,11 @@ const faunaStyle = (f: { delay: number, duration: number, y: number, scale: numb
   animation-name: vk-fauna-cross-rev;
 }
 
-/* 入场取证：钉住一只动物在画面中央（截图/探针用），动画停用 */
+/* 入场取证：把动物钉在画面里（截图/探针用），动画停用；两只错开位置便于同框 */
 .vk-fauna-item.is-forced .vk-fauna-move {
   animation: none;
   opacity: 1;
-  transform: translateX(42vw);
+  transform: translateX(var(--vk-fauna-pin, 44vw));
 }
 
 .vk-fauna-svg {
@@ -312,18 +380,19 @@ const faunaStyle = (f: { delay: number, duration: number, y: number, scale: numb
   width: 100%;
   height: 100%;
   overflow: visible;
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--vk-wood-deep) 40%, transparent));
 }
 
-/* 动物配色（同一套暖色系，与场景协调） */
-.vk-f-body { fill: var(--vk-wood-light); stroke: color-mix(in srgb, var(--vk-wood-deep) 40%, transparent); stroke-width: 0.8; }
-.vk-f-head { fill: var(--vk-wood-light); stroke: color-mix(in srgb, var(--vk-wood-deep) 40%, transparent); stroke-width: 0.8; }
-.vk-f-neck { fill: var(--vk-wood-light); }
-.vk-f-leg { fill: none; stroke: var(--vk-soil-lo); stroke-width: 2.2; stroke-linecap: round; }
+/* 动物配色（同一套暖色系，与场景协调；深描边保证在浅天空/草地上都看得清） */
+.vk-f-body { fill: var(--vk-wood); stroke: color-mix(in srgb, var(--vk-wood-deep) 60%, transparent); stroke-width: 1; }
+.vk-f-head { fill: var(--vk-wood); stroke: color-mix(in srgb, var(--vk-wood-deep) 60%, transparent); stroke-width: 1; }
+.vk-f-neck { fill: var(--vk-wood); stroke: color-mix(in srgb, var(--vk-wood-deep) 60%, transparent); stroke-width: 1; }
+.vk-f-leg { fill: none; stroke: var(--vk-soil-lo); stroke-width: 2.4; stroke-linecap: round; }
 .vk-f-tail { fill: var(--vk-paper-deep); }
-.vk-f-antler { fill: none; stroke: var(--vk-ink-soft); stroke-width: 1.6; stroke-linecap: round; }
-.vk-f-ear { fill: var(--vk-wood-light); stroke: color-mix(in srgb, var(--vk-wood-deep) 34%, transparent); stroke-width: 0.7; }
+.vk-f-antler { fill: none; stroke: var(--vk-ink-soft); stroke-width: 1.7; stroke-linecap: round; }
+.vk-f-ear { fill: var(--vk-wood); stroke: color-mix(in srgb, var(--vk-wood-deep) 56%, transparent); stroke-width: 0.9; }
 .vk-f-eye { fill: var(--vk-outline); }
-.vk-f-wing { fill: var(--vk-wood); }
+.vk-f-wing { fill: var(--vk-wood-light); stroke: color-mix(in srgb, var(--vk-wood-deep) 48%, transparent); stroke-width: 0.8; }
 .vk-f-beak { fill: var(--vk-honey); }
 
 .vk-fauna-item[data-kind='deer'] { width: 58px; height: 40px; }

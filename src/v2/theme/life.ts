@@ -117,6 +117,61 @@ export function cropField(season: Season, count = 10): CropSpec[] {
   return out
 }
 
+/** 田块布局常量（供 UI 与单测共享，避免模板里出现魔数） */
+export const FIELD_ROWS = 4
+export const FIELD_COLS = 2
+
+/**
+ * 单株「田块作物」的确定性排布（用于卡片两侧可见草场上的成排田地）。
+ * 与 cropField 的区别：这里给出的是**田地网格坐标**（side/row/col），
+ * 由组件换算成「贴着内容列左右边缘的草地条带」上的绝对位置，
+ * 从而保证无论视口多宽，作物都落在卡片矩形之外的可见草地上。
+ */
+export interface FieldCrop {
+  id: number
+  /** 田块所在侧：左侧草地 / 右侧草地 */
+  side: 'left' | 'right'
+  /** 田垄行（0 = 最远、越小越高） */
+  row: number
+  /** 株列（0 = 靠内容列内侧） */
+  col: number
+  stage: CropStage
+  scale: number
+  tone: number
+  delay: number
+  swayDur: number
+}
+
+/**
+ * 按季节播种出「两侧成畦田地」（确定性）。
+ * 同一季节 → 完全相同的排布（刷新不乱跳）；换季 → 阶段/尺寸自然更替。
+ */
+export function cropPlots(season: Season): FieldCrop[] {
+  const rnd = mulberry32(hashSeed(`field:${season}`))
+  const pool = STAGE_POOL[season]
+  const out: FieldCrop[] = []
+  let id = 0
+  for (const side of ['left', 'right'] as const) {
+    for (let row = 0; row < FIELD_ROWS; row++) {
+      for (let col = 0; col < FIELD_COLS; col++) {
+        out.push({
+          id: id++,
+          side,
+          row,
+          col,
+          stage: pool[Math.floor(rnd() * pool.length)] ?? 'grow',
+          // 近排略大、远排略小 —— 与 row 挂钩以强化「成排」的纵深
+          scale: Math.round((0.86 + row * 0.06 + rnd() * 0.24) * 100) / 100,
+          tone: Math.round(rnd() * 1000) / 1000,
+          delay: -Math.round(rnd() * 22 * 10) / 10,
+          swayDur: Math.round((3.2 + rnd() * 2.6) * 100) / 100,
+        })
+      }
+    }
+  }
+  return out
+}
+
 /** 季节 → 可能出没的动物（确定性物种表） */
 const FAUNA_POOL: Record<Season, FaunaKind[]> = {
   spring: ['rabbit', 'bird', 'rabbit'],
@@ -144,7 +199,8 @@ export function faunaPlan(season: Season, count = 2): FaunaSpec[] {
       delay: -Math.round(rnd() * duration), // 相位错开：不同时刻才现身
       duration,
       y: Math.round(rnd() * 12),
-      scale: Math.round((0.85 + rnd() * 0.4) * 100) / 100,
+      // 放大到可辨认尺度（原来 ~1.0 → 远看只是一个点）
+      scale: Math.round((1.3 + rnd() * 0.45) * 100) / 100,
     })
   }
   return out
