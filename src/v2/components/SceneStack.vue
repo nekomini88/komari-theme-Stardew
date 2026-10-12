@@ -12,13 +12,17 @@ import type { Season, TimeOfDay, TintSpec } from '@/v2/theme/sceneState'
 import { computed } from 'vue'
 import { resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
 import { useCrossfade } from '@/v2/theme/useCrossfade'
+import SceneLife from '@/v2/components/SceneLife.vue'
 
 const props = withDefaults(defineProps<{
   time?: TimeOfDay
   season?: Season
+  /** 彩蛋取证开关：把一只动物钉在画面里（截图/探针用），默认不计 */
+  forceLife?: boolean
 }>(), {
   time: 'day',
   season: 'summer',
+  forceLife: false,
 })
 
 const scene = computed(() => resolveScene(props.time, props.season))
@@ -127,6 +131,13 @@ defineExpose({
     >
       <span class="vk-layer-base" />
       <slot :name="layer.id" />
+      <!-- 生态层（植物生长循环 + 动物彩蛋）：仅在共享地面基线层内，随季节播种、确定性摆放 -->
+      <SceneLife
+        v-if="layer.id === 'ground'"
+        :time="scene.time"
+        :season="scene.season"
+        :force="forceLife"
+      />
     </div>
 
     <!-- 整栈 tint：进入层（始终存在） -->

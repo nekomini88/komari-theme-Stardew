@@ -41,6 +41,9 @@ const sceneSeason = ref(
     : seasonFromMonth(now.getMonth() + 1),
 )
 
+/** 彩蛋取证：?life=force 时把一只动物钉在画面里（仅截图/探针用，默认不计） */
+const forceLife = params.get('life') === 'force'
+
 onMounted(async () => {
   try {
     await initApp()
@@ -59,7 +62,7 @@ onUnmounted(() => {
 <template>
   <Provider>
     <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason">
-      <SceneStack :time="sceneTime" :season="sceneSeason" />
+      <SceneStack :time="sceneTime" :season="sceneSeason" :force-life="forceLife" />
       <TopBar />
       <main class="vk-main">
         <RouterView />
