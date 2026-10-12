@@ -35,6 +35,17 @@ const STAGE_IMG: Record<CropStage, string> = {
 }
 const CROP_IMG_RE = /^\/images\/v2-life\/crop-(sprout|grow|fruit|wither)\.png$/
 
+/** 动物种类 → ListenHub 手绘动物插画（与组件 FAUNA_IMG 契约共享） */
+const FAUNA_IMG: Record<string, string> = {
+  deer: '/images/v2-life/animal-deer.png',
+  rabbit: '/images/v2-life/animal-rabbit.png',
+  bird: '/images/v2-life/animal-bird.png',
+}
+const FAUNA_IMG_RE = /^\/images\/v2-life\/animal-(deer|rabbit|bird)\.png$/
+
+/** 前景草簇带（宽条、水平铺开、底部前景层） */
+const FOREGROUND_GRASS_IMG = '/images/v2-life/foreground-grass.png'
+
 describe('场景生态纯逻辑：确定性伪随机（生命周期与动物彩蛋）', () => {
   it('FNV-1a 哈希与 mulberry32 都是确定性的', () => {
     expect(hashSeed('crop:autumn')).toBe(hashSeed('crop:autumn'))
@@ -196,5 +207,48 @@ describe('SceneLife 美术口径：ListenHub PNG 插画 / 生长循环 / reduced
 
   it('站立基线落在卡片网格上方的露台带（min(37vh,336px)）', () => {
     expect(lifeSrc).toContain('--vk-life-line: min(37vh, 336px)')
+  })
+
+  it('动物彩蛋引用三张 ListenHub 动物插画（鹿/野兔/飞鸟），素材文件真实存在', () => {
+    for (const [kind, src] of Object.entries(FAUNA_IMG)) {
+      // 组件内 FAUNA_IMG 映射必须逐条引用对应 PNG（此前 rabbit/bird 引用了不存在的文件）
+      expect(lifeSrc).toContain(`${kind}: '${src}',`)
+      expect(lifeSrc).toContain(FAUNA_IMG[kind])
+      // 引用的素材必须真的躺在 public/images/v2-life/ 下（部署后即 /images/v2-life/）
+      expect(existsSync(resolve(root, `public${src}`))).toBe(true)
+    }
+  })
+
+  it('渲染出的动物（force 取证）全部指向 /images/v2-life/animal-*.png', () => {
+    const wrapper = mount(SceneStack, { props: { time: 'day', season: 'summer', forceLife: true } })
+    const imgs = wrapper.findAll('.vk-fauna-img')
+    expect(imgs.length).toBeGreaterThan(0)
+    for (const img of imgs) {
+      expect(img.attributes('src') ?? '').toMatch(FAUNA_IMG_RE)
+    }
+    wrapper.unmount()
+  })
+
+  it('前景草簇带引用 ListenHub 宽条 PNG，素材存在且无内联 SVG', () => {
+    // 组件必须引用前景草簇带 PNG，且素材真实存在
+    expect(lifeSrc).toContain(FOREGROUND_GRASS_IMG)
+    expect(existsSync(resolve(root, `public${FOREGROUND_GRASS_IMG}`))).toBe(true)
+    // 以背景图（cover）铺开 —— 宽条、水平铺开
+    expect(lifeSrc).toContain('vk-foreground-grass')
+    expect(lifeSrc).toContain('background-size: cover')
+    // 仍不得手搓 SVG
+    expect(lifeSrc).not.toContain('<svg')
+  })
+
+  it('前景草簇带锚在底部前景层（bottom:0）且位于卡片层之下 → 不遮挡卡片', () => {
+    // 底部前景层锚定
+    expect(lifeSrc).toContain('bottom: 0;')
+    expect(lifeSrc).toMatch(/\.vk-foreground-grass\s*\{[^}]*bottom:\s*0;/)
+    // 生态层整体挂在 ground 图层内 → .vk-scene(z0) < .vk-main(z1)，前景带落于卡片之后
+    const wrapper = mount(SceneStack, { props: { time: 'day', season: 'spring' } })
+    const ground = wrapper.find('[data-layer="ground"]')
+    expect(ground.exists()).toBe(true)
+    expect(ground.find('.vk-foreground-grass').exists()).toBe(true)
+    wrapper.unmount()
   })
 })

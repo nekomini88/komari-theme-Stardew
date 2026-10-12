@@ -46,6 +46,18 @@ const FAUNA_IMG: Record<FaunaKind, string> = {
   bird: '/images/v2-life/animal-bird.png',
 }
 
+/**
+ * 前景草簇带（ListenHub 生成的手绘透明 PNG，宽条状、带小野花）。
+ * 作为草场最底部的**前景层**水平铺开，营造「卡片座在草场上」的层次感；
+ * 它在 .vk-scene(z0) 内、卡片内容层 .vk-main(z1) 之下 → 永不遮挡卡片。
+ */
+const FOREGROUND_GRASS_IMG = '/images/v2-life/foreground-grass.png'
+
+/** 前景草簇带的背景样式（水平铺开 + cover，底部对齐） */
+const foregroundGrassStyle = {
+  backgroundImage: `url('${FOREGROUND_GRASS_IMG}')`,
+}
+
 /** 两侧田块作物（确定性） */
 const cropRows = computed(() => cropPlots(props.season))
 const leftField = computed(() => cropRows.value.filter(c => c.side === 'left'))
@@ -120,6 +132,15 @@ const faunaStyle = (f: { id: number, delay: number, duration: number, y: number,
         </div>
       </div>
     </template>
+
+    <!-- ============ 前景草簇带：草场最底部的前景层（宽条水平铺开）============
+         锚在生态层最底边（bottom:0），宽幅 cover → 一眼看出「卡片座在草场上」；
+         位于 .vk-scene(z0) 内、卡片层 .vk-main(z1) 之下 → 绝不遮挡卡片。 -->
+    <div
+      class="vk-foreground-grass"
+      data-life-part="foreground"
+      :style="foregroundGrassStyle"
+    />
   </div>
 </template>
 
@@ -243,6 +264,25 @@ const faunaStyle = (f: { id: number, delay: number, duration: number, y: number,
   84% { opacity: 1; }
   99% { opacity: 1; }
   100% { transform: translateX(-14vw) scaleX(-1); opacity: 0; }
+}
+
+/* ---------------- 前景草簇带（草场底部前景层） ---------------- */
+/* 宽条水平铺开、底部对齐：卡片内容层(.vk-main)在其之上 → 层次感「卡片座在草场」，
+   且因本层属于 .vk-scene(z0)（< .vk-main z1），永不遮挡卡片。 */
+.vk-foreground-grass {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 148px;
+  background-repeat: repeat-x;
+  background-position: center bottom;
+  background-size: cover;
+  pointer-events: none;
+  user-select: none;
+  /* 顶部柔化，使草簇带上沿与远处草场无缝相接 */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
 }
 
 /* 作物随风轻摆 */
