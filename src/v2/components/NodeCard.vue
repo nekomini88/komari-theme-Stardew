@@ -87,7 +87,7 @@ const accent = computed(() => {
 
 <template>
   <article
-    class="vk-node-card vk-contact"
+    class="vk-node-card vk-card vk-contact"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
     :style="{ '--vk-node-accent': accent }"

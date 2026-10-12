@@ -137,6 +137,8 @@ describe('NodeCard：视觉契约（母板/tokens/接触阴影）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const card = w.find('.vk-node-card')
     expect(card.classes()).toContain('vk-contact')
+    // 兼容探针/e2e 的短选择器 `.vk-card`（根节点同时挂 vk-node-card 与 vk-card）
+    expect(card.classes()).toContain('vk-card')
     expect(card.classes()).not.toContain('vk-pixel')
     expect(card.attributes('data-node-id')).toBe(frankfurt.uuid)
   })
