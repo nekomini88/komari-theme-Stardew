@@ -31,6 +31,19 @@ async function settle() {
   await nextTick()
 }
 
+/** 轮询等待条件成立（替代固定 flush 轮数 —— 全量并行跑时异步链更慢，固定等待会早查） */
+async function waitFor(pred: () => boolean, timeoutMs = 3000) {
+  const start = Date.now()
+  while (Date.now() - start < timeoutMs) {
+    if (pred())
+      return true
+    await flushPromises()
+    await nextTick()
+    await new Promise(r => setTimeout(r, 10))
+  }
+  return pred()
+}
+
 async function mountHome(fetcher: Fetcher) {
   const wrapper = mount(HomeView, {
     global: {
@@ -134,13 +147,14 @@ describe('HomeView：加载/空/错误三态', () => {
       return new Response(JSON.stringify({ jsonrpc: '2.0', id: body.id, result }), { status: 200 })
     }
     const w = await mountHome(flaky)
+    await waitFor(() => w.find('[data-testid="home-error"]').exists())
     expect(w.find('[data-testid="home-error"]').exists()).toBe(true)
     const retry = w.find('[data-testid="state-retry"]')
     expect(retry.exists()).toBe(true)
 
     fail = false
     await retry.trigger('click')
-    await settle()
+    await waitFor(() => w.findAll('.vk-node-card').length === TOTAL)
     expect(w.find('[data-testid="home-error"]').exists()).toBe(false)
     expect(w.findAll('.vk-node-card')).toHaveLength(TOTAL)
     w.unmount()

@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import NodeCard from '@/v2/components/NodeCard.vue'
-import { buildNodes, pickPingStats } from '@/v2/data/nodeModel'
+import { assignAccents, buildNodes, pickPingStats } from '@/v2/data/nodeModel'
 import {
   formatBytes,
   formatBytesPerSecond,
@@ -80,7 +80,7 @@ describe('NodeCard 数据：关键指标一律走 metrics 格式化', () => {
 })
 
 describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
-  it('标题栏：绿色木匾 + 名称唯一 + 叶片装饰 + 状态圆点', () => {
+  it('标题栏：名称唯一 + 叶片装饰 + 状态圆点 + 每台一色', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const heads = w.findAll('.vk-card-head')
     expect(heads).toHaveLength(1)
@@ -88,10 +88,10 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     expect(w.find('.vk-card-name').text()).toBe('法兰克福free')
     expect(w.find('.vk-panel-vine').exists()).toBe(true)
     expect(w.find('.vk-panel-dot').exists()).toBe(true)
-    // 标题栏取绿色木匾令牌（不是每台一色的 accent）
+    // 标题栏底色由「每台一色」的 accent 派生（参考稿就是每台一色）
     const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
-    expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*background:\s*var\(--vk-panel-head-face\)/)
-    expect(css).not.toContain('--vk-node-accent')
+    expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*var\(--vk-node-accent/)
+    expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
   })
 
   it('系统行：os · arch · 虚拟化 整宽一行（缺项自动跳过）', () => {
@@ -208,5 +208,61 @@ describe('NodeCard 视觉契约：取色仅走母板令牌、像素风硬边', (
     const w = mount(NodeCard, { props: { node: frankfurt } })
     expect(w.classes()).toContain('vk-node-card')
     expect(w.attributes('data-node-id')).toBe(frankfurt.uuid)
+  })
+})
+
+describe('每台一色（参考稿本身就是每台一色，配色取自参考稿实测）', () => {
+  const tokens = readFileSync(resolve(ROOT, 'src/styles/v2/tokens.css'), 'utf8')
+
+  function contrast(a: string, b: string): number {
+    const lum = (h: string) => {
+      const v = h.replace('#', '')
+      const ch = [0, 2, 4].map(i => Number.parseInt(v.slice(i, i + 2), 16) / 255)
+      const f = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+      return 0.2126 * f(ch[0]!) + 0.7152 * f(ch[1]!) + 0.0722 * f(ch[2]!)
+    }
+    const [la, lb] = [lum(a), lum(b)]
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
+  }
+
+  it('tokens.css 定义 6 组 accent/ink 成对令牌', () => {
+    for (let i = 1; i <= 6; i++) {
+      expect(tokens).toContain(`--vk-node-accent-${i}:`)
+      expect(tokens).toContain(`--vk-node-ink-${i}:`)
+    }
+  })
+
+  it('每组 accent 与其 ink 的对比度都 ≥4.5:1（WCAG 实算，标题栏整块上色）', () => {
+    for (let i = 1; i <= 6; i++) {
+      const a = tokens.match(new RegExp(`--vk-node-accent-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
+      const k = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
+      expect(contrast(a, k), `accent-${i} (${a}) 与 ink-${i} (${k}) 对比度不足`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('卡片根节点成对下发 --vk-node-accent 与 --vk-node-ink', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt, accentIndex: 2 } })
+    const style = w.attributes('style') ?? ''
+    expect(style).toContain('--vk-node-accent: var(--vk-node-accent-3)')
+    expect(style).toContain('--vk-node-ink: var(--vk-node-ink-3)')
+    expect(w.attributes('data-accent')).toBe('3')
+  })
+
+  it('同一台每次同色（不传 accentIndex 时按 uuid 稳定哈希）', () => {
+    const a = mount(NodeCard, { props: { node: frankfurt } }).attributes('data-accent')
+    const b = mount(NodeCard, { props: { node: frankfurt } }).attributes('data-accent')
+    expect(a).toBe(b)
+  })
+
+  it('assignAccents：同批 ≤6 台两两不同色，且结果稳定、与传入顺序无关', () => {
+    const uuids = ['a1', 'b2', 'c3', 'd4', 'e5', 'f6']
+    const m1 = assignAccents(uuids)
+    expect(new Set(m1.values()).size).toBe(6)
+    expect(assignAccents([...uuids].reverse())).toEqual(m1)
+    expect(assignAccents([]).size).toBe(0)
+    // 超过槽位数 → 回绕
+    const many = assignAccents(Array.from({ length: 13 }, (_, i) => `n${i}`))
+    expect(many.size).toBe(13)
+    expect(Math.max(...many.values())).toBeLessThan(6)
   })
 })

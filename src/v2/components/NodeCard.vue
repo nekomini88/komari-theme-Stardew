@@ -38,9 +38,27 @@ import {
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
 import { getRegionCode } from '@/utils/regionHelper'
 
-const props = defineProps<{ node: Node }>()
+const props = defineProps<{ node: Node, accentIndex?: number }>()
 
 const node = computed(() => props.node)
+
+/** 标题栏色槽数（与 tokens.css 的 --vk-node-accent-1..6 对应） */
+const ACCENT_SLOTS = 6
+
+/** 标题栏色槽：优先用父级（HomeView）按**全量**节点分配的 accentIndex
+ *  （同批 ≤6 台互不同色，见 nodeModel.assignAccents）；独立使用时退化为 uuid 哈希。
+ *  参考稿本身就是「每台一色」，配色取参考稿实测的绿/蓝/紫/粉/橙/青。 */
+const accentSlot = computed(() => {
+  const idx = props.accentIndex
+  if (typeof idx === 'number' && Number.isFinite(idx) && idx >= 0)
+    return idx % ACCENT_SLOTS
+  const key = node.value.uuid || node.value.name
+  let h = 0
+  for (let i = 0; i < key.length; i++)
+    h = (h * 31 + key.charCodeAt(i)) >>> 0
+  return h % ACCENT_SLOTS
+})
+
 const viewStatus = computed(() => nodeViewStatus(node.value))
 const statusLabel = computed(() => nodeStatusLabel(viewStatus.value))
 
@@ -94,6 +112,11 @@ defineExpose({ viewStatus, statusLabel })
     class="vk-node-card vk-panel"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
+    :data-accent="accentSlot + 1"
+    :style="{
+      '--vk-node-accent': `var(--vk-node-accent-${accentSlot + 1})`,
+      '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
+    }"
   >
     <!-- ① 绿色木匾标题栏 -->
     <header class="vk-card-head vk-panel-head">

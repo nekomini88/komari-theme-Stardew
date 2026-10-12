@@ -52,19 +52,24 @@
   box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
 }
 
-/* ---------- ① 绿色叶藤横幅标题栏 ---------- */
+/* ---------- ① 绿色叶藤横幅标题栏（每台一色，取参考稿实测的 6 色） ---------- */
 .vk-panel-head {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 9px 16px;
-  color: var(--vk-panel-head-ink);
-  background: var(--vk-panel-head-face);
+  color: var(--vk-node-ink, var(--vk-panel-head-ink));
+  /* 明暗全部由 accent 与母板色 color-mix 派生，不引入新色 */
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-ref-paper)) 0%,
+    var(--vk-node-accent, var(--vk-ref-leaf)) 26%,
+    var(--vk-node-accent, var(--vk-ref-leaf)) 74%,
+    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 72%, var(--vk-panel-border)) 100%);
   border-bottom: 1px solid var(--vk-panel-border);
 }
 
-/* 上下波浪叶边：用重复径向渐变造一排「叶片凸起」，模拟参考稿的锯齿叶缘 */
+/* 上下波浪叶边：用重复径向渐变造一排「叶片凸起」，颜色同样由 accent 派生 */
 .vk-panel-head::before,
 .vk-panel-head::after {
   content: '';
@@ -74,7 +79,7 @@
   height: 5px;
   background: repeating-radial-gradient(
     circle at 5px 5px,
-    var(--vk-ref-leaf-hi) 0 4px,
+    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 55%, var(--vk-ref-paper)) 0 4px,
     transparent 4.5px
   );
   background-size: 10px 5px;
@@ -87,7 +92,11 @@
 
 .vk-panel-head::after {
   bottom: -4px;
-  background: repeating-radial-gradient(circle at 5px 0, var(--vk-ref-leaf-lo) 0 4px, transparent 4.5px);
+  background: repeating-radial-gradient(
+    circle at 5px 0,
+    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 70%, var(--vk-panel-border)) 0 4px,
+    transparent 4.5px
+  );
   background-size: 10px 5px;
 }
 
@@ -99,9 +108,11 @@
   border: 1px solid var(--vk-panel-border);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, var(--vk-ref-leaf-hi) 0 3px, transparent 3.5px),
-    radial-gradient(circle at 70% 60%, var(--vk-ref-leaf) 0 4px, transparent 4.5px),
-    var(--vk-ref-leaf-lo);
+    radial-gradient(circle at 35% 30%,
+      color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 45%, var(--vk-ref-paper)) 0 3px, transparent 3.5px),
+    radial-gradient(circle at 70% 60%,
+      var(--vk-node-accent, var(--vk-ref-leaf)) 0 4px, transparent 4.5px),
+    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 70%, var(--vk-panel-border));
 }
 
 .vk-panel-head-icon {
@@ -121,11 +132,13 @@
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* 像素字描边：四向 1px 深色，做出参考稿的粗体像素字观感 */
+  /* 像素字描边：四向 1px，颜色由 accent 压暗派生（每台一色也保持可读） */
   text-shadow:
-    1px 0 0 var(--vk-ref-leaf-lo), -1px 0 0 var(--vk-ref-leaf-lo),
-    0 1px 0 var(--vk-ref-leaf-lo), 0 -1px 0 var(--vk-ref-leaf-lo),
-    1px 1px 0 var(--vk-ref-leaf-lo);
+    1px 0 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
+    -1px 0 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
+    0 1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
+    0 -1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
+    1px 1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border));
 }
 
 .vk-panel-flag {

@@ -12,15 +12,15 @@ function hexesIn(text: string): string[] {
 }
 
 describe('v2 母板结构（ART_SYSTEM §1 材质色阶）', () => {
-  it('母板恰好 48 色，且 meta.count 一致', () => {
+  it('母板恰好 54 色，且 meta.count 一致', () => {
     // v3：新增 plum/blossom/seafoam 三色（卡片主题色对齐参考稿的绿/蓝/紫/粉/橘/青）
-    expect(PALETTE).toHaveLength(48)
-    expect(PALETTE_META.count).toBe(48)
+    expect(PALETTE).toHaveLength(54)
+    expect(PALETTE_META.count).toBe(54)
   })
 
-  it('48 色唯一且均为合法 6 位 hex', () => {
+  it('54 色唯一且均为合法 6 位 hex', () => {
     const hexes = PALETTE.map(c => c.hex)
-    expect(new Set(hexes).size).toBe(48)
+    expect(new Set(hexes).size).toBe(54)
     for (const h of hexes) {
       expect(h).toMatch(/^#[0-9a-f]{6}$/)
     }
