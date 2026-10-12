@@ -32,7 +32,7 @@
   }
 }
 
-/* ---- 节点卡片：奶纸卡 + 彩色标题栏 ---- */
+/* ---- 节点卡片：奶纸卡（纸纹纤维面 + 柔边 + 厚投影 + 左上内高光）+ 彩色标题栏 ---- */
 .vk-node-card {
   position: relative;
   width: 100%;
@@ -40,9 +40,10 @@
   display: flex;
   flex-direction: column;
   background-color: var(--vk-paper-cream);
-  border: var(--vk-border-hair);
+  background-image: var(--vk-paper-fiber), var(--vk-paper-face);
+  border: var(--vk-border-soft);
   border-radius: var(--vk-radius-md);
-  box-shadow: var(--vk-shadow-2);
+  box-shadow: var(--vk-shadow-3), var(--vk-inset-hi);
   color: var(--vk-text);
   font-family: var(--vk-font-body);
   font-size: 12px;
@@ -53,9 +54,9 @@
   background-color: var(--vk-paper-warm);
 }
 
-/* 顶部彩色标题栏：每台一个主题色，承「图标 + 居中节点名 + 状态」。
-   取色：把母板主题色按 55% 混入米纸底 → 浅而仍带主题色相的标题栏，
-   再压深棕正文色(--vk-wood-deep)，实测对比度 ≥4.5（奶白字压原色栏时仅 2.06，不达标）。 */
+/* 顶部彩色标题栏：每台一个主题色，**整块上色**（承「图标 + 居中节点名 + 状态」）。
+   取色：--vk-node-accent 直接作底色，--vk-node-ink 为配对的承色字
+   （两者在 tokens.css 里成对定义，对比度实测 ≥4.5:1，故整块上色仍达标）。 */
 .vk-card-head {
   position: relative;
   display: flex;
@@ -63,11 +64,11 @@
   justify-content: space-between;
   gap: var(--vk-space-2);
   min-height: 34px;
-  background-color: color-mix(in srgb, var(--vk-node-accent, var(--vk-moss-dark)) 55%, var(--vk-paper-cream));
+  background-color: var(--vk-node-accent, var(--vk-moss-dark));
   background-image: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-paper-cream) 42%, transparent) 0%,
-    transparent 55%);
-  color: var(--vk-wood-deep);
+    color-mix(in srgb, var(--vk-paper-cream) 30%, transparent) 0%,
+    transparent 58%);
+  color: var(--vk-node-ink, var(--vk-paper-cream));
   padding: var(--vk-space-2) var(--vk-space-3);
 }
 
@@ -77,8 +78,8 @@
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  color: var(--vk-wood-deep);
-  opacity: 0.9;
+  color: var(--vk-node-ink, var(--vk-paper-cream));
+  opacity: 0.92;
 }
 
 /* 名称：绝对居中（左右对称留白，避开图标/状态签），超长省略且不撑坏卡片宽度 */
@@ -94,8 +95,8 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
-  color: var(--vk-wood-deep);
-  text-shadow: 0 1px 0 color-mix(in srgb, var(--vk-paper-cream) 72%, transparent);
+  color: var(--vk-node-ink, var(--vk-paper-cream));
+  text-shadow: 0 1px 1px color-mix(in srgb, var(--vk-wood-deep) 34%, transparent);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -412,9 +413,9 @@
   line-height: 1.3;
 }
 
-/* ---- 卡片标题栏：更薄 ---- */
+/* ---- 卡片标题栏：紧凑但仍承得住整块主题色 ---- */
 .vk-card-head {
-  min-height: 28px;
+  min-height: 30px;
   padding: 5px var(--vk-space-3);
 }
 
@@ -437,7 +438,7 @@
   height: 6px;
 }
 
-/* ---- 事实网格：2 列 → 3 列（8 项全部保留，只改排布密度） ---- */
+/* ---- 事实网格：3 列（9 项正好 3×3；本轮按 §6 补齐「丢包」） ---- */
 .vk-card-facts {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px var(--vk-space-2);
@@ -459,10 +460,13 @@
 
 
 /* ---- 落地接触阴影:让卡片"站在"田野上,而不是悬浮 ----
-   (视觉审阅连续两轮指出卡片悬浮;这里在卡片下方加一层朝下、偏土色的柔和阴影) */
+   注意:原来这里引用的 --vk-soil-day **从未定义过** → 整条声明在计算时失效 → 卡片实际是
+   `box-shadow: none`(这就是历轮"卡片悬浮"的根因)。这里改用已定义的 --vk-soil,
+   并叠加纸张厚投影 + 左上内高光(材质加深)。 */
 .vk-node-grid .vk-card {
   box-shadow:
-    var(--vk-shadow-2),
-    0 12px 16px -10px color-mix(in srgb, var(--vk-soil-day) 42%, transparent),
-    0 2px 3px -1px color-mix(in srgb, var(--vk-soil-day) 26%, transparent);
+    var(--vk-shadow-3),
+    var(--vk-inset-hi),
+    0 12px 16px -10px color-mix(in srgb, var(--vk-soil) 46%, transparent),
+    0 2px 3px -1px color-mix(in srgb, var(--vk-soil) 28%, transparent);
 }

@@ -62,6 +62,54 @@ describe('v2 设计令牌/CSS 取色 ⊆ 母板（ART_SYSTEM §1.2 / §1.4）', 
   })
 })
 
+describe('v2 令牌引用完整性（防 --vk-soil-day 类静默失效）', () => {
+  const stylesDir = resolve(__dirname, '..', '..', 'src', 'styles')
+  const srcDir = resolve(__dirname, '..', '..', 'src')
+
+  /** 递归收集目录下的文件 */
+  const walk = (dir: string, ext: string[]): string[] => {
+    const out: string[] = []
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = resolve(dir, e.name)
+      if (e.isDirectory())
+        out.push(...walk(p, ext))
+      else if (ext.some(x => e.name.endsWith(x)))
+        out.push(p)
+    }
+    return out
+  }
+
+  it('src/styles 下 var(--vk-*) 的硬引用（无 fallback）都有定义', () => {
+    const styleFiles = walk(stylesDir, ['.css'])
+    const defFiles = [...styleFiles, ...walk(srcDir, ['.vue'])]
+    // 定义：`--vk-xxx:`（含 Vue 内联样式对象里的 `'--vk-xxx':`）
+    const DEF_RE = /['"]?(--vk-[a-z0-9-]+)['"]?\s*:/gi
+    // 引用：`var(--vk-xxx)`
+    const USE_RE = /var\(\s*(--vk-[a-z0-9-]+)/gi
+
+    const defined = new Set<string>()
+    for (const f of defFiles) {
+      for (const m of readFileSync(f, 'utf8').matchAll(DEF_RE))
+        defined.add(m[1]!)
+    }
+
+    const offenders: { file: string, token: string }[] = []
+    for (const f of styleFiles) {
+      const text = readFileSync(f, 'utf8')
+      for (const m of text.matchAll(USE_RE)) {
+        const token = m[1]!
+        // 带 fallback（`var(--x, ...)`）= 有意提供的默认值 → 不算违规
+        const after = text.slice(m.index! + m[0].length)
+        const hasFallback = /^\s*,/.test(after)
+        if (!defined.has(token) && !hasFallback)
+          offenders.push({ file: f.split('/').pop()!, token })
+      }
+    }
+    // 硬引用未定义令牌 → 该条 CSS 声明在计算时整条失效（不报错、只是没效果）
+    expect(offenders).toEqual([])
+  })
+})
+
 describe('场景状态机取色 ⊆ 母板（全部 time × season 组合）', () => {
   const times: TimeOfDay[] = ['day', 'dusk', 'night']
   const seasons: Season[] = ['spring', 'summer', 'autumn', 'winter']

@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import NodeCard from '@/v2/components/NodeCard.vue'
-import { buildNodes } from '@/v2/data/nodeModel'
+import { assignAccents, buildNodes, pickPingStats } from '@/v2/data/nodeModel'
 import {
   formatBytes,
   formatBytesPerSecond,
@@ -12,10 +12,27 @@ import {
   formatLatency,
   formatLoad,
   formatLoadPercent,
+  formatLoss,
   formatPercent,
   formatUptime,
 } from '@/v2/data/metrics'
 import { nodeViewStatus } from '@/v2/data/nodeStatus'
+
+const ROOT = resolve(__dirname, '..', '..')
+
+/** WCAG 相对亮度 → 对比度（用于校验「彩色标题栏 + 承色字」配对） */
+function contrast(hexA: string, hexB: string): number {
+  const lum = (h: string) => {
+    const v = h.replace('#', '')
+    const ch = [0, 2, 4].map(i => Number.parseInt(v.slice(i, i + 2), 16) / 255)
+    const f = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * f(ch[0]!) + 0.7152 * f(ch[1]!) + 0.0722 * f(ch[2]!)
+  }
+  const [la, lb] = [lum(hexA), lum(hexB)]
+  const hi = Math.max(la, lb)
+  const lo = Math.min(la, lb)
+  return (hi + 0.05) / (lo + 0.05)
+}
 
 const fixture = JSON.parse(
   readFileSync(resolve(__dirname, '..', 'fixtures', 'clients.sample.json'), 'utf8'),
@@ -113,12 +130,13 @@ describe('NodeCard：彩色标题栏 + 指标小图标 + Expire（原帖 mockup 
     expect(head.find('.vk-card-status').exists()).toBe(true)
   })
 
-  it('每项指标行都带一个小图标（CPU/内存/硬盘 + 7 项明细）', () => {
+  it('每项指标行都带一个小图标（CPU/内存/硬盘 + 9 项明细）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     // CPU/内存/硬盘三行各一个
     expect(w.findAll('.vk-card-metric .vk-icon-inline').length).toBe(3)
-    // 明细 8 项（下行/上行/负载/在线/累计↓/累计↑/延迟/到期）各一个
-    expect(w.findAll('.vk-fact dt .vk-icon-inline').length).toBe(8)
+    // 明细 9 项（下行/上行/累计↓/累计↑/负载/在线/延迟/丢包/到期）各一个
+    // —— 本轮按 DESIGN_REFERENCE §6 补齐「丢包 Packet Loss」，故由 8 项变 9 项
+    expect(w.findAll('.vk-fact dt .vk-icon-inline').length).toBe(9)
   })
 
   it('Expire：有 expired_at 显示日期，缺失显示 —', () => {
@@ -152,5 +170,105 @@ describe('NodeCard：视觉契约（母板/tokens/接触阴影）', () => {
     // 新口径(照 DESIGN_REFERENCE §6):卡片改 3×2 grid 排布,不再用 bottom:22% 绝对定位贴 ground 基线
     expect(css).toMatch(/display:\s*grid/)
     expect(css).toMatch(/grid-template-columns:\s*repeat\(3/)
+  })
+})
+
+describe('NodeCard：彩色标题栏整块上色（每台一个主题色 + 配对承色字）', () => {
+  /** 从 tokens.css 取某个令牌的 hex 值 */
+  const tokenHex = (name: string): string | undefined => {
+    const css = readFileSync(resolve(ROOT, 'src', 'styles', 'v2', 'tokens.css'), 'utf8')
+    return (css.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})`)) ?? [])[1]
+  }
+
+  it('卡片根节点成对下发 --vk-node-accent 与 --vk-node-ink', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    const style = w.find('.vk-node-card').attributes('style') ?? ''
+    expect(style).toContain('--vk-node-accent: var(--vk-card-accent-')
+    expect(style).toContain('--vk-node-ink: var(--vk-card-ink-')
+  })
+
+  it('同一台每次同色；不同节点能落到不同主题色（可辨、不串色）', () => {
+    const styleOf = (n: Node) => mount(NodeCard, { props: { node: n } })
+      .find('.vk-node-card').attributes('style')
+    expect(styleOf(frankfurt)).toBe(styleOf(frankfurt))
+    const distinct = new Set(nodes.map(n => styleOf(n)))
+    expect(distinct.size).toBeGreaterThan(1)
+  })
+
+  it('tokens.css：6 组 accent/ink 成对定义，且每组对比度 ≥4.5:1（WCAG 相对亮度实算）', () => {
+    for (let i = 1; i <= 6; i++) {
+      const bg = tokenHex(`--vk-card-accent-${i}`)
+      const ink = tokenHex(`--vk-card-ink-${i}`)
+      expect(bg, `--vk-card-accent-${i} 缺失`).toBeTruthy()
+      expect(ink, `--vk-card-ink-${i} 缺失`).toBeTruthy()
+      expect(contrast(bg!, ink!), `第 ${i} 组 ${bg}/${ink} 对比度不足`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('card.css：标题栏整块取 --vk-node-accent，承色字取 --vk-node-ink（不再 55% 混纸底）', () => {
+    const css = readFileSync(resolve(ROOT, 'src', 'styles', 'v2', 'card.css'), 'utf8')
+    expect(css).toMatch(/\.vk-card-head\s*\{[^}]*background-color:\s*var\(--vk-node-accent/)
+    expect(css).toMatch(/\.vk-card-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
+    expect(css).toMatch(/\.vk-card-name\s*\{[^}]*color:\s*var\(--vk-node-ink/)
+    // 旧的「混 55% 米纸」写法必须已移除（否则标题栏仍发白）
+    expect(css).not.toMatch(/--vk-node-accent[^)]*\)\s*55%/)
+  })
+})
+
+describe('NodeCard：丢包 Packet Loss（DESIGN_REFERENCE §6 指标清单）', () => {
+  it('渲染 formatLoss(node.loss) 且带 data-field=loss', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    expect(text(w, 'loss')).toBe(formatLoss(frankfurt.loss))
+  })
+
+  it('无丢包数据 → —', () => {
+    const none: Node = { ...frankfurt, loss: null }
+    const w = mount(NodeCard, { props: { node: none } })
+    expect(text(w, 'loss')).toBe('—')
+  })
+
+  it('延迟与丢包取自同一个 Ping 任务（口径一致）', () => {
+    const ping = { a: { avg: 30, loss: 1.5 }, b: { avg: 12, loss: 7.25 } }
+    expect(pickPingStats(ping)).toEqual({ latency: 12, loss: 7.25 })
+    // 全丢包 / 空 → 两者皆 null
+    expect(pickPingStats({ a: { avg: -1 } })).toEqual({ latency: null, loss: null })
+    expect(pickPingStats(undefined)).toEqual({ latency: null, loss: null })
+  })
+
+  it('buildNode 把丢包挂到 Node 上（与 latency 同源任务）', () => {
+    const withStatus = nodes.find(n => n.hasStatus)!
+    const st = fixture.statuses[withStatus.uuid]!
+    expect(withStatus.loss).toBe(pickPingStats(st.ping).loss)
+  })
+})
+
+describe('assignAccents：同批主题色互不重复（参考稿 6 卡 6 色）', () => {
+  it('≤6 台 → 两两不同色，且同一集合结果稳定', () => {
+    const uuids = nodes.map(n => n.uuid)
+    const a = assignAccents(uuids)
+    const b = assignAccents(uuids)
+    expect([...a.entries()]).toEqual([...b.entries()])
+    expect(new Set(a.values()).size).toBe(Math.min(uuids.length, 6))
+  })
+
+  it('顺序无关（传入顺序不同 → 结果一致）', () => {
+    const uuids = nodes.map(n => n.uuid)
+    const a = assignAccents(uuids)
+    const b = assignAccents([...uuids].reverse())
+    expect([...a.entries()].sort()).toEqual([...b.entries()].sort())
+  })
+
+  it('>6 台 → 回绕到 6 个槽位', () => {
+    const many = Array.from({ length: 9 }, (_, i) => `uuid-${i}`)
+    const m = assignAccents(many)
+    expect(m.size).toBe(9)
+    for (const v of m.values()) {
+      expect(v).toBeGreaterThanOrEqual(0)
+      expect(v).toBeLessThan(6)
+    }
+  })
+
+  it('空输入 → 空表', () => {
+    expect(assignAccents([]).size).toBe(0)
   })
 })

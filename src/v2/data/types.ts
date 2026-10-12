@@ -138,6 +138,8 @@ export interface Node {
   ping: Record<string, RawPing>
   /** 代表延迟（ms）—— 取 avg 最小的任务，<0 视为丢包 */
   latency: number | null
+  /** 代表丢包率（%）—— 与 latency 取自**同一个** Ping 任务，口径一致；无数据 → null */
+  loss: number | null
 }
 
 /** 顶部总览统计（纯计算结果） */

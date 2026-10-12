@@ -118,7 +118,7 @@ defineExpose({
 
     <!-- 场景关键素材层：太阳(带笑脸光芒) / 蓬松云 / 层叠丘陵 / 风车 / 房屋 / 灌木 / 小路
          —— 一律为 ListenHub 生成的透明 PNG 插画（/images/v2-scene/*.png），非 CSS/SVG 手搓 -->
-    <SceneDecor :time="scene.time" />
+    <SceneDecor :time="scene.time" :season="scene.season" />
 
     <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
     <div

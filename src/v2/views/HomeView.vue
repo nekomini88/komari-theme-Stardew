@@ -15,7 +15,7 @@ import type { Node, SortDir, SortKey } from '@/v2/data/types'
 import type { StatusFilter } from '@/v2/data/nodeModel'
 import { computed, inject, ref } from 'vue'
 import { CLIENTS_FETCHER_KEY, CLIENTS_INTERVAL_KEY } from '@/v2/data/injectionKeys'
-import { collectGroups, filterNodes, sortNodes } from '@/v2/data/nodeModel'
+import { collectGroups, assignAccents, filterNodes, sortNodes } from '@/v2/data/nodeModel'
 import { useClients } from '@/v2/data/useClients'
 import { buildOverviewStats } from '@/v2/data/overviewStats'
 import type { Fetcher } from '@/v2/data/client'
@@ -56,6 +56,9 @@ const visibleNodes = computed<Node[]>(() => sortNodes(
 
 const stats = computed(() => buildOverviewStats(nodes.value))
 const firstLoad = computed(() => nodes.value.length === 0 && (loading.value || refreshing.value))
+
+/** 主题色槽按「全量节点」分配（不随筛选/排序变化）→ 同一台每次同色，且 ≤6 台时互不同色 */
+const accentSlots = computed(() => assignAccents(nodes.value.map(n => n.uuid)))
 
 /** 空节点时的整页状态：error 优先 → loading → empty；有节点则不占位 */
 const pageState = computed<'loading' | 'empty' | 'error' | null>(() => {
@@ -115,6 +118,7 @@ const noMatch = computed(() => nodes.value.length > 0 && visibleNodes.value.leng
         v-for="n in visibleNodes"
         :key="n.uuid"
         :node="n"
+        :accent-index="accentSlots.get(n.uuid)"
       />
     </div>
   </section>

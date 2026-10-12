@@ -130,6 +130,14 @@ export function formatLatency(ms: unknown): string {
   return `${Math.round(v)}ms`
 }
 
+/** 丢包率（0..100 的百分数）→ 一位小数百分比（如 '0.4%'）；缺失/非法/负数 → '—' */
+export function formatLoss(pct: unknown): string {
+  const v = toFiniteNumber(pct, Number.NaN)
+  if (!Number.isFinite(v) || v < 0)
+    return '—'
+  return `${roundTo(v, 1).toFixed(1)}%`
+}
+
 /**
  * ISO 时间戳 → 'YYYY-MM-DD'（到期时间用）。
  * 空串/null/非法日期 → '—'。按 UTC 取日期，避免显示随运行环境时区漂移（结果稳定、可单测）。

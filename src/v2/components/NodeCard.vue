@@ -3,7 +3,7 @@
  * NodeCard —— 节点卡片（住在 SceneStack 的 mid 层，ART_SYSTEM §2）
  *
  * 展示：彩色标题栏（图标 + 居中名称 + 状态）/ CPU% / 内存% / 硬盘% / 上下行 / 负载 /
- *       在线时长 / 累计流量 / 延迟 / 到期时间（Expire）。
+ *       在线时长 / 累计流量 / 延迟 / 丢包 / 到期时间（Expire）。
  * 约束：
  *  - 所有数值统一走 @/v2/data/metrics 的格式化函数，组件内不做任何自造格式。
  *  - 视觉全部取自母板/tokens：柔和投影、圆角、无硬边像素描边（笔触平滑）。
@@ -18,9 +18,10 @@ import {
   formatBytes,
   formatBytesPerSecond,
   formatDate,
+  formatLatency,
   formatLoad,
   formatLoadPercent,
-  formatLatency,
+  formatLoss,
   formatPercent,
   formatUptime,
   percentValue,
@@ -28,7 +29,7 @@ import {
 } from '@/v2/data/metrics'
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
 
-const props = defineProps<{ node: Node }>()
+const props = defineProps<{ node: Node, accentIndex?: number }>()
 
 const node = computed(() => props.node)
 
@@ -64,25 +65,32 @@ const cpuLevel = computed(() => usageLevel(node.value.cpu))
 const memLevel = computed(() => usageLevel(percentValue(node.value.ram, node.value.ramTotal)))
 const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.value.diskTotal)))
 
-/** 顶部彩色标题栏主题色：按 uuid 稳定映射到 8 个母板色令牌（每台一个色，可辨且不串色） */
+/** 顶部彩色标题栏主题色：按 uuid 稳定映射到 6 组「底色 + 承色字」配对（每台一个色，可辨且不串色）。
+ *  承色字保证 ≥4.5:1 对比度（见 tokens.css 注释），故标题栏可整块上色。 */
 const CARD_ACCENTS = [
-  'var(--vk-accent-1)',
-  'var(--vk-accent-2)',
-  'var(--vk-accent-3)',
-  'var(--vk-accent-4)',
-  'var(--vk-accent-5)',
-  'var(--vk-accent-6)',
-  'var(--vk-accent-7)',
-  'var(--vk-accent-8)',
+  { bg: 'var(--vk-card-accent-1)', ink: 'var(--vk-card-ink-1)' },
+  { bg: 'var(--vk-card-accent-2)', ink: 'var(--vk-card-ink-2)' },
+  { bg: 'var(--vk-card-accent-3)', ink: 'var(--vk-card-ink-3)' },
+  { bg: 'var(--vk-card-accent-4)', ink: 'var(--vk-card-ink-4)' },
+  { bg: 'var(--vk-card-accent-5)', ink: 'var(--vk-card-ink-5)' },
+  { bg: 'var(--vk-card-accent-6)', ink: 'var(--vk-card-ink-6)' },
 ] as const
 
+/** 顶部彩色标题栏主题色：优先用父级（HomeView）按全量节点分配的 accentIndex
+ *  （同批 ≤6 台互不同色，见 nodeModel.assignAccents）；独立使用时退化为 uuid 哈希。 */
 const accent = computed(() => {
+  const idx = props.accentIndex
+  if (typeof idx === 'number' && Number.isFinite(idx) && idx >= 0)
+    return CARD_ACCENTS[idx % CARD_ACCENTS.length]!
   const key = node.value.uuid || node.value.name
   let h = 0
   for (let i = 0; i < key.length; i++)
     h = (h * 31 + key.charCodeAt(i)) >>> 0
-  return CARD_ACCENTS[h % CARD_ACCENTS.length]
+  return CARD_ACCENTS[h % CARD_ACCENTS.length]!
 })
+
+/** 丢包率文案（取与代表延迟同一个 Ping 任务，口径一致） */
+const lossText = computed(() => formatLoss(node.value.loss))
 </script>
 
 <template>
@@ -90,7 +98,7 @@ const accent = computed(() => {
     class="vk-node-card vk-card vk-contact"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
-    :style="{ '--vk-node-accent': accent }"
+    :style="{ '--vk-node-accent': accent.bg, '--vk-node-ink': accent.ink }"
   >
     <header class="vk-card-head">
       <span class="vk-card-head-icon" aria-hidden="true">
@@ -143,14 +151,6 @@ const accent = computed(() => {
         <dd data-field="net-out">{{ netOutText }}</dd>
       </div>
       <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:gauge" :width="12" :height="12" />负载</dt>
-        <dd data-field="load">{{ loadText }} ({{ loadPctText }})</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:clock" :width="12" :height="12" />在线</dt>
-        <dd data-field="uptime">{{ uptimeText }}</dd>
-      </div>
-      <div class="vk-fact">
         <dt><Icon class="vk-icon-inline" icon="tabler:download" :width="12" :height="12" />累计↓</dt>
         <dd data-field="traffic-down">{{ trafficDownText }}</dd>
       </div>
@@ -159,8 +159,20 @@ const accent = computed(() => {
         <dd data-field="traffic-up">{{ trafficUpText }}</dd>
       </div>
       <div class="vk-fact">
+        <dt><Icon class="vk-icon-inline" icon="tabler:gauge" :width="12" :height="12" />负载</dt>
+        <dd data-field="load">{{ loadText }} ({{ loadPctText }})</dd>
+      </div>
+      <div class="vk-fact">
+        <dt><Icon class="vk-icon-inline" icon="tabler:clock" :width="12" :height="12" />在线</dt>
+        <dd data-field="uptime">{{ uptimeText }}</dd>
+      </div>
+      <div class="vk-fact">
         <dt><Icon class="vk-icon-inline" icon="tabler:activity" :width="12" :height="12" />延迟</dt>
         <dd data-field="latency">{{ latencyText }}</dd>
+      </div>
+      <div class="vk-fact">
+        <dt><Icon class="vk-icon-inline" icon="tabler:shield-off" :width="12" :height="12" />丢包</dt>
+        <dd data-field="loss">{{ lossText }}</dd>
       </div>
       <div class="vk-fact">
         <dt><Icon class="vk-icon-inline" icon="tabler:calendar-event" :width="12" :height="12" />到期</dt>

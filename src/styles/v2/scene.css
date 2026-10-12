@@ -63,11 +63,14 @@
 }
 
 /* 手绘天空插画：铺满天空区（底部对齐 → 地平线奶白过渡自然接远山）。
-   昼/昏显示；夜隐藏，露出上方 4 段色带的夜空，从而时间切换仍由状态机驱动。 */
+   本张为 ListenHub 生成的**中性天空**（不烘焙太阳/云，光照均匀）——
+   太阳与云由 SceneDecor 的 PNG 单独提供，避免与天空图里的云重影；
+   中性底也让昼夜/季节的整栈 tint 真正生效（DESIGN_REFERENCE §9）。
+   昼/昏显示；夜隐藏，露出上方 4 段色带的夜空 + 月亮星空层。 */
 .vk-sky-img {
   position: absolute;
   inset: 0;
-  background: url('/images/v2-scene/sky.png') center bottom / cover no-repeat;
+  background: url('/images/v2-scene/sky-neutral.png') center bottom / cover no-repeat;
   z-index: 3;
   transition: opacity var(--vk-transition-ms) linear;
 }
@@ -106,12 +109,13 @@
   pointer-events: none;
 }
 
-/* ---- 太阳（左上，带笑脸光芒）：PNG 插画 + 暖色辉光 ---- */
+/* ---- 太阳（左上，带笑脸光芒）：PNG 插画 + 暖色辉光。
+    top 抬到顶栏下方，避免与站点顶栏/铭牌叠在一起显得"贴上去" ---- */
 .vk-decor-sun {
   position: absolute;
-  left: 1%;
-  top: 10px;
-  width: 118px;
+  left: 1.5%;
+  top: 44px;
+  width: 116px;
   height: auto;
   user-select: none;
   filter: drop-shadow(0 0 18px color-mix(in srgb, var(--vk-honey-hi) 60%, transparent))
@@ -131,16 +135,19 @@
   top: 6px;
   width: 152px;
 }
+/* 第 2/3 朵镜像 + 改尺寸，避免"同一朵云复制三遍"的重复感 */
 .vk-decor-cloud-2 {
   left: 54%;
   top: 0;
-  width: 112px;
+  width: 118px;
+  transform: scaleX(-1);
   opacity: 0.95;
 }
 .vk-decor-cloud-3 {
   left: 74%;
   top: 30px;
-  width: 134px;
+  width: 136px;
+  transform: scaleX(-1) scale(0.94);
   opacity: 0.92;
 }
 
@@ -212,6 +219,63 @@
   mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 100%);
 }
 
+/* ---- 月亮 + 星星（夜间替代太阳；由 SceneDecor 在 night 时才渲染）---- */
+.vk-decor-moon {
+  position: absolute;
+  right: 4%;
+  top: 6px;
+  width: 340px;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--vk-paper-cream) 46%, transparent));
+  opacity: 0.94;
+}
+
+/* ---- 春季专属：樱花树（地平线带）+ 春花丛 ---- */
+.vk-decor-blossom {
+  left: 30%;
+  width: 132px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 118px);
+}
+
+.vk-decor-spring-flowers {
+  left: auto;
+  right: 26%;
+  width: 96px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 62px);
+}
+
+/* ---- 前景框景：木栅栏横带（贴卡片网格上沿并整体让出，避免被卡片压住）---- */
+.vk-decor-fence {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 44px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 72px);
+  object-fit: cover;
+  object-position: bottom;
+  user-select: none;
+  opacity: 0.96;
+  filter: drop-shadow(0 3px 3px color-mix(in srgb, var(--vk-wood-deep) 26%, transparent));
+}
+
+/* ---- 前景花丛带：贴首屏底边（卡片下缘之外仍露出），构成参考稿的底部框景 ---- */
+.vk-decor-flowerbed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 58px;
+  top: calc(100vh - 58px);
+  object-fit: cover;
+  object-position: top;
+  user-select: none;
+  opacity: 0.92;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 100%);
+}
+
 /* 夜间：太阳 / 云隐藏（露出夜色插画自带的月亮与星空）；地面景观保留但柔化 */
 .vk-scene[data-time='night'] .vk-decor-sun,
 .vk-scene[data-time='night'] .vk-decor-cloud {
@@ -224,9 +288,16 @@
 }
 
 .vk-scene[data-time='night'] .vk-decor-building,
+.vk-scene[data-time='night'] .vk-decor-fence,
+.vk-scene[data-time='night'] .vk-decor-flowerbed,
 .vk-scene[data-time='night'] .vk-decor-path {
   opacity: 0.5;
   filter: brightness(0.82) saturate(0.7);
+}
+
+/* 夜间月亮保持明亮（在整栈 tint 之下，不被地面柔化规则影响） */
+.vk-scene[data-time='night'] .vk-decor-moon {
+  opacity: 1;
 }
 
 /* ---- 视差层（背景由下面按时间给到 .vk-layer-base） ---- */
