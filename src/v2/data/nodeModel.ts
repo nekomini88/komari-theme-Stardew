@@ -12,47 +12,6 @@ import { nodeViewStatus } from './nodeStatus'
 
 const num = (v: unknown) => toFiniteNumber(v)
 
-/** 卡片主题色槽位数（与 tokens.css 的 --vk-card-accent-1..6 一一对应） */
-export const CARD_ACCENT_SLOTS = 6
-
-/** 单个 uuid → 偏好主题色槽（稳定哈希） */
-function preferredSlot(uuid: string, slots: number): number {
-  let h = 0
-  for (let i = 0; i < uuid.length; i++)
-    h = (h * 31 + uuid.charCodeAt(i)) >>> 0
-  return h % slots
-}
-
-/**
- * 为一批节点分配互不重复的主题色槽（参考稿：6 张卡片 6 个不同主题色）。
- *
- * 口径：
- *  - 先按 uuid 哈希得到「偏好槽」，再按 uuid 升序**贪心避让**已在用槽位；
- *  - 节点集合不变时结果完全稳定（刷新/筛选/排序都不换色）—— 调用方应传**全量** uuid，
- *    不要传筛选后的列表，否则筛掉一台会让其余的重新配色；
- *  - 台数 ≤ 槽位数时保证两两不同色；超出后自然回绕。
- */
-export function assignAccents(uuids: readonly string[], slots = CARD_ACCENT_SLOTS): Map<string, number> {
-  const out = new Map<string, number>()
-  if (slots <= 0)
-    return out
-  const used = new Set<number>()
-  for (const uuid of [...uuids].sort()) {
-    const start = preferredSlot(uuid, slots)
-    let slot = start
-    for (let i = 0; i < slots; i++) {
-      const cand = (start + i) % slots
-      if (!used.has(cand)) {
-        slot = cand
-        break
-      }
-    }
-    used.add(slot)
-    out.set(uuid, slot)
-  }
-  return out
-}
-
 /** 从 Ping 汇总里取「代表任务」的延迟与丢包（同一任务 → 口径一致）。
  *  取 avg 最小且非丢包的任务；无可用任务 → 两者皆 null。 */
 export function pickPingStats(

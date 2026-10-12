@@ -1,17 +1,25 @@
 <script setup lang="ts">
 /**
- * NodeCard —— 节点卡片（住在 SceneStack 的 mid 层，ART_SYSTEM §2）
+ * NodeCard —— 节点卡片（**木牌面板**，复刻《星露谷物语主题.pdf》）
  *
- * 展示：彩色标题栏（图标 + 居中名称 + 状态）/ CPU% / 内存% / 硬盘% / 上下行 / 负载 /
- *       在线时长 / 累计流量 / 延迟 / 丢包 / 到期时间（Expire）。
+ * 参考稿结构（逐项对齐）：
+ *   ① 绿色木匾标题栏：叶片/藤蔓装饰 + 路由图标 + 白色粗体节点名 + 右侧国旗 + 右上角状态灯
+ *   ② 奶油色纸/浅木纹主体：深棕 1px 描边、圆角
+ *   ③ 系统行：`os · arch · 虚拟化`（整宽，左侧一枚系统图标）
+ *   ④ 之后每行两列，行间有浅色细横线：
+ *        CPU% / Memory%   → Disk% / Load
+ *        ↑Upload / ↓Download → Outbound / Inbound
+ *        Latency / Packet Loss → Expires / Uptime
+ *   ⑤ 进度条：圆角长槽 + 一排小方块（分段式）；CPU/Mem/Disk/Latency/Loss 绿，**Load 橙**
+ *   ⑥ 数值文字用蓝、标签用深棕
+ *
  * 约束：
- *  - 所有数值统一走 @/v2/data/metrics 的格式化函数，组件内不做任何自造格式。
- *  - 视觉全部取自母板/tokens：柔和投影、圆角、无硬边像素描边（笔触平滑）。
- *  - 标题栏主题色按 uuid 稳定映射到母板 --vk-accent-*，同一台每次同色。
- *  - 小图标统一走 Iconify（@iconify/vue，仓内既有图标管线），不使用像素 sprite。
+ *  - 数值一律走 @/v2/data/metrics 的格式化函数，组件内不自造格式。
+ *  - 图标走 @/components/PixelIcon.vue（像素 sprite，缺图自动回落 Iconify）。
+ *  - 视觉取色 ⊆ tokens.css 的母板令牌，不写死十六进制。
  *  - 状态用「颜色 + 文字」双重区分（nodeStatus.ts），不只靠颜色。
  */
-import { Icon } from '@iconify/vue'
+import PixelIcon from '@/components/PixelIcon.vue'
 import type { Node } from '@/v2/data/types'
 import { computed } from 'vue'
 import {
@@ -28,162 +36,192 @@ import {
   usageLevel,
 } from '@/v2/data/metrics'
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
+import { getRegionCode } from '@/utils/regionHelper'
 
-const props = defineProps<{ node: Node, accentIndex?: number }>()
+const props = defineProps<{ node: Node }>()
 
 const node = computed(() => props.node)
-
 const viewStatus = computed(() => nodeViewStatus(node.value))
 const statusLabel = computed(() => nodeStatusLabel(viewStatus.value))
 
-/** 资源百分比文案/进度条宽度（全部经 metrics，不另写格式化） */
+/* ---- 指标文案与进度条取值（全部经 metrics） ---- */
 const cpuPctText = computed(() => formatPercent(node.value.cpu, 100))
-const cpuPctValue = computed(() => percentValue(node.value.cpu, 100))
+const cpuPct = computed(() => percentValue(node.value.cpu, 100))
 
 const memPctText = computed(() => formatPercent(node.value.ram, node.value.ramTotal))
-const memPctValue = computed(() => percentValue(node.value.ram, node.value.ramTotal))
-const memText = computed(() => `${formatBytes(node.value.ram)} / ${formatBytes(node.value.ramTotal)}`)
+const memPct = computed(() => percentValue(node.value.ram, node.value.ramTotal))
 
 const diskPctText = computed(() => formatPercent(node.value.disk, node.value.diskTotal))
-const diskPctValue = computed(() => percentValue(node.value.disk, node.value.diskTotal))
-const diskText = computed(() => `${formatBytes(node.value.disk)} / ${formatBytes(node.value.diskTotal)}`)
-
-const netInText = computed(() => formatBytesPerSecond(node.value.netIn))
-const netOutText = computed(() => formatBytesPerSecond(node.value.netOut))
-const trafficDownText = computed(() => formatBytes(node.value.netTotalDown))
-const trafficUpText = computed(() => formatBytes(node.value.netTotalUp))
+const diskPct = computed(() => percentValue(node.value.disk, node.value.diskTotal))
 
 const loadText = computed(() => formatLoad(node.value.load))
-const loadPctText = computed(() => formatLoadPercent(node.value.load, node.value.cpuCores))
-const uptimeText = computed(() => formatUptime(node.value.uptime))
+const loadPct = computed(() => percentValue(node.value.load, node.value.cpuCores))
+
 const latencyText = computed(() => formatLatency(node.value.latency))
-/** 到期时间：expired_at 缺失/非法 → '—' */
+const lossText = computed(() => formatLoss(node.value.loss))
+
+const uptimeText = computed(() => formatUptime(node.value.uptime))
 const expireText = computed(() => formatDate(node.value.expiredAt))
 
-/** 各资源使用率等级（着色用） */
-const cpuLevel = computed(() => usageLevel(node.value.cpu))
-const memLevel = computed(() => usageLevel(percentValue(node.value.ram, node.value.ramTotal)))
-const diskLevel = computed(() => usageLevel(percentValue(node.value.disk, node.value.diskTotal)))
+/** 上下行（实时速率）：↑Upload = 上行(netOut)，↓Download = 下行(netIn) */
+const uploadText = computed(() => formatBytesPerSecond(node.value.netOut))
+const downloadText = computed(() => formatBytesPerSecond(node.value.netIn))
+/** 累计流量：Outbound = 累计上行，Inbound = 累计下行 */
+const outboundText = computed(() => formatBytes(node.value.netTotalUp))
+const inboundText = computed(() => formatBytes(node.value.netTotalDown))
 
-/** 顶部彩色标题栏主题色：按 uuid 稳定映射到 6 组「底色 + 承色字」配对（每台一个色，可辨且不串色）。
- *  承色字保证 ≥4.5:1 对比度（见 tokens.css 注释），故标题栏可整块上色。 */
-const CARD_ACCENTS = [
-  { bg: 'var(--vk-card-accent-1)', ink: 'var(--vk-card-ink-1)' },
-  { bg: 'var(--vk-card-accent-2)', ink: 'var(--vk-card-ink-2)' },
-  { bg: 'var(--vk-card-accent-3)', ink: 'var(--vk-card-ink-3)' },
-  { bg: 'var(--vk-card-accent-4)', ink: 'var(--vk-card-ink-4)' },
-  { bg: 'var(--vk-card-accent-5)', ink: 'var(--vk-card-ink-5)' },
-  { bg: 'var(--vk-card-accent-6)', ink: 'var(--vk-card-ink-6)' },
-] as const
-
-/** 顶部彩色标题栏主题色：优先用父级（HomeView）按全量节点分配的 accentIndex
- *  （同批 ≤6 台互不同色，见 nodeModel.assignAccents）；独立使用时退化为 uuid 哈希。 */
-const accent = computed(() => {
-  const idx = props.accentIndex
-  if (typeof idx === 'number' && Number.isFinite(idx) && idx >= 0)
-    return CARD_ACCENTS[idx % CARD_ACCENTS.length]!
-  const key = node.value.uuid || node.value.name
-  let h = 0
-  for (let i = 0; i < key.length; i++)
-    h = (h * 31 + key.charCodeAt(i)) >>> 0
-  return CARD_ACCENTS[h % CARD_ACCENTS.length]!
+/** 系统行：os · arch · 虚拟化（缺项自动跳过，不留空点） */
+const sysLine = computed(() => {
+  const n = node.value
+  return [n.os, n.arch, n.virtualization].filter(v => typeof v === 'string' && v.trim() !== '').join(' · ')
 })
 
-/** 丢包率文案（取与代表延迟同一个 Ping 任务，口径一致） */
-const lossText = computed(() => formatLoss(node.value.loss))
+/** 地区 → ISO 码 → 国旗素材；解析不出则不渲染国旗 */
+const flagCode = computed(() => {
+  const code = getRegionCode(node.value.region ?? '')
+  return code && /^[A-Z]{2}$/.test(code) ? code : null
+})
+
+/** 进度条颜色：Load 用橙，其余用绿（对齐参考稿） */
+const GREEN = 'var(--vk-leaf)'
+const ORANGE = 'var(--vk-honey)'
+
+defineExpose({ viewStatus, statusLabel })
 </script>
 
 <template>
   <article
-    class="vk-node-card vk-card vk-contact"
+    class="vk-node-card vk-panel"
     :data-node-id="node.uuid"
     :data-status="viewStatus"
-    :style="{ '--vk-node-accent': accent.bg, '--vk-node-ink': accent.ink }"
   >
-    <header class="vk-card-head">
-      <span class="vk-card-head-icon" aria-hidden="true">
-        <Icon icon="tabler:server-2" :width="15" :height="15" />
+    <!-- ① 绿色木匾标题栏 -->
+    <header class="vk-card-head vk-panel-head">
+      <span class="vk-panel-vine" aria-hidden="true" />
+      <span class="vk-card-head-icon vk-panel-head-icon" aria-hidden="true">
+        <PixelIcon name="server" :size="16" />
       </span>
-      <span class="vk-card-name" :title="node.name">{{ node.name }}</span>
-      <span class="vk-card-status" :data-status="viewStatus">{{ statusLabel }}</span>
+      <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
+      <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
+        <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
+      </span>
+      <!-- 视觉上是参考稿的状态圆点；状态文字作为 tooltip + 无障碍标签，保证不只靠颜色区分 -->
+      <span class="vk-panel-dot" :data-status="viewStatus" :title="statusLabel" aria-hidden="true" />
+      <span class="vk-card-status vk-visually-hidden">{{ statusLabel }}</span>
     </header>
 
-    <div class="vk-card-body">
-      <ul class="vk-card-metrics">
-      <li class="vk-card-metric" data-metric="cpu">
-        <span class="vk-metric-label">
-          <Icon class="vk-icon-inline" icon="tabler:cpu" :width="13" :height="13" />CPU
-        </span>
-        <span class="vk-metric-value" data-field="cpu">{{ cpuPctText }}</span>
-        <span class="vk-meter" :data-level="cpuLevel">
-          <span class="vk-meter-fill" :style="{ width: `${cpuPctValue}%` }" />
-        </span>
-      </li>
-      <li class="vk-card-metric" data-metric="mem">
-        <span class="vk-metric-label">
-          <Icon class="vk-icon-inline" icon="tabler:memory" :width="13" :height="13" />内存
-        </span>
-        <span class="vk-metric-value" data-field="mem">{{ memPctText }}</span>
-        <span class="vk-meter" :data-level="memLevel">
-          <span class="vk-meter-fill" :style="{ width: `${memPctValue}%` }" />
-        </span>
-        <span class="vk-metric-sub" data-field="mem-detail">{{ memText }}</span>
-      </li>
-      <li class="vk-card-metric" data-metric="disk">
-        <span class="vk-metric-label">
-          <Icon class="vk-icon-inline" icon="tabler:device-sd-card" :width="13" :height="13" />硬盘
-        </span>
-        <span class="vk-metric-value" data-field="disk">{{ diskPctText }}</span>
-        <span class="vk-meter" :data-level="diskLevel">
-          <span class="vk-meter-fill" :style="{ width: `${diskPctValue}%` }" />
-        </span>
-        <span class="vk-metric-sub" data-field="disk-detail">{{ diskText }}</span>
-      </li>
-    </ul>
+    <!-- ② 奶油色纸主体 -->
+    <div class="vk-card-body vk-panel-body">
+      <!-- ③ 系统行 -->
+      <p v-if="sysLine" class="vk-panel-sys">
+        <PixelIcon name="desktop" :size="14" />
+        <span>{{ sysLine }}</span>
+      </p>
 
-    <dl class="vk-card-facts">
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:arrow-down" :width="12" :height="12" />下行</dt>
-        <dd data-field="net-in">{{ netInText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:arrow-up" :width="12" :height="12" />上行</dt>
-        <dd data-field="net-out">{{ netOutText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:download" :width="12" :height="12" />累计↓</dt>
-        <dd data-field="traffic-down">{{ trafficDownText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:upload" :width="12" :height="12" />累计↑</dt>
-        <dd data-field="traffic-up">{{ trafficUpText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:gauge" :width="12" :height="12" />负载</dt>
-        <dd data-field="load">{{ loadText }} ({{ loadPctText }})</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:clock" :width="12" :height="12" />在线</dt>
-        <dd data-field="uptime">{{ uptimeText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:activity" :width="12" :height="12" />延迟</dt>
-        <dd data-field="latency">{{ latencyText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:shield-off" :width="12" :height="12" />丢包</dt>
-        <dd data-field="loss">{{ lossText }}</dd>
-      </div>
-      <div class="vk-fact">
-        <dt><Icon class="vk-icon-inline" icon="tabler:calendar-event" :width="12" :height="12" />到期</dt>
-        <dd data-field="expire" :title="node.expiredAt ?? ''">{{ expireText }}</dd>
-      </div>
-    </dl>
+      <!-- ④ 指标行：每行两列 -->
+      <div class="vk-panel-rows">
+        <!-- CPU / Memory -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="cpu" :size="14" />
+            <span class="vk-cell-label">CPU</span>
+            <span class="vk-cell-value" data-field="cpu">{{ cpuPctText }}</span>
+            <span class="vk-seg" :data-level="usageLevel(node.cpu)" :style="{ '--vk-seg-color': GREEN }">
+              <span class="vk-seg-fill" :style="{ width: `${cpuPct}%` }" />
+            </span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="memory" :size="14" />
+            <span class="vk-cell-label">Memory</span>
+            <span class="vk-cell-value" data-field="mem">{{ memPctText }}</span>
+            <span class="vk-seg" :data-level="usageLevel(memPct)" :style="{ '--vk-seg-color': GREEN }">
+              <span class="vk-seg-fill" :style="{ width: `${memPct}%` }" />
+            </span>
+          </div>
+        </div>
 
-    <footer class="vk-card-foot">
-      <span v-if="node.region" class="vk-card-region" :title="node.region">{{ node.region }}</span>
-      <span class="vk-card-os" :title="node.os">{{ node.os }}</span>
-    </footer>
+        <!-- Disk / Load -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="hard-disk" :size="14" />
+            <span class="vk-cell-label">Disk</span>
+            <span class="vk-cell-value" data-field="disk">{{ diskPctText }}</span>
+            <span class="vk-seg" :data-level="usageLevel(diskPct)" :style="{ '--vk-seg-color': GREEN }">
+              <span class="vk-seg-fill" :style="{ width: `${diskPct}%` }" />
+            </span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="dashboard" :size="14" />
+            <span class="vk-cell-label">Load</span>
+            <span class="vk-cell-value" data-field="load">{{ loadText }}</span>
+            <span class="vk-seg" :style="{ '--vk-seg-color': ORANGE }">
+              <span class="vk-seg-fill" :style="{ width: `${loadPct}%` }" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Upload / Download -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="traffic-up" :size="14" />
+            <span class="vk-cell-label">Upload</span>
+            <span class="vk-cell-value" data-field="net-out">{{ uploadText }}</span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="traffic-down" :size="14" />
+            <span class="vk-cell-label">Download</span>
+            <span class="vk-cell-value" data-field="net-in">{{ downloadText }}</span>
+          </div>
+        </div>
+
+        <!-- Outbound / Inbound -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="transfer" :size="14" />
+            <span class="vk-cell-label">Outbound</span>
+            <span class="vk-cell-value" data-field="traffic-up">{{ outboundText }}</span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="globe" :size="14" />
+            <span class="vk-cell-label">Inbound</span>
+            <span class="vk-cell-value" data-field="traffic-down">{{ inboundText }}</span>
+          </div>
+        </div>
+
+        <!-- Latency / Packet Loss -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="clock" :size="14" />
+            <span class="vk-cell-label">Latency</span>
+            <span class="vk-cell-value" data-field="latency">{{ latencyText }}</span>
+            <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
+              <span class="vk-seg-fill" :style="{ width: `${Math.min(100, node.latency || 0)}%` }" />
+            </span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="shield" :size="14" />
+            <span class="vk-cell-label">Packet Loss</span>
+            <span class="vk-cell-value" data-field="loss">{{ lossText }}</span>
+            <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
+              <span class="vk-seg-fill" :style="{ width: `${Math.min(100, node.loss || 0)}%` }" />
+            </span>
+          </div>
+        </div>
+
+        <!-- Expires / Uptime -->
+        <div class="vk-panel-row">
+          <div class="vk-cell">
+            <PixelIcon name="calendar" :size="14" />
+            <span class="vk-cell-label">Expires</span>
+            <span class="vk-cell-value" data-field="expire" :title="node.expiredAt ?? ''">{{ expireText }}</span>
+          </div>
+          <div class="vk-cell">
+            <PixelIcon name="hourglass" :size="14" />
+            <span class="vk-cell-label">Uptime</span>
+            <span class="vk-cell-value" data-field="uptime">{{ uptimeText }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </article>
 </template>

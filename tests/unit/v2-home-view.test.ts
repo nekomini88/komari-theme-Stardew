@@ -46,7 +46,7 @@ describe('HomeView：装配真实首页', () => {
     const cards = wrapper.findAll('.vk-node-card')
     expect(cards).toHaveLength(Object.keys(fixture.nodes).length)
     for (const c of cards) {
-      expect(c.classes()).toContain('vk-contact')
+      expect(c.classes()).toContain('vk-panel')
       expect(c.attributes('data-node-id')).toBeTruthy()
     }
     wrapper.unmount()

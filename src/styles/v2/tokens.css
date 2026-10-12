@@ -59,23 +59,22 @@
   --vk-grass-night: #3f6b4c;
   --vk-soil-night: #5a4034;
 
-  /* ---- 卡片顶部彩色标题栏：每台一个主题色（取母板）+ **配对承色字** ----
-     口径（DESIGN_REFERENCE §6/§7）：每台一个可辨主题色；标题栏是整块彩色，
-     故必须为每个底色配一个满足 对比度 ≥4.5:1 的文字色（cream=#f7ecd3 / wood=#3d2a1a，
-     比值由 WCAG 相对亮度公式实测，写在行尾）。整块上色 = 参考稿的「彩色标题栏」观感。
-     v3：6 色对齐参考稿的「绿/青/蓝/紫/粉/橘」家族（紫/粉/青由母板 v3 新增）。 */
-  --vk-card-accent-1: #4e6b39; /* 苔绿·暗 */
-  --vk-card-ink-1: #f7ecd3;    /* 5.13:1 */
-  --vk-card-accent-2: #4fa8a0; /* 青（seafoam，v3 新增） */
-  --vk-card-ink-2: #3d2a1a;    /* 4.82:1 */
-  --vk-card-accent-3: #4f9fd0; /* 晴空蓝 */
-  --vk-card-ink-3: #3d2a1a;    /* 4.66:1 */
-  --vk-card-accent-4: #7e5aa0; /* 紫（plum，v3 新增） */
-  --vk-card-ink-4: #f7ecd3;    /* 4.64:1 */
-  --vk-card-accent-5: #d97f9a; /* 粉（blossom，v3 新增） */
-  --vk-card-ink-5: #3d2a1a;    /* 4.83:1 */
-  --vk-card-accent-6: #d99a4e; /* 蜜橘 */
-  --vk-card-ink-6: #3d2a1a;    /* 5.62:1 */
+  /* ---- 木牌面板（复刻《星露谷物语主题.pdf》的节点卡）----
+     口径：标题栏是**绿色木匾**（所有面板统一绿，不再每台一色 → accent 机制已退役），
+     主体是奶油色纸/浅木纹，深棕 1px 描边，硬边小圆角（像素风不追求大圆角）。
+
+     可读性：标题栏文字用纸奶白，故木匾主体须压到 --vk-moss-dark（#4e6b39）——
+     对纸奶白实测 5.13:1 ≥ 4.5:1；顶部只留一道 --vk-moss 亮边做木牌立体感
+     （亮绿 #7fa851 配奶白仅 2.35:1，不可作文字底色）。 */
+  --vk-panel-head-face: linear-gradient(180deg, var(--vk-moss) 0%, var(--vk-moss-dark) 22%, var(--vk-moss-dark) 100%);
+  --vk-panel-head-ink: var(--vk-paper-cream);
+  --vk-panel-face: linear-gradient(180deg, var(--vk-paper-cream) 0%, var(--vk-paper-warm) 100%);
+  --vk-panel-border: var(--vk-outline);
+  --vk-panel-value: var(--vk-sky-day-lo); /* 数值用蓝（参考稿口径） */
+  --vk-panel-radius: 4px;
+  --vk-seg-h: 8px;      /* 分段进度条高度 */
+  --vk-seg-unit: 5px;   /* 单格宽 */
+  --vk-seg-gap: 2px;    /* 格间距 */
 
   /* ---- 暖色阴影基色（柔和投影一律用它，绝不用纯黑） ---- */
   --vk-shadow-warm: var(--vk-wood-deep);
@@ -239,22 +238,4 @@
 .vk-btn:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--vk-honey) 80%, transparent);
   outline-offset: 2px;
-}
-
-/* ---- 接触阴影：落地元素的柔和椭圆投影（渐变构成，非硬边像素带） ---- */
-.vk-contact {
-  position: relative;
-}
-
-.vk-contact::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -10px;
-  width: 82%;
-  height: 18px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--vk-shadow-warm) 26%, transparent), transparent 70%);
-  pointer-events: none;
-  z-index: -1;
 }
