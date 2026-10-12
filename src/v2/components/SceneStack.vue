@@ -32,7 +32,7 @@ const SCENE_DIR = '/images/v2-scene/full'
 
 /** 已出图的时段。**night 出图后加进来即可**，其余代码无需改动。
  *  未出图的时段回退到最近可用的时段，避免 404 破图。 */
-const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk']
+const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk', 'night']
 const FALLBACK_TIME: TimeOfDay = 'dusk'
 
 /** 实际渲染用时段：请求的时段没图时回退 */

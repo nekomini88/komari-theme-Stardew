@@ -41,22 +41,20 @@ describe('SceneStack 架构：整幅场景图（复刻 PDF 的像素风，不做
     expect(stackSrc).not.toContain('<svg')
   })
 
-  it('每个「已出图」的时段都有真实素材落盘（day / dusk）', () => {
-    for (const t of ['day', 'dusk']) {
+  it('三个时段都有真实素材（day / dusk / night）', () => {
+    expect(stackSrc).toContain("const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk', 'night']")
+    for (const t of ['day', 'dusk', 'night']) {
       const f = resolve(root, `${SCENE_DIR}/${t}.png`)
       expect(existsSync(f), `缺少场景素材 ${t}.png`).toBe(true)
     }
   })
 
-  it('未出图的时段（night）回退到已有时段，避免 404 破图', () => {
-    expect(stackSrc).toContain("const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk']")
-    expect(stackSrc).toContain("const FALLBACK_TIME: TimeOfDay = 'dusk'")
-    const wrapper = mount(SceneStack, { props: { time: 'night' } })
+  it('回退机制仍在：素材缺失/非法时段不会 404 破图', () => {
+    expect(stackSrc).toContain('const FALLBACK_TIME')
+    // 传一个不在 AVAILABLE 里的时段 → 回退到 dusk，且引用的是已存在的图
+    const wrapper = mount(SceneStack, { props: { time: 'noon' as never } })
     expect(wrapper.attributes('data-time')).toBe('dusk')
-    // 文件名必须是回退后的时段，不能是缺失的 night.png
-    const plate = wrapper.get('.vk-scene-plate')
-    expect(plate.attributes('style')).toContain('dusk.png')
-    expect(plate.attributes('style')).not.toContain('night.png')
+    expect(wrapper.get('.vk-scene-plate').attributes('style')).toContain('dusk.png')
   })
 })
 
