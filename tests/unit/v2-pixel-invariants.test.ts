@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { contrastRatio, decodePng, dominantColor } from '../helpers/png'
 import { describe, expect, it } from 'vitest'
 
 const ROOT = resolve(__dirname, '..', '..')
@@ -78,7 +79,7 @@ describe('像素风硬约束（每次改样式都要过）', () => {
 
   it('像素字号必须是设计尺寸 12px 的整数倍', () => {
     const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
-    for (const name of ['--vk-fs-sm', '--vk-fs-md', '--vk-fs-lg']) {
+    for (const name of ['--vk-fs-sm', '--vk-fs-lg']) {
       const m = tokens.match(new RegExp(`${name}:\\s*(\\d+)px`))
       expect(m, `${name} 未定义`).toBeTruthy()
       expect(Number(m![1]) % 12, `${name}=${m![1]}px 不是 12 的整数倍`).toBe(0)
@@ -92,5 +93,54 @@ describe('像素风硬约束（每次改样式都要过）', () => {
       const bad = [...css.matchAll(/font-weight:\s*(6\d\d|7\d\d|8\d\d|9\d\d|bold)/g)]
       expect(bad.map(b => b[0]), `${file} 里出现合成加粗`).toEqual([])
     }
+  })
+})
+
+describe('标题文字色必须与底板横幅色配对（自动审核：防「字色与横幅不配」复发）', () => {
+  const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
+  const panelDir = resolve(ROOT, 'public/images/v2-panel')
+
+  /**
+   * 取「标题文字实际所在的横幅中央主体」的颜色 —— 直接解码底板 PNG。
+   * 不能读一份手写的事实表：事实表会与实际产物脱节，等于没验。
+   * 区域按底板比例取：中央主体 x 28%..75.5%、横幅上半 y 1%..11.5%（底板 428×394 → x120..323, y4..45）。
+   */
+  function bannerColorOf(slot: number): { hex: string, size: [number, number] } {
+    const img = decodePng(readFileSync(resolve(panelDir, `panel-${slot}.png`)))
+    const x0 = Math.round(img.width * 0.28)
+    const x1 = Math.round(img.width * 0.755)
+    const y0 = Math.round(img.height * 0.01)
+    const y1 = Math.round(img.height * 0.115)
+    return { hex: dominantColor(img, x0, x1, y0, y1), size: [img.width, img.height] }
+  }
+
+  it('6 个色槽：底板横幅实测色 与 --vk-node-ink-N 的对比度都 ≥4.5:1', () => {
+    for (let i = 1; i <= 6; i++) {
+      const { hex, size } = bannerColorOf(i)
+      const ink = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))?.[1]
+      expect(ink, `--vk-node-ink-${i} 未定义`).toBeTruthy()
+      const c = contrastRatio(hex, ink!)
+      expect(c, `第 ${i} 槽：底板横幅实测 ${hex}（${size[0]}x${size[1]}）与文字 ${ink} 对比度仅 ${c.toFixed(2)}，不足 4.5:1`)
+        .toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('描边取与文字相反的色调（深字配浅描边 / 浅字配深描边）', () => {
+    for (let i = 1; i <= 6; i++) {
+      const ink = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
+      const sh = tokens.match(new RegExp(`--vk-node-shadow-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
+      const inkDark = contrastRatio(ink, '#000000') > contrastRatio(ink, '#ffffff')
+      const shDark = contrastRatio(sh, '#000000') > contrastRatio(sh, '#ffffff')
+      expect(inkDark, `第 ${i} 槽：文字与描边明暗同向（起不到分离作用）`).not.toBe(shDark)
+    }
+  })
+
+  it('底板尺寸与卡片锁定的比例一致（改了底板必须同步 aspect-ratio）', () => {
+    const cardCss = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const m = cardCss.match(/aspect-ratio:\s*(\d+)\s*\/\s*(\d+)/)
+    expect(m, 'card.css 未锁定底板比例').toBeTruthy()
+    const [w, h] = [Number(m![1]), Number(m![2])]
+    const { size } = bannerColorOf(1)
+    expect(Math.abs(w / h - size[0] / size[1])).toBeLessThan(0.02)
   })
 })

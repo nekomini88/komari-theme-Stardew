@@ -227,26 +227,22 @@ describe('每台一色（参考稿本身就是每台一色，配色取自参考�
     return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
   }
 
-  it('tokens.css 定义 6 组 accent/ink 成对令牌', () => {
+  it('tokens.css 定义 6 组 ink/shadow 成对令牌（横幅配色由美术底板提供，已无 accent 令牌）', () => {
     for (let i = 1; i <= 6; i++) {
-      expect(tokens).toContain(`--vk-node-accent-${i}:`)
       expect(tokens).toContain(`--vk-node-ink-${i}:`)
+      expect(tokens).toContain(`--vk-node-shadow-${i}:`)
     }
+    expect(tokens).not.toContain('--vk-node-accent-')
   })
 
-  it('每组 accent 与其 ink 的对比度都 ≥4.5:1（WCAG 实算，标题栏整块上色）', () => {
-    for (let i = 1; i <= 6; i++) {
-      const a = tokens.match(new RegExp(`--vk-node-accent-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
-      const k = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
-      expect(contrast(a, k), `accent-${i} (${a}) 与 ink-${i} (${k}) 对比度不足`).toBeGreaterThanOrEqual(4.5)
-    }
-  })
+  // 对比度审核已改为对**美术底板横幅实测色**校验，见 v2-pixel-invariants.test.ts
+  // （原先拿 accent 十六进制值算 —— 基准错误，正是 3 台字色压不住横幅的原因）
 
   it('卡片根节点成对下发 --vk-node-accent 与 --vk-node-ink', () => {
     const w = mount(NodeCard, { props: { node: frankfurt, accentIndex: 2 } })
     const style = w.attributes('style') ?? ''
-    expect(style).toContain('--vk-node-accent: var(--vk-node-accent-3)')
     expect(style).toContain('--vk-node-ink: var(--vk-node-ink-3)')
+    expect(style).toContain('--vk-node-shadow: var(--vk-node-shadow-3)')
     expect(w.attributes('data-accent')).toBe('3')
   })
 

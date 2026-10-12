@@ -42,7 +42,8 @@ const props = defineProps<{ node: Node, accentIndex?: number }>()
 
 const node = computed(() => props.node)
 
-/** 标题栏色槽数（与 tokens.css 的 --vk-node-accent-1..6 对应） */
+/** 标题栏色槽数（与 tokens.css 的 --vk-node-ink-1..6 / --vk-node-shadow-1..6 一致，
+ *  色彩本身由 public/images/v2-panel/panel-1..6.png 提供） */
 const ACCENT_SLOTS = 6
 
 /** 标题栏色槽：优先用父级（HomeView）按**全量**节点分配的 accentIndex
@@ -114,8 +115,8 @@ defineExpose({ viewStatus, statusLabel })
     :data-status="viewStatus"
     :data-accent="accentSlot + 1"
     :style="{
-      '--vk-node-accent': `var(--vk-node-accent-${accentSlot + 1})`,
       '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
+      '--vk-node-shadow': `var(--vk-node-shadow-${accentSlot + 1})`,
       '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
     }"
   >

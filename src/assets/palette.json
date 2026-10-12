@@ -1,17 +1,41 @@
 {
   "meta": {
     "name": "NekoVPS v2 母板（木质感拟物 + 手绘平滑）",
-    "version": 6,
-    "count": 54,
+    "version": 7,
+    "count": 60,
     "outline": "#2b1d16",
-    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：并入参考稿实测的 6 个标题栏 accent 色（绿/蓝/紫/粉/橙/青）——参考稿本身就是「每台一色」，此前误判为统一绿色并把 accent 机制删除，现已恢复。",
+    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：参考稿实测的 6 个 accent 色定义「每台一色的色相槽位」；实际底色横幅由 public/images/v2-panel/panel-1..6.png 提供（对原图做色相替换、保留原明度，故比 accent 十六进制值暗）。标题文字色必须按**底板横幅实测色**配对，拿 accent 值算会得到深字压深底（v7 修正）。",
     "accentInkPairing": {
-      "accent-leaf": "ref-ink",
-      "accent-sky": "ref-ink",
-      "accent-plum": "paper-cream",
-      "accent-blossom": "ref-ink",
-      "accent-honey": "ref-ink",
-      "accent-seafoam": "ref-ink"
+      "slot1": {
+        "banner": "#279A06",
+        "ink": "#101702",
+        "contrast": 4.99
+      },
+      "slot2": {
+        "banner": "#06509A",
+        "ink": "#f7ecd3",
+        "contrast": 6.82
+      },
+      "slot3": {
+        "banner": "#53069A",
+        "ink": "#f7ecd3",
+        "contrast": 9.62
+      },
+      "slot4": {
+        "banner": "#9A0623",
+        "ink": "#f7ecd3",
+        "contrast": 7.38
+      },
+      "slot5": {
+        "banner": "#9A5D06",
+        "ink": "#f7ecd3",
+        "contrast": 4.54
+      },
+      "slot6": {
+        "banner": "#069A96",
+        "ink": "#101702",
+        "contrast": 5.3
+      }
     }
   },
   "colors": [
@@ -284,6 +308,36 @@
       "id": "accent-seafoam",
       "hex": "#00aba7",
       "role": "参考稿实测标题栏色·青（每台一色）"
+    },
+    {
+      "id": "panel-banner-1",
+      "hex": "#279a06",
+      "role": "美术底板 panel-1.png 的横幅实测色（色相槽位 1）"
+    },
+    {
+      "id": "panel-banner-2",
+      "hex": "#06509a",
+      "role": "美术底板 panel-2.png 的横幅实测色（色相槽位 2）"
+    },
+    {
+      "id": "panel-banner-3",
+      "hex": "#53069a",
+      "role": "美术底板 panel-3.png 的横幅实测色（色相槽位 3）"
+    },
+    {
+      "id": "panel-banner-4",
+      "hex": "#9a0623",
+      "role": "美术底板 panel-4.png 的横幅实测色（色相槽位 4）"
+    },
+    {
+      "id": "panel-banner-5",
+      "hex": "#9a5d06",
+      "role": "美术底板 panel-5.png 的横幅实测色（色相槽位 5）"
+    },
+    {
+      "id": "panel-banner-6",
+      "hex": "#069a96",
+      "role": "美术底板 panel-6.png 的横幅实测色（色相槽位 6）"
     }
   ]
 }

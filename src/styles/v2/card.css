@@ -84,20 +84,23 @@
   flex: 1 1 auto;
   margin: 0;
   overflow: hidden;
-  font-size: var(--vk-fs-md);
+  /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
+     像素字只能取 12 的整数倍，12px 明显偏小（与横幅不相称），故取 24px（= 设计尺寸 2×） */
+  font-size: var(--vk-fs-lg);
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: 0.02em;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* 像素字描边：四向 1px，颜色由 accent 压暗派生（每台一色也保持可读） */
+  /* 像素字描边：四向 1px，颜色取「与文字相反的色调」（深字配浅描边 / 浅字配深描边），
+     由底板横幅实测色决定 —— 见 tokens.css 的 --vk-node-shadow-N */
   text-shadow:
-    1px 0 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
-    -1px 0 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
-    0 1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
-    0 -1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border)),
-    1px 1px 0 color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-panel-border));
+    1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    -1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    0 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    0 -1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    1px 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo));
 }
 
 .vk-panel-flag {
