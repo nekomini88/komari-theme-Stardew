@@ -10,9 +10,10 @@
  */
 import type { Season, TimeOfDay, TintSpec } from '@/v2/theme/sceneState'
 import { computed } from 'vue'
+import SceneDecor from '@/v2/components/SceneDecor.vue'
+import SceneLife from '@/v2/components/SceneLife.vue'
 import { resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
 import { useCrossfade } from '@/v2/theme/useCrossfade'
-import SceneLife from '@/v2/components/SceneLife.vue'
 
 const props = withDefaults(defineProps<{
   time?: TimeOfDay
@@ -113,12 +114,11 @@ defineExpose({
       <!-- 手绘天空插画：昼/昏显示（自带云与地平线奶白过渡）；夜隐藏 → 露出色带夜空。
            tint 仍是整栈叠加层（见下方 .vk-tint），与天空色带/各层无关地统一生效。 -->
       <span class="vk-sky-img" />
-      <!-- 太阳（左上，带光芒）/ 云（柔边白云）—— 田园场景要素 -->
-      <span class="vk-sun" />
-      <span class="vk-cloud vk-cloud-1" />
-      <span class="vk-cloud vk-cloud-2" />
-      <span class="vk-cloud vk-cloud-3" />
     </div>
+
+    <!-- 场景关键素材层：太阳(带笑脸光芒) / 蓬松云 / 层叠丘陵 / 风车 / 房屋 / 灌木 / 小路
+         —— 一律为 ListenHub 生成的透明 PNG 插画（/images/v2-scene/*.png），非 CSS/SVG 手搓 -->
+    <SceneDecor :time="scene.time" />
 
     <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
     <div

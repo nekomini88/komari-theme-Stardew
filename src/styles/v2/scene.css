@@ -16,8 +16,13 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  /* 通透感：整栈统一的饱和度/对比度提升（只作用于场景层，卡片在 .vk-main 内不受影响） */
+  filter: saturate(var(--vk-scene-saturate, 1.18)) contrast(var(--vk-scene-contrast, 1.04))
+    brightness(var(--vk-scene-bright, 1.03));
   /* 兜底：白天插画（首帧/切换空窗期间不至于露底），实际视觉由 .vk-scene-bg 按时间提供 */
-  background: url('/images/v2-scene/ui-farm-bg.png') center top / cover no-repeat, var(--vk-sky-day);
+  background:
+    url('/images/v2-scene/ui-farm-bg.png') center top / cover no-repeat,
+    var(--vk-sky-day);
 }
 
 /* ---- 场景底图：整幅手绘插画，按访客本地时间交叉淡化 ----
@@ -79,80 +84,149 @@
   right: 0;
   bottom: 0;
   height: 26%;
-  background: linear-gradient(180deg,
+  background: linear-gradient(
+    180deg,
     transparent 0%,
     color-mix(in srgb, var(--vk-paper-cream) 34%, transparent) 72%,
-    color-mix(in srgb, var(--vk-paper-cream) 52%, transparent) 100%);
+    color-mix(in srgb, var(--vk-paper-cream) 52%, transparent) 100%
+  );
   z-index: 4;
 }
 
-/* ---- 太阳（左上偏上）：暖黄亮核 + 外圈柔光 + 放射光芒 ---- */
-.vk-sun {
+/* ============================================================================
+ * 场景关键素材层（SceneDecor）：太阳 / 云 / 层叠丘陵 / 风车 / 房屋 / 灌木 / 小路
+ * —— 一律来自 ListenHub 生成的透明 PNG（/images/v2-scene/*.png）。
+ * 代码只做摆放 / 缩放 / 显隐；不得内联 SVG/CSS 手搓图形。
+ * 整层位于 .vk-scene(z-index 0) 内、卡片内容层 .vk-main(z-index 1) 之下 → 不遮挡卡片。
+ * ========================================================================== */
+.vk-decor {
   position: absolute;
-  left: 13%;
-  top: 20%;
-  width: 104px;
-  height: 104px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 46% 42%,
-    var(--vk-warm-hi) 0%,
-    var(--vk-honey-hi) 40%,
-    var(--vk-honey) 64%,
-    color-mix(in srgb, var(--vk-honey) 34%, transparent) 82%,
-    transparent 100%);
-  filter:
-    drop-shadow(0 0 16px color-mix(in srgb, var(--vk-honey-hi) 70%, transparent))
-    drop-shadow(0 0 44px color-mix(in srgb, var(--vk-honey) 44%, transparent));
-  z-index: 6;
+  inset: 0;
+  z-index: 5; /* 在天空插画(z3)之上、整栈 tint(z7)之下 → tint 仍统一生效 */
+  pointer-events: none;
 }
 
-/* 放射光芒：repeating-conic 扇叶 + 径向遮罩淡出，平滑无硬边 */
-.vk-sun::before {
-  content: '';
+/* ---- 太阳（左上，带笑脸光芒）：PNG 插画 + 暖色辉光 ---- */
+.vk-decor-sun {
   position: absolute;
-  inset: -88px;
-  border-radius: 50%;
-  background: repeating-conic-gradient(from 0deg,
-    color-mix(in srgb, var(--vk-warm-hi) 60%, transparent) 0deg 3.4deg,
-    transparent 3.4deg 17deg);
-  mask-image: radial-gradient(circle at center, black 16%, transparent 74%);
-  -webkit-mask-image: radial-gradient(circle at center, black 16%, transparent 74%);
-  opacity: 0.6;
+  left: 1%;
+  top: 10px;
+  width: 118px;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--vk-honey-hi) 60%, transparent))
+    drop-shadow(0 0 46px color-mix(in srgb, var(--vk-honey) 40%, transparent));
 }
 
-/* ---- 云：2-3 朵柔边白云（多个径向渐变堆出蓬松轮廓） ---- */
-.vk-cloud {
+/* ---- 云（蓬松白云，三朵散布天空）---- */
+.vk-decor-cloud {
   position: absolute;
-  background:
-    radial-gradient(closest-side at 30% 70%, var(--vk-paper-cream) 96%, transparent),
-    radial-gradient(closest-side at 50% 42%, var(--vk-paper-cream) 96%, transparent),
-    radial-gradient(closest-side at 70% 68%, var(--vk-paper-cream) 96%, transparent),
-    radial-gradient(closest-side at 50% 80%, var(--vk-paper-cream) 96%, transparent);
-  filter: blur(0.6px) drop-shadow(0 8px 12px color-mix(in srgb, var(--vk-sky-day-lo) 20%, transparent));
-  z-index: 5;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--vk-sky-day-lo) 18%, transparent));
 }
 
-.vk-cloud-1 {
-  left: 30%;
-  top: 26%;
-  width: 168px;
-  height: 62px;
+.vk-decor-cloud-1 {
+  left: 31%;
+  top: 6px;
+  width: 152px;
+}
+.vk-decor-cloud-2 {
+  left: 54%;
+  top: 0;
+  width: 112px;
+  opacity: 0.95;
+}
+.vk-decor-cloud-3 {
+  left: 74%;
+  top: 30px;
+  width: 134px;
+  opacity: 0.92;
 }
 
-.vk-cloud-2 {
-  left: 58%;
-  top: 12%;
-  width: 132px;
-  height: 50px;
-  opacity: 0.94;
+/* ---- 层叠丘陵：两层做纵深（远层淡且高、近层实且低）---- */
+.vk-decor-hills {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: auto;
+  user-select: none;
 }
 
-.vk-cloud-3 {
-  left: 76%;
-  top: 34%;
-  width: 120px;
-  height: 46px;
+/* 远层：压在地平线上方更高处、淡化 → 拉开层次 */
+.vk-decor-hills-back {
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
+  opacity: 0.72;
+  filter: saturate(0.82) brightness(1.06);
+}
+
+/* 近层：更靠下、更饱和 → 与底图草地自然衔接 */
+.vk-decor-hills-front {
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h) * 0.6);
   opacity: 0.9;
+}
+
+/* ---- 地平线带：风车 / 房屋 / 灌木 —— 落在卡片网格左右**可见侧边草地**与上方露出带，
+        底边贴「卡片网格顶」（--vk-scene-horizon − --vk-scene-reveal）⇒ 一眼可见且不压卡片 ---- */
+.vk-decor-building {
+  position: absolute;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom;
+  user-select: none;
+  filter: drop-shadow(0 4px 3px color-mix(in srgb, var(--vk-wood-deep) 30%, transparent));
+}
+
+.vk-decor-windmill {
+  left: 0.5%;
+  width: 92px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 148px);
+}
+
+.vk-decor-house {
+  right: 0.5%;
+  left: auto;
+  width: 104px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 106px);
+}
+
+.vk-decor-bush {
+  left: 2%;
+  width: 78px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 44px);
+}
+
+/* ---- 小路：自地平线向下延伸至前景（居中，向上淡出以融入草地）---- */
+.vk-decor-path {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h) * 0.5);
+  transform: translateX(-50%);
+  width: 148px;
+  height: 46vh;
+  object-fit: cover;
+  object-position: top;
+  user-select: none;
+  opacity: 0.86;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 100%);
+}
+
+/* 夜间：太阳 / 云隐藏（露出夜色插画自带的月亮与星空）；地面景观保留但柔化 */
+.vk-scene[data-time='night'] .vk-decor-sun,
+.vk-scene[data-time='night'] .vk-decor-cloud {
+  display: none;
+}
+
+.vk-scene[data-time='night'] .vk-decor-hills {
+  opacity: 0.42;
+  filter: saturate(0.6) brightness(0.9);
+}
+
+.vk-scene[data-time='night'] .vk-decor-building,
+.vk-scene[data-time='night'] .vk-decor-path {
+  opacity: 0.5;
+  filter: brightness(0.82) saturate(0.7);
 }
 
 /* ---- 视差层（背景由下面按时间给到 .vk-layer-base） ---- */
@@ -180,7 +254,7 @@
   top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
   height: var(--vk-scene-band-h);
   border-radius: 0;
-  background: none;   /* 已由整幅底图 ui-farm-bg.png 包含,避免重复绘制 */
+  background: none; /* 已由整幅底图 ui-farm-bg.png 包含,避免重复绘制 */
 }
 
 /* 中景：手绘栅栏 + 树丛（1600×900，透明上方留白已抠为 alpha）。
@@ -192,7 +266,7 @@
   top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
   height: var(--vk-scene-band-h);
   border-radius: 0;
-  background: none;   /* 已由整幅底图包含 */
+  background: none; /* 已由整幅底图包含 */
 }
 
 /* 草沿：地平线处一条矮绿色坡沿（顶边柔圆），压在卡片网格顶沿之下，
@@ -215,12 +289,12 @@
 /* ---- 昼/昏：草地/近沿配色（远山与中景改用插画，不在此着色，避免覆盖 background-image） ---- */
 .vk-scene[data-time='day'] .vk-layer[data-layer='near'] .vk-layer-base,
 .vk-scene[data-time='dusk'] .vk-layer[data-layer='near'] .vk-layer-base {
-  background: none;   /* 整幅底图已含草地/坡沿;保留元素供时间/季节 tint 使用 */
+  background: none; /* 整幅底图已含草地/坡沿;保留元素供时间/季节 tint 使用 */
 }
 
 .vk-scene[data-time='day'] .vk-layer[data-layer='ground'] .vk-layer-base,
 .vk-scene[data-time='dusk'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: none;   /* 同上:地面不再铺色,避免盖住插画 */
+  background: none; /* 同上:地面不再铺色,避免盖住插画 */
 }
 
 /* ---- 夜：整幅底图已是夜色插画，各层不再另铺色（避免盖住插画）；
@@ -229,7 +303,7 @@
         ② 给夜色底图抬一层亮度，使远山轮廓 / 栅栏 / 草地仍可辨认；
         ③ 时间 tint 只留极淡冷调，不再压暗。 ---- */
 .vk-scene[data-time='night'] .vk-sky-band {
-  opacity: 0;   /* 露出底图自带的星空 + 月亮 */
+  opacity: 0; /* 露出底图自带的星空 + 月亮 */
 }
 
 .vk-scene[data-time='night'] .vk-scene-bg {
@@ -243,7 +317,7 @@
 
 .vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: none;   /* 夜间插画自带草地/坡沿，不再铺冷色渐变遮盖 */
+  background: none; /* 夜间插画自带草地/坡沿，不再铺冷色渐变遮盖 */
 }
 
 /* 夜晚：天空改由插画自带星空承载 → 收回 CSS 太阳/月亮与 CSS 云，
@@ -252,16 +326,8 @@
   opacity: 0.22;
 }
 
-.vk-scene[data-time='night'] .vk-sun {
-  display: none;
-}
-
-.vk-scene[data-time='night'] .vk-cloud {
-  opacity: 0;
-}
-
 /* ---- 栅栏已改由 mid 层的手绘插画提供（mid-ground.png 内含木栅栏），
-        故移除原 CSS 手搓栅栏条，避免与插画重影 ---- */
+        故移除原 CSS 手搓栅栏条，避免与插画重影；太阳/云的夜间隐藏见上方 .vk-decor-* 段 ---- */
 
 /* ---- 田野：柔和土色小路 + 草叶纹理 + 小花点缀（平滑叠加，非硬边色块） ---- */
 .vk-layer[data-layer='ground'] .vk-layer-base::before {
@@ -270,19 +336,21 @@
   inset: 0;
   background:
     /* 斜向土色小路 */
-    linear-gradient(102deg,
+    linear-gradient(
+      102deg,
       transparent 4%,
       color-mix(in srgb, var(--vk-soil-hi) 42%, transparent) 22%,
       color-mix(in srgb, var(--vk-soil) 36%, transparent) 34%,
-      transparent 52%),
+      transparent 52%
+    ),
     /* 竖向草叶纹理 */
-    repeating-linear-gradient(88deg,
-      color-mix(in srgb, var(--vk-grass-lo) 22%, transparent) 0 2px,
-      transparent 2px 9px),
+    repeating-linear-gradient(88deg, color-mix(in srgb, var(--vk-grass-lo) 22%, transparent) 0 2px, transparent 2px 9px),
     /* 田垄起伏 */
-    repeating-linear-gradient(180deg,
-      color-mix(in srgb, var(--vk-grass-lo) 12%, transparent) 0 1px,
-      transparent 1px 26px);
+    repeating-linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--vk-grass-lo) 12%, transparent) 0 1px,
+        transparent 1px 26px
+      );
   opacity: 0.75;
 }
 
