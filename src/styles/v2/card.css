@@ -45,9 +45,14 @@
      这是「完美复刻」的关键，CSS 只负责叠内容，不再手搓边框/叶边。
      底板 428×394，故锁同比例，避免拉伸导致叶片与装饰变形。 */
   aspect-ratio: 428 / 394;
+  /* 兜底纸色：底图按比例绘制，卡片比底板高时底部自然延续纸色（底板正文本就是平色纸，接缝不可见） */
+  background-color: var(--vk-ref-paper);
   background-image: var(--vk-panel-art);
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  /* 【关键】不写 100% 100%：那会在卡片实际高度 ≠ 底板比例时把底图**纵向拉伸**，
+     叶片与盆栽/向日葵随之变形。100% auto + 顶对齐 = 永不拉伸。 */
+  background-size: 100% auto;
+  background-position: top center;
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
   /* 像素风投影：硬位移不用 blur */
