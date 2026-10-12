@@ -13,8 +13,6 @@ import Provider from '@/components/Provider.vue'
 import { destroyInitManager, initApp } from '@/utils/init'
 import { seasonFromMonth, timeOfDayFromHour } from '@/v2/theme/sceneState'
 import type { Season, TimeOfDay } from '@/v2/theme/sceneState'
-import type { WeatherType } from '@/v2/theme/weather'
-import { fetchVisitorWeather, parseWeatherParam, WEATHER_FALLBACK } from '@/v2/theme/weather'
 import AppFooter from '@/v2/components/AppFooter.vue'
 import BackToTop from '@/v2/components/BackToTop.vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
@@ -43,14 +41,6 @@ const sceneSeason = ref(
     : seasonFromMonth(now.getMonth() + 1),
 )
 
-/**
- * 天气：默认 'clear'（首帧/失败态），挂载后按访客 IP 异步取当地天气再更新。
- * 支持 `?weather=clear|cloudy|rain|snow|fog|thunder` 覆盖，仅用于预览/截图。
- * 取数失败/无网络/超时 → 保持 clear，不报错、不阻塞页面。
- */
-const weatherParam = parseWeatherParam(params.get('weather'))
-const sceneWeather = ref<WeatherType>(weatherParam ?? WEATHER_FALLBACK)
-
 onMounted(async () => {
   try {
     await initApp()
@@ -59,12 +49,6 @@ onMounted(async () => {
     console.error('[App] Initialization failed:', error)
   }
   await nextTick()
-  // 天气取数不阻塞：URL 覆盖优先，否则后台按 IP 取，失败静默退化为 clear
-  if (!weatherParam) {
-    fetchVisitorWeather()
-      .then((w) => { sceneWeather.value = w })
-      .catch(() => { sceneWeather.value = WEATHER_FALLBACK })
-  }
 })
 
 onUnmounted(() => {
@@ -74,8 +58,8 @@ onUnmounted(() => {
 
 <template>
   <Provider>
-    <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason" :data-scene-weather="sceneWeather">
-      <SceneStack :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" />
+    <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason">
+      <SceneStack :time="sceneTime" :season="sceneSeason" />
       <TopBar />
       <main class="vk-main">
         <RouterView />
