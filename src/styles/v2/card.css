@@ -41,78 +41,32 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: var(--vk-ref-paper);
-  /* 纸纹：两层极淡的横竖细纹，模拟参考稿的噪点纸面（不是纯平涂） */
-  background-image:
-    repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-panel-border) 5%, transparent) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--vk-panel-border) 4%, transparent) 0 1px, transparent 1px 4px);
+  /* 参考稿美术底板当背景：横幅叶藤、纸底、角上盆栽/向日葵、外框全部来自原图 →
+     这是「完美复刻」的关键，CSS 只负责叠内容，不再手搓边框/叶边。
+     底板 428×394，故锁同比例，避免拉伸导致叶片与装饰变形。 */
+  aspect-ratio: 428 / 394;
+  background-image: var(--vk-panel-art);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
-  /* 硬投影：像素风用位移，不用 blur */
+  /* 像素风投影：硬位移不用 blur */
   box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
+  overflow: hidden;
 }
 
-/* ---------- ① 绿色叶藤横幅标题栏（每台一色，取参考稿实测的 6 色） ---------- */
+/* ---------- ① 标题栏：内容层（叶藤横幅由美术底板提供，这里不再画背景/叶边） ---------- */
 .vk-panel-head {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 16px;
+  /* 高度与美术底板的横幅对齐（横幅占底板 49/394 = 12.4%），文字才能落在横幅正中 */
+  flex: 0 0 12.4%;
+  padding: 0 18px;
   color: var(--vk-node-ink, var(--vk-panel-head-ink));
-  /* 明暗全部由 accent 与母板色 color-mix 派生，不引入新色 */
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 60%, var(--vk-ref-paper)) 0%,
-    var(--vk-node-accent, var(--vk-ref-leaf)) 26%,
-    var(--vk-node-accent, var(--vk-ref-leaf)) 74%,
-    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 72%, var(--vk-panel-border)) 100%);
-  border-bottom: 1px solid var(--vk-panel-border);
-}
-
-/* 上下波浪叶边：用重复径向渐变造一排「叶片凸起」，颜色同样由 accent 派生 */
-.vk-panel-head::before,
-.vk-panel-head::after {
-  content: '';
-  position: absolute;
-  right: 10px;
-  left: 10px;
-  height: 5px;
-  background: repeating-radial-gradient(
-    circle at 5px 5px,
-    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 55%, var(--vk-ref-paper)) 0 4px,
-    transparent 4.5px
-  );
-  background-size: 10px 5px;
-  pointer-events: none;
-}
-
-.vk-panel-head::before {
-  top: -4px;
-}
-
-.vk-panel-head::after {
-  bottom: -4px;
-  background: repeating-radial-gradient(
-    circle at 5px 0,
-    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 70%, var(--vk-panel-border)) 0 4px,
-    transparent 4.5px
-  );
-  background-size: 10px 5px;
-}
-
-/* 两端叶簇：两个圆头叶球，收住横幅两端 */
-.vk-panel-vine {
-  flex: none;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--vk-panel-border);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 30%,
-      color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 45%, var(--vk-ref-paper)) 0 3px, transparent 3.5px),
-    radial-gradient(circle at 70% 60%,
-      var(--vk-node-accent, var(--vk-ref-leaf)) 0 4px, transparent 4.5px),
-    color-mix(in srgb, var(--vk-node-accent, var(--vk-ref-leaf)) 70%, var(--vk-panel-border));
+  background: none;
+  border: none;
 }
 
 .vk-panel-head-icon {

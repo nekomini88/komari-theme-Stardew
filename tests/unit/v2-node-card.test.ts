@@ -86,12 +86,14 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     expect(heads).toHaveLength(1)
     expect(w.findAll('.vk-card-name')).toHaveLength(1)
     expect(w.find('.vk-card-name').text()).toBe('法兰克福free')
-    expect(w.find('.vk-panel-vine').exists()).toBe(true)
     expect(w.find('.vk-panel-dot').exists()).toBe(true)
-    // 标题栏底色由「每台一色」的 accent 派生（参考稿就是每台一色）
+    // 标题栏的叶藤造型与配色由**参考稿美术底板**提供（每台一色 = 6 张底板变体），
+    // CSS 不再手搓叶边；文字色仍取 accent 配对的 ink
     const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
-    expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*var\(--vk-node-accent/)
+    expect(css).toMatch(/\.vk-panel\s*\{[^}]*background-image:\s*var\(--vk-panel-art\)/)
     expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
+    expect(w.attributes('style')).toContain('--vk-panel-art: url(/images/v2-panel/panel-')
+    expect(w.attributes('style')).toContain('--vk-node-ink: var(--vk-node-ink-')
   })
 
   it('系统行：os · arch · 虚拟化 整宽一行（缺项自动跳过）', () => {

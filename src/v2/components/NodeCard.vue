@@ -116,11 +116,11 @@ defineExpose({ viewStatus, statusLabel })
     :style="{
       '--vk-node-accent': `var(--vk-node-accent-${accentSlot + 1})`,
       '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
+      '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
     }"
   >
     <!-- ① 绿色木匾标题栏 -->
     <header class="vk-card-head vk-panel-head">
-      <span class="vk-panel-vine" aria-hidden="true" />
       <span class="vk-card-head-icon vk-panel-head-icon" aria-hidden="true">
         <PixelIcon name="server" :size="32" />
       </span>
