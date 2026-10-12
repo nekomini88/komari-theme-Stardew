@@ -304,10 +304,14 @@
     radial-gradient(2.5px 2.5px at 88% 44%, var(--vk-honey-hi) 60%, transparent 64%);
 }
 
-/* ---- 整栈 tint：进入/离开两层叠加做交叉淡化 ---- */
+/* ---- 整栈 tint：进入/离开两层叠加做交叉淡化 ----
+   关键：tint 必须位于天空插图(.vk-sky-img, z:3)与各视差层之上，
+   否则不透明的天空插画会把它完全遮住 → 黄昏/季节 tint 在天空带失效。
+   层级：scene-bg(0) < 天空色带/插画(0..3) < 视差层(1..4) < tint(7) < 天气(8)。 */
 .vk-tint {
   position: absolute;
   inset: 0;
+  z-index: 7;
   pointer-events: none;
   transition-property: opacity;
   transition-timing-function: linear;
@@ -344,7 +348,7 @@
 .vk-weather {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 8;   /* 在整栈 tint(7) 之上：时间/季节 tint 不得盖住雨/雪 */
   overflow: hidden;
   pointer-events: none;
 }
@@ -356,29 +360,35 @@
   display: none;
 }
 
-/* ---- 雨：斜向雨丝斜纹下落（重复线性渐变 + 背景位移 = 下落感） ---- */
+/* ---- 雨：斜向雨丝斜纹下落（重复线性渐变 + 背景位移 = 下落感）。
+   为在明亮天空上肉眼可辨：用偏暗的昼天阴色(--vk-sky-day-lo)作雨丝，
+   加大线宽/覆盖与整体不透明度。 ---- */
 .vk-weather-rain {
   inset: -25% -12%;
   background-image: repeating-linear-gradient(102deg,
-    transparent 0 7px,
-    color-mix(in srgb, var(--vk-sky-hi) 42%, transparent) 7px 8px,
-    transparent 8px 15px);
-  opacity: 0.5;
+    transparent 0 4px,
+    color-mix(in srgb, var(--vk-sky-day-lo) 78%, transparent) 4px 6.2px,
+    transparent 6.2px 11px);
+  opacity: 0.66;
 }
 
-/* ---- 大雪/阵雪：平铺小圆点缓缓飘落 + 轻微横向摆动 ---- */
+/* ---- 大雪/阵雪：白蒙蒙的雪幕(低透明奶白覆盖) + 平铺雪花缓缓飘落 + 轻微横向摆动。
+   单靠稀疏白点在不透明天空上几乎不可见 → 叠一层雪幕保证「一眼可辨」。 ---- */
 .vk-weather-snow {
   inset: -20% -10%;
+  background-color: color-mix(in srgb, var(--vk-paper-cream) 22%, transparent);
   background-image:
-    radial-gradient(2px 2px at 12% 18%, var(--vk-paper-cream) 92%, transparent),
-    radial-gradient(2.6px 2.6px at 34% 46%, var(--vk-paper-cream) 92%, transparent),
-    radial-gradient(1.8px 1.8px at 58% 28%, var(--vk-paper-cream) 92%, transparent),
-    radial-gradient(2.4px 2.4px at 76% 62%, var(--vk-paper-cream) 92%, transparent),
-    radial-gradient(2px 2px at 88% 12%, var(--vk-paper-cream) 92%, transparent),
-    radial-gradient(1.6px 1.6px at 24% 78%, var(--vk-paper-cream) 92%, transparent);
-  background-size: 260px 260px;
+    radial-gradient(2.6px 2.6px at 12% 18%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(3.2px 3.2px at 34% 46%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.4px 2.4px at 58% 28%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(3px 3px at 76% 62%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.6px 2.6px at 88% 12%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.2px 2.2px at 24% 78%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.4px 2.4px at 46% 8%, var(--vk-paper-cream) 92%, transparent),
+    radial-gradient(2.8px 2.8px at 68% 84%, var(--vk-paper-cream) 92%, transparent);
+  background-size: 150px 150px;
   background-repeat: repeat;
-  opacity: 0.85;
+  opacity: 0.92;
 }
 
 /* ---- 雾：两层柔边奶雾带横向漂移（下浓上淡，贴地感） ---- */

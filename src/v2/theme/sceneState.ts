@@ -69,10 +69,12 @@ export interface ScenePreset {
   groundBaseline: typeof GROUND_BASELINE_LAYER
 }
 
-/** 各时段的天空 4 段色带（top → bottom），全部 ⊆ 母板 */
+/** 各时段的天空 4 段色带（top → bottom），全部 ⊆ 母板。
+ *  黄昏不再是昼色带：黄昏改用暖色带（蜜色高光 → 黄昏橙 → 蜜橘 → 土色），
+ *  与昼的冷蓝天色真正不同，避免「昼/昏天空完全一致」。 */
 const SKY_BANDS: Record<TimeOfDay, string[]> = {
   day: ['#a6dcf7', '#7ec8f2', '#7ec8f2', '#4f9fd0'],
-  dusk: ['#a6dcf7', '#7ec8f2', '#7ec8f2', '#4f9fd0'],
+  dusk: ['#f2c574', '#e8a05c', '#d99a4e', '#a9764b'],
   night: ['#3a548c', '#2b3f6b', '#2b3f6b', '#1e2c4c'],
 }
 

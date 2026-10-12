@@ -53,7 +53,9 @@
   background-color: var(--vk-paper-warm);
 }
 
-/* 顶部彩色标题栏：每台一个主题色，承「图标 + 居中节点名 + 状态」 */
+/* 顶部彩色标题栏：每台一个主题色，承「图标 + 居中节点名 + 状态」。
+   取色：把母板主题色按 55% 混入米纸底 → 浅而仍带主题色相的标题栏，
+   再压深棕正文色(--vk-wood-deep)，实测对比度 ≥4.5（奶白字压原色栏时仅 2.06，不达标）。 */
 .vk-card-head {
   position: relative;
   display: flex;
@@ -61,11 +63,11 @@
   justify-content: space-between;
   gap: var(--vk-space-2);
   min-height: 34px;
-  background-color: var(--vk-node-accent, var(--vk-moss-dark));
+  background-color: color-mix(in srgb, var(--vk-node-accent, var(--vk-moss-dark)) 55%, var(--vk-paper-cream));
   background-image: linear-gradient(180deg,
-    color-mix(in srgb, var(--vk-warm-hi) 22%, transparent) 0%,
+    color-mix(in srgb, var(--vk-paper-cream) 42%, transparent) 0%,
     transparent 55%);
-  color: var(--vk-paper-cream);
+  color: var(--vk-wood-deep);
   padding: var(--vk-space-2) var(--vk-space-3);
 }
 
@@ -75,8 +77,8 @@
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  color: var(--vk-paper-cream);
-  opacity: 0.92;
+  color: var(--vk-wood-deep);
+  opacity: 0.9;
 }
 
 /* 名称：绝对居中（左右对称留白，避开图标/状态签），超长省略且不撑坏卡片宽度 */
@@ -92,8 +94,8 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
-  color: var(--vk-paper-cream);
-  text-shadow: 0 1px 1px color-mix(in srgb, var(--vk-wood-deep) 40%, transparent);
+  color: var(--vk-wood-deep);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--vk-paper-cream) 72%, transparent);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

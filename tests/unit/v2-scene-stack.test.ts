@@ -33,10 +33,11 @@ describe('SceneStack 状态机：时间 × 季节 → 层参数/tint（ART_SYSTE
     expect(resolveScene('day', 'summer').groundBaseline).toBe(GROUND_BASELINE_LAYER)
   })
 
-  it('黄昏 = 昼色带 + 统一 tint #e8a05c（不是各层各换一套图）', () => {
+  it('黄昏 = 独立暖色带 + 统一 tint #e8a05c（不是各层各换一套图）', () => {
     const day = resolveScene('day', 'summer')
     const dusk = resolveScene('dusk', 'summer')
-    expect(dusk.skyBands).toEqual(day.skyBands)
+    // 黄昏天色带必须与昼不同（探针实测：昼/昏天空带亮度需严格递减）
+    expect(dusk.skyBands).not.toEqual(day.skyBands)
     expect(dusk.layerColors).toEqual(day.layerColors)
     expect(dusk.timeTint.color).toBe('#e8a05c')
     expect(dusk.timeTint.opacity).toBeGreaterThan(0)
