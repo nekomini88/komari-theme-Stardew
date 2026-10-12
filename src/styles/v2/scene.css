@@ -218,6 +218,206 @@
   top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 118px);
 }
 
+/* ---- 地平线带：左右两棵独立树（参考稿白天两侧的树；冬换雪树）---- */
+.vk-decor-tree-left {
+  left: 16%;
+  width: 116px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 102px);
+}
+
+.vk-decor-tree-right {
+  left: auto;
+  right: 15%;
+  width: 128px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 114px);
+}
+
+/* ---- 秋：南瓜 + 干草垛（地平线带两侧）---- */
+.vk-decor-pumpkins {
+  left: 41%;
+  width: 92px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 42px);
+}
+
+.vk-decor-haybale {
+  left: auto;
+  right: 36%;
+  width: 100px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 38px);
+}
+
+/* 飘落枫叶：ListenHub 枫叶 PNG + CSS 缓降飘移（仅摆放/动画，不手搓图形） */
+.vk-decor-leaf {
+  position: absolute;
+  left: calc(var(--vk-fx) * 1%);
+  top: 0;
+  width: 26px;
+  height: auto;
+  user-select: none;
+  opacity: 0.9;
+  animation: vk-leaf-fall var(--vk-dur) linear var(--vk-delay) infinite;
+}
+
+/* ---- 冬：积雪丘（贴地平线带，沿草沿分布）---- */
+.vk-decor-snowpatch {
+  position: absolute;
+  height: auto;
+  user-select: none;
+  opacity: 0.95;
+}
+
+.vk-decor-snowpatch-1 {
+  left: 5%;
+  width: 170px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 26px);
+}
+
+.vk-decor-snowpatch-2 {
+  left: auto;
+  right: 7%;
+  width: 140px;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 20px);
+}
+
+/* ---- 夜间：萤火虫（暖黄光点，首屏范围内缓慢浮动 + 呼吸）---- */
+.vk-decor-firefly {
+  position: absolute;
+  left: calc(var(--vk-fx) * 1%);
+  top: calc(var(--vk-fy) * 1vh);
+  width: 18px;
+  height: auto;
+  user-select: none;
+  animation: vk-firefly var(--vk-dur) ease-in-out var(--vk-delay) infinite;
+}
+
+/* ---- 季节：只改「整栈 tint + 各层滤镜」，绝不每层各换一套图（见 sceneState 注释）----
+   冬：把草地/草沿/远山/中景去饱和并提亮 → 绿草变雪地；配合更白的季节 tint，整体入冬。 */
+.vk-scene[data-season='winter'] .vk-layer[data-layer='ground'] .vk-layer-base,
+.vk-scene[data-season='winter'] .vk-layer[data-layer='near'] .vk-layer-base,
+.vk-scene[data-season='winter'] .vk-layer[data-layer='far'] .vk-layer-base,
+.vk-scene[data-season='winter'] .vk-layer[data-layer='mid'] .vk-layer-base {
+  filter: saturate(0.18) brightness(1.28) contrast(0.94);
+}
+
+.vk-scene[data-season='winter'] .vk-decor-building,
+.vk-scene[data-season='winter'] .vk-decor-hills,
+.vk-scene[data-season='winter'] .vk-decor-bush,
+.vk-scene[data-season='winter'] .vk-decor-path,
+.vk-scene[data-season='winter'] .vk-decor-flowerbed {
+  filter: saturate(0.28) brightness(1.14);
+}
+
+/* 秋：整片压一层暖色（南瓜/干草垛/枫叶之外，草地也略带枯黄） */
+.vk-scene[data-season='autumn'] .vk-layer[data-layer='ground'] .vk-layer-base,
+.vk-scene[data-season='autumn'] .vk-layer[data-layer='near'] .vk-layer-base {
+  filter: saturate(0.82) hue-rotate(-8deg) brightness(1.02);
+}
+
+/* 天气（§2.3）：雨 / 雪 / 雾 —— ListenHub 精灵 + CSS 动画 ---- */
+/* 天气容器只覆盖首屏（首屏之外滚动时不必继续下落） */
+.vk-weather {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.vk-weather-drop {
+  position: absolute;
+  left: var(--vk-wx);
+  top: 0;
+  width: 10px;
+  height: auto;
+  user-select: none;
+  opacity: 0.5;
+  animation: vk-wx-fall var(--vk-dur) linear var(--vk-delay) infinite;
+}
+
+.vk-weather-flake {
+  position: absolute;
+  left: var(--vk-wx);
+  top: 0;
+  width: 18px;
+  height: auto;
+  user-select: none;
+  opacity: 0.95;
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--vk-sky-day-lo) 40%, transparent));
+  animation: vk-wx-fall var(--vk-dur) linear var(--vk-delay) infinite;
+}
+
+.vk-weather-fog {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 0;
+  width: 120%;
+  height: auto;
+  user-select: none;
+  opacity: 0.42;
+  animation: vk-wx-drift 38s ease-in-out infinite alternate;
+}
+
+@keyframes vk-wx-fall {
+  from { transform: translate3d(0, -14vh, 0) scale(var(--vk-scale, 1)); }
+  to { transform: translate3d(0, 108vh, 0) scale(var(--vk-scale, 1)); }
+}
+
+@keyframes vk-leaf-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+  100% { transform: translate3d(-7vw, 100vh, 0) rotate(240deg); }
+}
+
+@keyframes vk-firefly {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.5; }
+  50% { transform: translate3d(2.6vw, -3.4vh, 0); opacity: 1; }
+}
+
+@keyframes vk-wx-drift {
+  from { transform: translate3d(-3%, 0, 0); }
+  to { transform: translate3d(3%, -1.5%, 0); }
+}
+
+/* ---- 风：云被吹着走 + 树/灌木随风摆（只动已有的 PNG，不新增图形）---- */
+.vk-decor-windy .vk-decor-cloud {
+  animation: vk-wind-drift 11s linear infinite;
+}
+
+.vk-decor-windy .vk-decor-tree-left,
+.vk-decor-windy .vk-decor-tree-right,
+.vk-decor-windy .vk-decor-bush,
+.vk-decor-windy .vk-decor-blossom {
+  transform-origin: bottom center;
+  animation: vk-wind-sway 3.6s ease-in-out infinite;
+}
+
+@keyframes vk-wind-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(6vw, 0, 0); }
+}
+
+@keyframes vk-wind-sway {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.6deg); }
+}
+
+/* 尊重系统「减少动态效果」偏好：关掉天气/萤火虫/落叶/风摆 */
+@media (prefers-reduced-motion: reduce) {
+  .vk-weather-drop,
+  .vk-weather-flake,
+  .vk-weather-fog,
+  .vk-decor-leaf,
+  .vk-decor-firefly,
+  .vk-decor-windy .vk-decor-cloud,
+  .vk-decor-windy .vk-decor-tree-left,
+  .vk-decor-windy .vk-decor-tree-right,
+  .vk-decor-windy .vk-decor-bush,
+  .vk-decor-windy .vk-decor-blossom {
+    animation: none;
+  }
+}
+
+
 .vk-decor-spring-flowers {
   left: auto;
   right: 26%;

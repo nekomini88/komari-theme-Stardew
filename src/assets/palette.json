@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "NekoVPS v2 母板（木质感拟物 + 手绘平滑）",
-    "version": 3,
-    "count": 41,
+    "version": 4,
+    "count": 42,
     "outline": "#2b1d16",
     "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。"
   },
@@ -49,7 +49,8 @@
     { "id": "soil-night", "hex": "#5a4034", "role": "夜·土基色" },
     { "id": "dusk-tint", "hex": "#e8a05c", "role": "黄昏·整栈统一叠加色" },
     { "id": "autumn-warm", "hex": "#d9c27a", "role": "秋·季节 tint" },
-    { "id": "winter-cool", "hex": "#6b8fa8", "role": "冬·季节 tint" },
+    { "id": "winter-cool", "hex": "#6b8fa8", "role": "冬·冷调（远山/树影压蓝）" },
+    { "id": "snow", "hex": "#e6eef6", "role": "冬·积雪 tint（中性分层底整体转雪地）" },
     { "id": "plum", "hex": "#7e5aa0", "role": "卡片主题色·紫（承米色字 #f7ecd3，对比度 4.64:1）" },
     { "id": "blossom", "hex": "#d97f9a", "role": "卡片主题色·粉（承深棕字 #3d2a1a，对比度 4.83:1）" },
     { "id": "seafoam", "hex": "#4fa8a0", "role": "卡片主题色·青（承深棕字 #3d2a1a，对比度 4.82:1）" }

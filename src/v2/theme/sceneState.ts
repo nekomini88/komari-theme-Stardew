@@ -6,7 +6,7 @@
  *  - 变化 = 整栈同步套一层 tint + 换天空色带；季节只改整栈 tint，绝不每层各换一套图。
  *  - 过渡 = 交叉淡化（crossfade），禁止硬切。
  *
- * 所有颜色均取自 src/assets/palette.json 的 41 色母板（见 palette.ts / 单测校验）。
+ * 所有颜色均取自 src/assets/palette.json 的 42 色母板（见 palette.ts / 单测校验）。
  */
 
 import { PALETTE_HEXES } from './palette'
@@ -92,12 +92,15 @@ const TIME_TINTS: Record<TimeOfDay, TintSpec> = {
   night: { color: '#1e2c4c', opacity: 0.7 },
 }
 
-/** 季节 tint：只对整栈套一层，颜色取自母板的季节色 */
+/** 季节 tint：只对整栈套一层，颜色取自母板的季节色。
+ *  【口径修正 2026-10-12】原先各季 opacity 只有 0.06–0.18，配合「烘焙好的季节底图」够用；
+ *  但改成中性分层底之后，这类强度根本压不住底色 —— 冬天依旧是绿草如茵。
+ *  现在把季节色强度提到"真的能改变观感"的量级（冬季同时另加各层的去饱和/提亮，见 scene.css）。 */
 const SEASON_TINTS: Record<Season, TintSpec> = {
-  spring: { color: '#8fc9a6', opacity: 0.10 },
+  spring: { color: '#8fc9a6', opacity: 0.12 },
   summer: { color: '#f4d9a0', opacity: 0.06 },
-  autumn: { color: '#d9c27a', opacity: 0.14 },
-  winter: { color: '#6b8fa8', opacity: 0.18 },
+  autumn: { color: '#d9c27a', opacity: 0.26 },
+  winter: { color: '#e6eef6', opacity: 0.42 },
 }
 
 /**
@@ -139,6 +142,33 @@ export function seasonFromMonth(month: number): Season {
   if (month >= 9 && month <= 11)
     return 'autumn'
   return 'winter'
+}
+
+/** 天气（参考稿 §2.3：晴 / 雨 / 雪 / 风 / 雾 的随机氛围） */
+export type Weather = 'clear' | 'rain' | 'snow' | 'wind' | 'fog'
+
+export const WEATHERS: readonly Weather[] = ['clear', 'rain', 'snow', 'wind', 'fog'] as const
+
+/**
+ * 日期 × 季节 → 当天天气。
+ *
+ * 口径：
+ *  - **确定性**（同一天同一结果，可测、不会每次刷新乱跳）——用日序做哈希，不用 Math.random。
+ *  - **多为晴朗**（0.55）：天气是点缀，不该天天糊住场景。
+ *  - **季节自洽**：冬天不下雨（改下雪），非冬天不下雪。
+ */
+export function weatherFromDate(date: Date, season: Season): Weather {
+  const seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate()
+  let h = Math.imul(seed, 2654435761) >>> 0
+  h = (h ^ (h >>> 13)) >>> 0
+  const r = h / 4294967296
+  if (r < 0.55)
+    return 'clear'
+  if (r < 0.72)
+    return season === 'winter' ? 'snow' : 'rain'
+  if (r < 0.85)
+    return 'wind'
+  return 'fog'
 }
 
 /** 解析时间 × 季节 → 整栈场景参数 */

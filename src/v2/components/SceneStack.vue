@@ -8,7 +8,8 @@
  * - 变化 = 整栈套 tint + 换天空色带；时间 tint 与季节 tint 各自 1.2s 交叉淡化
  * - 所有角色/建筑共享 ground 基线（本组件把 ground 层暴露为具名插槽）
  */
-import type { Season, TimeOfDay, TintSpec } from '@/v2/theme/sceneState'
+import type { Season, TimeOfDay, Weather } from '@/v2/theme/sceneState'
+import type { TintSpec } from '@/v2/theme/sceneState'
 import { computed } from 'vue'
 import SceneDecor from '@/v2/components/SceneDecor.vue'
 import SceneLife from '@/v2/components/SceneLife.vue'
@@ -18,15 +19,19 @@ import { useCrossfade } from '@/v2/theme/useCrossfade'
 const props = withDefaults(defineProps<{
   time?: TimeOfDay
   season?: Season
+  /** 天气（参考稿 §2.3）：晴 / 雨 / 雪 / 风 / 雾 —— 只影响装饰层的精灵与动画 */
+  weather?: Weather
   /** 彩蛋取证开关：把一只动物钉在画面里（截图/探针用），默认不计 */
   forceLife?: boolean
 }>(), {
   time: 'day',
   season: 'summer',
+  weather: 'clear',
   forceLife: false,
 })
 
-const scene = computed(() => resolveScene(props.time, props.season))
+/** 时间 × 季节 → 场景状态机；天气不属于该状态机（由日期推出），单独并入 */
+const scene = computed(() => ({ ...resolveScene(props.time, props.season), weather: props.weather }))
 
 /** 内容层（sky 单独渲染色带，不参与视差层循环） */
 const contentLayers = computed(() => scene.value.layers.filter(l => l.id !== 'sky'))
@@ -96,7 +101,7 @@ defineExpose({
 
     <!-- 场景关键素材层：太阳(带笑脸光芒) / 蓬松云 / 层叠丘陵 / 风车 / 房屋 / 灌木 / 小路
          —— 一律为 ListenHub 生成的透明 PNG 插画（/images/v2-scene/*.png），非 CSS/SVG 手搓 -->
-    <SceneDecor :time="scene.time" :season="scene.season" />
+    <SceneDecor :time="scene.time" :season="scene.season" :weather="scene.weather" />
 
     <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
     <div

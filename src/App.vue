@@ -11,8 +11,8 @@ import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Toaster } from '@/components/ui/sonner'
 import Provider from '@/components/Provider.vue'
 import { destroyInitManager, initApp } from '@/utils/init'
-import { seasonFromMonth, timeOfDayFromHour } from '@/v2/theme/sceneState'
-import type { Season, TimeOfDay } from '@/v2/theme/sceneState'
+import { seasonFromMonth, timeOfDayFromHour, WEATHERS, weatherFromDate } from '@/v2/theme/sceneState'
+import type { Season, TimeOfDay, Weather } from '@/v2/theme/sceneState'
 import AppFooter from '@/v2/components/AppFooter.vue'
 import BackToTop from '@/v2/components/BackToTop.vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
@@ -44,6 +44,14 @@ const sceneSeason = ref(
 /** 彩蛋取证：?life=force 时把一只动物钉在画面里（仅截图/探针用，默认不计） */
 const forceLife = params.get('life') === 'force'
 
+/** 天气：默认由「当天日期 × 季节」确定性推出；?weather=clear|rain|snow|wind|fog 可覆盖（预览/截图） */
+const weatherParam = params.get('weather')
+const sceneWeather = ref<Weather>(
+  weatherParam && (WEATHERS as readonly string[]).includes(weatherParam)
+    ? (weatherParam as Weather)
+    : weatherFromDate(now, sceneSeason.value),
+)
+
 onMounted(async () => {
   try {
     await initApp()
@@ -61,8 +69,8 @@ onUnmounted(() => {
 
 <template>
   <Provider>
-    <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason">
-      <SceneStack :time="sceneTime" :season="sceneSeason" :force-life="forceLife" />
+    <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason" :data-scene-weather="sceneWeather">
+      <SceneStack :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" :force-life="forceLife" />
       <TopBar />
       <main class="vk-main">
         <RouterView />
