@@ -114,18 +114,20 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
     return { hex: dominantColor(img, x0, x1, y0, y1), size: [img.width, img.height] }
   }
 
-  it('6 个色槽：底板横幅实测色 与 --vk-node-ink-N 的对比度都 ≥4.5:1', () => {
+  // 门槛用 3:1 而非 4.5:1：标题字号 24px 属 WCAG「大号文本」（≥24px 常规字重），AA 门槛即 3:1。
+  // 参考稿本身就是「浅色字 + 深色描边」，统一复刻这一口径。
+  it('6 个色槽：底板横幅实测色 与 --vk-node-ink-N 的对比度都 ≥3:1（WCAG 大号文本 AA）', () => {
     for (let i = 1; i <= 6; i++) {
       const { hex, size } = bannerColorOf(i)
       const ink = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))?.[1]
       expect(ink, `--vk-node-ink-${i} 未定义`).toBeTruthy()
       const c = contrastRatio(hex, ink!)
-      expect(c, `第 ${i} 槽：底板横幅实测 ${hex}（${size[0]}x${size[1]}）与文字 ${ink} 对比度仅 ${c.toFixed(2)}，不足 4.5:1`)
-        .toBeGreaterThanOrEqual(4.5)
+      expect(c, `第 ${i} 槽：底板横幅实测 ${hex}（${size[0]}x${size[1]}）与文字 ${ink} 对比度仅 ${c.toFixed(2)}，不足 3:1`)
+        .toBeGreaterThanOrEqual(3)
     }
   })
 
-  it('描边取与文字相反的色调（深字配浅描边 / 浅字配深描边）', () => {
+  it('描边取与文字相反的色调（参考稿口径：浅色字配深色描边）', () => {
     for (let i = 1; i <= 6; i++) {
       const ink = tokens.match(new RegExp(`--vk-node-ink-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!
       const sh = tokens.match(new RegExp(`--vk-node-shadow-${i}:\\s*(#[0-9a-fA-F]{6})`))![1]!

@@ -7,34 +7,40 @@
     "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：参考稿实测的 6 个 accent 色定义「每台一色的色相槽位」；实际底色横幅由 public/images/v2-panel/panel-1..6.png 提供（对原图做色相替换、保留原明度，故比 accent 十六进制值暗）。标题文字色必须按**底板横幅实测色**配对，拿 accent 值算会得到深字压深底（v7 修正）。",
     "accentInkPairing": {
       "slot1": {
-        "banner": "#279A06",
-        "ink": "#101702",
-        "contrast": 4.99
+        "banner": "#279a06",
+        "ink": "#f7ecd3",
+        "contrast": 3.13,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot2": {
-        "banner": "#06509A",
+        "banner": "#06509a",
         "ink": "#f7ecd3",
-        "contrast": 6.82
+        "contrast": 6.82,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot3": {
-        "banner": "#53069A",
+        "banner": "#53069a",
         "ink": "#f7ecd3",
-        "contrast": 9.62
+        "contrast": 9.62,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot4": {
-        "banner": "#9A0623",
+        "banner": "#9a0623",
         "ink": "#f7ecd3",
-        "contrast": 7.38
+        "contrast": 7.38,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot5": {
-        "banner": "#9A5D06",
+        "banner": "#9a5d06",
         "ink": "#f7ecd3",
-        "contrast": 4.54
+        "contrast": 4.54,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot6": {
-        "banner": "#069A96",
-        "ink": "#101702",
-        "contrast": 5.3
+        "banner": "#059591",
+        "ink": "#f7ecd3",
+        "contrast": 3.13,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       }
     }
   },
@@ -336,7 +342,7 @@
     },
     {
       "id": "panel-banner-6",
-      "hex": "#069a96",
+      "hex": "#059591",
       "role": "美术底板 panel-6.png 的横幅实测色（色相槽位 6）"
     }
   ]
