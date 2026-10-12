@@ -99,7 +99,7 @@ defineExpose({ viewStatus, statusLabel })
     <header class="vk-card-head vk-panel-head">
       <span class="vk-panel-vine" aria-hidden="true" />
       <span class="vk-card-head-icon vk-panel-head-icon" aria-hidden="true">
-        <PixelIcon name="server" :size="16" />
+        <PixelIcon name="server" :size="24" />
       </span>
       <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
       <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
@@ -114,7 +114,7 @@ defineExpose({ viewStatus, statusLabel })
     <div class="vk-card-body vk-panel-body">
       <!-- ③ 系统行 -->
       <p v-if="sysLine" class="vk-panel-sys">
-        <PixelIcon name="desktop" :size="14" />
+        <PixelIcon name="desktop" :size="20" />
         <span>{{ sysLine }}</span>
       </p>
 
@@ -123,7 +123,7 @@ defineExpose({ viewStatus, statusLabel })
         <!-- CPU / Memory -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="cpu" :size="14" />
+            <PixelIcon name="cpu" :size="20" />
             <span class="vk-cell-label">CPU</span>
             <span class="vk-cell-value" data-field="cpu">{{ cpuPctText }}</span>
             <span class="vk-seg" :data-level="usageLevel(node.cpu)" :style="{ '--vk-seg-color': GREEN }">
@@ -131,7 +131,7 @@ defineExpose({ viewStatus, statusLabel })
             </span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="memory" :size="14" />
+            <PixelIcon name="memory" :size="20" />
             <span class="vk-cell-label">Memory</span>
             <span class="vk-cell-value" data-field="mem">{{ memPctText }}</span>
             <span class="vk-seg" :data-level="usageLevel(memPct)" :style="{ '--vk-seg-color': GREEN }">
@@ -143,7 +143,7 @@ defineExpose({ viewStatus, statusLabel })
         <!-- Disk / Load -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="hard-disk" :size="14" />
+            <PixelIcon name="hard-disk" :size="20" />
             <span class="vk-cell-label">Disk</span>
             <span class="vk-cell-value" data-field="disk">{{ diskPctText }}</span>
             <span class="vk-seg" :data-level="usageLevel(diskPct)" :style="{ '--vk-seg-color': GREEN }">
@@ -151,7 +151,7 @@ defineExpose({ viewStatus, statusLabel })
             </span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="dashboard" :size="14" />
+            <PixelIcon name="dashboard" :size="20" />
             <span class="vk-cell-label">Load</span>
             <span class="vk-cell-value" data-field="load">{{ loadText }}</span>
             <span class="vk-seg" :style="{ '--vk-seg-color': ORANGE }">
@@ -163,12 +163,12 @@ defineExpose({ viewStatus, statusLabel })
         <!-- Upload / Download -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="traffic-up" :size="14" />
+            <PixelIcon name="traffic-up" :size="20" />
             <span class="vk-cell-label">Upload</span>
             <span class="vk-cell-value" data-field="net-out">{{ uploadText }}</span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="traffic-down" :size="14" />
+            <PixelIcon name="traffic-down" :size="20" />
             <span class="vk-cell-label">Download</span>
             <span class="vk-cell-value" data-field="net-in">{{ downloadText }}</span>
           </div>
@@ -177,12 +177,12 @@ defineExpose({ viewStatus, statusLabel })
         <!-- Outbound / Inbound -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="transfer" :size="14" />
+            <PixelIcon name="transfer" :size="20" />
             <span class="vk-cell-label">Outbound</span>
             <span class="vk-cell-value" data-field="traffic-up">{{ outboundText }}</span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="globe" :size="14" />
+            <PixelIcon name="globe" :size="20" />
             <span class="vk-cell-label">Inbound</span>
             <span class="vk-cell-value" data-field="traffic-down">{{ inboundText }}</span>
           </div>
@@ -191,7 +191,7 @@ defineExpose({ viewStatus, statusLabel })
         <!-- Latency / Packet Loss -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="clock" :size="14" />
+            <PixelIcon name="clock" :size="20" />
             <span class="vk-cell-label">Latency</span>
             <span class="vk-cell-value" data-field="latency">{{ latencyText }}</span>
             <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
@@ -199,7 +199,7 @@ defineExpose({ viewStatus, statusLabel })
             </span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="shield" :size="14" />
+            <PixelIcon name="shield" :size="20" />
             <span class="vk-cell-label">Packet Loss</span>
             <span class="vk-cell-value" data-field="loss">{{ lossText }}</span>
             <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
@@ -211,12 +211,12 @@ defineExpose({ viewStatus, statusLabel })
         <!-- Expires / Uptime -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="calendar" :size="14" />
+            <PixelIcon name="calendar" :size="20" />
             <span class="vk-cell-label">Expires</span>
             <span class="vk-cell-value" data-field="expire" :title="node.expiredAt ?? ''">{{ expireText }}</span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="hourglass" :size="14" />
+            <PixelIcon name="hourglass" :size="20" />
             <span class="vk-cell-label">Uptime</span>
             <span class="vk-cell-value" data-field="uptime">{{ uptimeText }}</span>
           </div>

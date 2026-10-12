@@ -5,6 +5,9 @@
  */
 
 .vk-app {
+  /* 像素字体必须在这里落一次：卡片/工具栏此前都是从 html/body 继承，
+     而 body 用的是 --font-sans（普通字体）→ 像素字体文件下了却没人用。 */
+  font-family: var(--vk-font-body);
   position: relative;
   z-index: 1;
   display: flex;

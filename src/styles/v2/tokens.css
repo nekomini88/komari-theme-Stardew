@@ -9,7 +9,34 @@
  *  - 相机光照恒为左上 45°：受光面用蜜色高光 inset，背光面落暖阴影
  */
 
+/**
+ * v2 设计令牌
+ *
+ * 像素字体：Fusion Pixel Font（缝合像素字体，OFL 许可，永久免费开源）
+ *  —— 关键：它是**带 CJK 覆盖的像素字体**。之前 --vk-font-* 用的是 Noto Sans SC，
+ *     中文完全没有像素感（西文虽然回退到 Press Start 2P 之类，但中文一律变黑体）
+ *     → 这是"看起来不像像素风"的最大破绽。
+ *  文件：public/fonts/fusion-pixel-12px-{zh_hans,latin}.woff2，许可证随包附 OFL.txt
+ */
+@font-face {
+  font-family: 'Fusion Pixel';
+  src: url('/fonts/fusion-pixel-12px-zh_hans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fusion Pixel';
+  src: url('/fonts/fusion-pixel-12px-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
+
   /* ---- 母板取色（全部 ⊆ palette.json）—— 木材层次 ---- */
   --vk-wood-deep: #3d2a1a;
   --vk-wood-dark: #5c3d22;
@@ -59,22 +86,32 @@
   --vk-grass-night: #3f6b4c;
   --vk-soil-night: #5a4034;
 
-  /* ---- 木牌面板（复刻《星露谷物语主题.pdf》的节点卡）----
-     口径：标题栏是**绿色木匾**（所有面板统一绿，不再每台一色 → accent 机制已退役），
-     主体是奶油色纸/浅木纹，深棕 1px 描边，硬边小圆角（像素风不追求大圆角）。
+  /* ---- 参考稿实测色（复刻《星露谷物语主题.pdf》的面板本色）----
+     此前的暗苔绿 + 偏黄纸底是凭感觉调的，导致观感发闷发丑；下面全部换成参考稿采样值。 */
+  --vk-ref-paper: #fcefd2;    /* 面板纸底 */
+  --vk-ref-leaf-hi: #baec58;  /* 横幅叶绿·亮部 */
+  --vk-ref-leaf: #2a9708;     /* 横幅叶绿·主色 */
+  --vk-ref-leaf-lo: #0d5507;  /* 横幅叶绿·暗部/叶缘 */
+  --vk-ref-ink: #101702;      /* 面板文字（近黑偏绿） */
+  --vk-ref-value: #6e86bb;    /* 数值蓝 */
 
-     可读性：标题栏文字用纸奶白，故木匾主体须压到 --vk-moss-dark（#4e6b39）——
-     对纸奶白实测 5.13:1 ≥ 4.5:1；顶部只留一道 --vk-moss 亮边做木牌立体感
-     （亮绿 #7fa851 配奶白仅 2.35:1，不可作文字底色）。 */
-  --vk-panel-head-face: linear-gradient(180deg, var(--vk-moss) 0%, var(--vk-moss-dark) 22%, var(--vk-moss-dark) 100%);
+  /* ---- 木牌面板（复刻参考稿）----
+     标题栏 = 鲜亮草绿木匾（而不是暗苔绿），文字用奶白 + 深绿描边 ——
+     参考稿正是这么做的：纯色对比只有 3.24:1，靠 1px 深绿描边（ref-leaf-lo）拉开层次。 */
+  --vk-panel-head-face: linear-gradient(180deg,
+    var(--vk-ref-leaf-hi) 0%,
+    var(--vk-ref-leaf) 24%,
+    var(--vk-ref-leaf) 74%,
+    var(--vk-ref-leaf-lo) 100%);
   --vk-panel-head-ink: var(--vk-paper-cream);
-  --vk-panel-face: linear-gradient(180deg, var(--vk-paper-cream) 0%, var(--vk-paper-warm) 100%);
+  --vk-panel-face: var(--vk-ref-paper);
   --vk-panel-border: var(--vk-outline);
-  --vk-panel-value: var(--vk-sky-day-lo); /* 数值用蓝（参考稿口径） */
-  --vk-panel-radius: 4px;
-  --vk-seg-h: 8px;      /* 分段进度条高度 */
-  --vk-seg-unit: 5px;   /* 单格宽 */
-  --vk-seg-gap: 2px;    /* 格间距 */
+  --vk-panel-text: var(--vk-ref-ink);   /* 标签/正文 */
+  --vk-panel-value: var(--vk-ref-value); /* 数值 */
+  --vk-panel-radius: 5px;
+  --vk-seg-h: 11px;     /* 分段进度条高度（参考稿是厚条） */
+  --vk-seg-unit: 7px;   /* 单格宽 */
+  --vk-seg-gap: 3px;    /* 格间距 */
 
   /* ---- 暖色阴影基色（柔和投影一律用它，绝不用纯黑） ---- */
   --vk-shadow-warm: var(--vk-wood-deep);
@@ -117,8 +154,15 @@
     repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-paper-deep) 16%, transparent) 0 1px, transparent 1px 7px);
 
   /* ---- 字体：平滑人文体栈（明确禁用像素字体） ---- */
-  --vk-font-display: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --vk-font-body: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* ---- 字体 ----
+     像素字体 Fusion Pixel（12px 设计）。**字号必须是 12 的整数倍**（12 / 24），
+     否则像素格被插值糊掉、反而不如黑体清晰 —— 这条是像素风的关键约束。 */
+  --vk-font-display: 'Fusion Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --vk-font-body: 'Fusion Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --vk-fs-sm: 12px;   /* 正文/指标（= 设计尺寸 1×） */
+  --vk-fs-md: 12px;   /* 次级标题 */
+  --vk-fs-lg: 24px;   /* 大标题（= 设计尺寸 2×） */
+  --vk-lh: 1.75;      /* 像素字行高要松，参考稿约 1.6-2.0 */
 
   /* ---- 间距 ---- */
   --vk-space-1: 4px;

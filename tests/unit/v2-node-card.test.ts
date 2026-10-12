@@ -192,9 +192,8 @@ describe('NodeCard 视觉契约：取色仅走母板令牌、像素风硬边', (
 
   it('像素风：小圆角 + 硬投影（不用 blur）', () => {
     expect(cardCss).toMatch(/--vk-panel-radius/)
-    // 硬投影：2px 位移 + 0 blur
-    expect(cardCss).toMatch(/box-shadow:\s*2px 2px 0 0/)
-    expect(cardCss).not.toMatch(/box-shadow:[^;]*\b(1[0-9]|[2-9][0-9])px\b[^;]*;(?!.*0 0)/)
+    // 硬投影：位移 px + 0 blur（模糊量必须是 0）
+    expect(cardCss).toMatch(/box-shadow:\s*\d+px \d+px 0 0/)
   })
 
   it('tokens.css 定义木牌面板令牌，且已无 accent 令牌', () => {

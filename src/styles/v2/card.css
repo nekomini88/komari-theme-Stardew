@@ -1,15 +1,16 @@
 /**
  * NodeCard 样式 —— 木牌面板（复刻《星露谷物语主题.pdf》）
  *
- * 参考稿结构：
- *   绿色木匾标题栏（叶片/藤蔓 + 图标 + 白粗体名 + 国旗 + 右上角状态灯）
- *   → 奶油色纸主体（深棕 1px 描边）
- *   → 系统行 → 6 组「一行两列」指标（行间浅色细横线）
- *   → 分段式进度条（圆角长槽 + 一排小方块；CPU/Mem/Disk/Latency/Loss 绿，Load 橙）
+ * 参考稿实测（1448×1086 原图，单块面板 427×393）：
+ *   - 标题栏：**绿色叶片藤蔓编成的横幅**，上下边缘是波浪状叶边、两端叶簇收成圆头
+ *   - 主体：奶油纸 + 轻微噪点纹理，**1px 浅棕描边**、圆角，
+ *           内部是**浅棕虚线**分隔线（不是实线）
+ *   - 角饰：左上陶土盆栽 / 右上叶芽 / 右下向日葵
+ *   - 图标约 20px 像素图；进度条是**厚分段条**（深色描边 + 内高光）
+ *   - 排版宽松：行高约 1.75，页面留白大
  *
- * 像素风口径：
- *   - 硬边、小圆角（4px）、1px 描边，**不用模糊投影**（改用 2px 硬投影）
- *   - 取色一律 var(--vk-*)，不写死十六进制
+ * 像素风口径：硬边、字号 12 的整数倍、`image-rendering: pixelated`、
+ *             投影用硬位移不用 blur、取色一律 var(--vk-*)
  */
 
 /* ---------- 卡片网格：3 列，窄屏降列 ---------- */
@@ -34,39 +35,73 @@
   }
 }
 
+/* ---------- 面板 ---------- */
 .vk-panel {
+  font-family: var(--vk-font-body);
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--vk-panel-face);
+  background-color: var(--vk-ref-paper);
+  /* 纸纹：两层极淡的横竖细纹，模拟参考稿的噪点纸面（不是纯平涂） */
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-panel-border) 5%, transparent) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--vk-panel-border) 4%, transparent) 0 1px, transparent 1px 4px);
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
-  /* 像素风投影：硬边位移，不用 blur */
-  box-shadow: 2px 2px 0 0 color-mix(in srgb, var(--vk-shadow-warm) 65%, transparent);
+  /* 硬投影：像素风用位移，不用 blur */
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
 }
 
-/* ---------- ① 绿色木匾标题栏 ---------- */
+/* ---------- ① 绿色叶藤横幅标题栏 ---------- */
 .vk-panel-head {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 8px;
+  gap: 8px;
+  padding: 9px 16px;
   color: var(--vk-panel-head-ink);
   background: var(--vk-panel-head-face);
   border-bottom: 1px solid var(--vk-panel-border);
 }
 
-/* 左侧叶片/藤蔓装饰：像素风用两个小方块拼，而非 SVG */
+/* 上下波浪叶边：用重复径向渐变造一排「叶片凸起」，模拟参考稿的锯齿叶缘 */
+.vk-panel-head::before,
+.vk-panel-head::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  left: 10px;
+  height: 5px;
+  background: repeating-radial-gradient(
+    circle at 5px 5px,
+    var(--vk-ref-leaf-hi) 0 4px,
+    transparent 4.5px
+  );
+  background-size: 10px 5px;
+  pointer-events: none;
+}
+
+.vk-panel-head::before {
+  top: -4px;
+}
+
+.vk-panel-head::after {
+  bottom: -4px;
+  background: repeating-radial-gradient(circle at 5px 0, var(--vk-ref-leaf-lo) 0 4px, transparent 4.5px);
+  background-size: 10px 5px;
+}
+
+/* 两端叶簇：两个圆头叶球，收住横幅两端 */
 .vk-panel-vine {
   flex: none;
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--vk-panel-border);
+  border-radius: 50%;
   background:
-    linear-gradient(var(--vk-leaf-hi), var(--vk-leaf-hi)) 0 0 / 5px 5px no-repeat,
-    linear-gradient(var(--vk-moss-dark), var(--vk-moss-dark)) 5px 5px / 5px 5px no-repeat;
-  image-rendering: pixelated;
+    radial-gradient(circle at 35% 30%, var(--vk-ref-leaf-hi) 0 3px, transparent 3.5px),
+    radial-gradient(circle at 70% 60%, var(--vk-ref-leaf) 0 4px, transparent 4.5px),
+    var(--vk-ref-leaf-lo);
 }
 
 .vk-panel-head-icon {
@@ -79,14 +114,18 @@
   flex: 1 1 auto;
   margin: 0;
   overflow: hidden;
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: var(--vk-fs-md);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* 白字配深色描边，保证在绿色木匾上清晰（参考稿的像素字观感） */
-  text-shadow: 1px 1px 0 var(--vk-moss-dark);
+  /* 像素字描边：四向 1px 深色，做出参考稿的粗体像素字观感 */
+  text-shadow:
+    1px 0 0 var(--vk-ref-leaf-lo), -1px 0 0 var(--vk-ref-leaf-lo),
+    0 1px 0 var(--vk-ref-leaf-lo), 0 -1px 0 var(--vk-ref-leaf-lo),
+    1px 1px 0 var(--vk-ref-leaf-lo);
 }
 
 .vk-panel-flag {
@@ -97,25 +136,27 @@
 
 .vk-panel-flag img {
   display: block;
-  width: 18px;
-  height: 13px;
+  width: 22px;
+  height: 16px;
   object-fit: cover;
-  border: 1px solid var(--vk-outline);
+  border: 1px solid var(--vk-panel-border);
+  image-rendering: pixelated;
 }
 
-/* 右上角状态灯：颜色 + （下行的）文字双重区分，不只靠颜色 */
+/* 状态灯 */
 .vk-panel-dot {
   flex: none;
-  width: 8px;
-  height: 8px;
-  border: 1px solid var(--vk-outline);
-  background: var(--vk-paper-deep);
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--vk-panel-border);
+  border-radius: 50%;
+  background: var(--vk-paper-warm);
 }
 
-.vk-panel-dot[data-status='online'] { background: var(--vk-leaf); }
+.vk-panel-dot[data-status='online'] { background: var(--vk-ref-leaf-hi); }
 .vk-panel-dot[data-status='alert'] { background: var(--vk-honey); }
 .vk-panel-dot[data-status='offline'] { background: var(--vk-wood-dark); }
-.vk-panel-dot[data-status='unknown'] { background: var(--vk-paper-deep); }
+.vk-panel-dot[data-status='unknown'] { background: var(--vk-paper-warm); }
 
 .vk-visually-hidden {
   position: absolute;
@@ -130,21 +171,21 @@
 .vk-panel-body {
   display: flex;
   flex-direction: column;
-  padding: 8px 10px 10px;
-  color: var(--vk-ink-soft);
+  padding: 16px 18px 18px;
+  color: var(--vk-panel-text);
 }
 
-/* ③ 系统行（整宽，左侧一枚系统图标） */
+/* ③ 系统行 */
 .vk-panel-sys {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  margin: 0 0 6px;
-  padding-bottom: 6px;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  color: var(--vk-ink-soft);
-  border-bottom: 1px solid color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
+  margin: 0 0 12px;
+  padding: 0 0 12px;
+  font-size: var(--vk-fs-sm);
+  line-height: var(--vk-lh);
+  /* 参考稿是虚线分隔，不是实线 */
+  border-bottom: 1px dashed color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
 }
 
 .vk-panel-sys span {
@@ -153,7 +194,7 @@
   white-space: nowrap;
 }
 
-/* ④ 指标行：一行两列，行间浅色细横线 */
+/* ④ 指标行：一行两列，行间虚线 */
 .vk-panel-rows {
   display: flex;
   flex-direction: column;
@@ -162,36 +203,35 @@
 .vk-panel-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 5px 0;
+  gap: 14px;
+  padding: 10px 0;
 }
 
 .vk-panel-row + .vk-panel-row {
-  border-top: 1px solid color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
+  border-top: 1px dashed color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
 }
 
 .vk-cell {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-areas:
     'icon label value'
     'bar  bar   bar';
-  gap: 2px 5px;
+  gap: 4px 8px;
   align-items: center;
   min-width: 0;
-  font-size: 0.75rem;
-  line-height: 1.3;
+  font-size: var(--vk-fs-sm);
+  line-height: var(--vk-lh);
 }
 
 .vk-cell > :first-child { grid-area: icon; }
 
 .vk-cell-label {
   grid-area: label;
-  color: var(--vk-ink-soft);
+  color: var(--vk-panel-text);
   white-space: nowrap;
 }
 
-/* 数值用蓝（参考稿口径） */
 .vk-cell-value {
   grid-area: value;
   overflow: hidden;
@@ -202,29 +242,29 @@
   white-space: nowrap;
 }
 
-/* ---------- ⑤ 分段式进度条 ---------- */
+/* ---------- ⑤ 厚分段进度条（深色描边 + 内高光） ---------- */
 .vk-seg {
   grid-area: bar;
   position: relative;
   display: block;
-  height: var(--vk-seg-h);
-  margin-top: 2px;
+  height: calc(var(--vk-seg-h) + 2px);
+  margin-top: 5px;
   overflow: hidden;
-  background: var(--vk-paper-deep);
+  background: var(--vk-paper-warm);
   border: 1px solid var(--vk-panel-border);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--vk-ref-paper) 70%, transparent);
 }
 
 .vk-seg-fill {
   display: block;
   height: 100%;
-  /* 一排小方块：实色格 + 间隙，构成参考稿的分段观感 */
   background: repeating-linear-gradient(
     90deg,
-    var(--vk-seg-color, var(--vk-leaf)) 0 var(--vk-seg-unit),
+    var(--vk-seg-color, var(--vk-ref-leaf)) 0 var(--vk-seg-unit),
     transparent var(--vk-seg-unit) calc(var(--vk-seg-unit) + var(--vk-seg-gap))
   );
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
 }
 
-/* 高占用告警：进度条转暖色（与状态灯同源） */
 .vk-seg[data-level='alert'] { --vk-seg-color: var(--vk-honey); }
 .vk-seg[data-level='danger'] { --vk-seg-color: var(--vk-bark); }
