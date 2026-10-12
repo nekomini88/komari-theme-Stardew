@@ -63,8 +63,6 @@ export interface ScenePreset {
   timeTint: TintSpec
   /** 季节 tint（只改整栈 tint，不动其它层参数） */
   seasonTint: TintSpec
-  /** 场景底图 URL（按时间切换、季节素材优先；见 sceneBackgroundUrl） */
-  backgroundUrl: string
   /** 共享地面基线 */
   groundBaseline: typeof GROUND_BASELINE_LAYER
 }
@@ -85,11 +83,13 @@ const LAYER_COLORS: Record<TimeOfDay, Record<'far' | 'mid' | 'near' | 'ground', 
   night: { far: '#2f4a56', mid: '#5a4034', near: '#3f6b4c', ground: '#5a4034' },
 }
 
-/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜只留极淡冷调（夜景亮化改由 scene.css 抬底图亮度承担，避免再压暗） */
+/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜压暗成夜色。
+ *  【口径变更 2026-10-12】中性分层底之后，夜不能再靠「预暗好的夜景底图」，
+ *  必须由整栈 tint 真正压暗（原 0.05 是给烘焙夜景底图让路的，现在会白得像白天）。 */
 const TIME_TINTS: Record<TimeOfDay, TintSpec> = {
   day: { color: '#7ec8f2', opacity: 0 },
-  dusk: { color: '#e8a05c', opacity: 0.35 },
-  night: { color: '#3a548c', opacity: 0.05 },
+  dusk: { color: '#e8a05c', opacity: 0.4 },
+  night: { color: '#1e2c4c', opacity: 0.7 },
 }
 
 /** 季节 tint：只对整栈套一层，颜色取自母板的季节色 */
@@ -101,34 +101,25 @@ const SEASON_TINTS: Record<Season, TintSpec> = {
 }
 
 /**
- * 已接入的场景底图（整幅手绘田园插画，按访客本地时间切换）。
- * 素材缺失的时段不登记 → 由 sceneBackgroundUrl 回退，接口原地保留。
+ * 已接入的场景分层素材（见 scene.css 的 `.vk-layer[data-layer=...]`）。
+ *
+ * 【口径变更 2026-10-12】原先这里是「整幅烘焙底图按时间/季节切换」（ui-farm-*.png）——
+ * 那是**死光照**：太阳/云/远山/栅栏都烘进一张图里，昼夜只能整体加滤镜，且与装饰层重影。
+ * 现改为 **真分层 + 中性光照**（DESIGN_REFERENCE §9）：
+ *   sky  = sky-neutral.png（中性天空，不烘太阳/云）
+ *   far  = far-hills.png     （远山横带）
+ *   mid  = mid-ground.png    （栅栏 + 树丛）
+ *   near = CSS 草沿
+ *   ground = ground-neutral.png（中性草地）
+ * 昼夜/季节一律由**整栈 tint** 驱动 → 任何时间 × 季节组合都连续可过渡。
  */
-const SCENE_BG: Record<TimeOfDay, string> = {
-  day: '/images/v2-scene/ui-farm-bg.png',
-  dusk: '/images/v2-scene/ui-farm-dusk.png',
-  night: '/images/v2-scene/ui-farm-night.png',
-}
+export const SCENE_LAYER_IMAGES = {
+  sky: '/images/v2-scene/sky-neutral.png',
+  far: '/images/v2-scene/far-hills.png',
+  mid: '/images/v2-scene/mid-ground.png',
+  ground: '/images/v2-scene/ground-neutral.png',
+} as const
 
-/**
- * 季节底图（覆盖整幅插画，仅用于白天时段：日出/黄昏/夜晚仍按光影变体切换，
- * 让「时间光影」全年有效；季节则改变白天的田园面貌）。
- */
-const SEASON_BG: Partial<Record<Season, string>> = {
-  autumn: '/images/v2-scene/ui-farm-autumn.png',
-  winter: '/images/v2-scene/ui-farm-winter.png',
-}
-
-/**
- * 解析场景底图：
- *  - 黄昏/夜晚 → 对应光影变体（季节不改变夜色）
- *  - 白天 → 有季节素材则用季节图（秋/冬），否则用白天图（春/夏）
- */
-export function sceneBackgroundUrl(time: TimeOfDay, season: Season): string {
-  if (time !== 'day')
-    return SCENE_BG[time]
-  return SEASON_BG[season] ?? SCENE_BG.day
-}
 
 /** 小时 → 时段（昼夜由真实时间驱动，保证场景自然切换） */
 export function timeOfDayFromHour(hour: number): TimeOfDay {
@@ -162,7 +153,6 @@ export function resolveScene(time: TimeOfDay, season: Season): ScenePreset {
     layerColors: { ...LAYER_COLORS[time] },
     timeTint: { ...TIME_TINTS[time] },
     seasonTint: { ...SEASON_TINTS[season] },
-    backgroundUrl: sceneBackgroundUrl(time, season),
     groundBaseline: GROUND_BASELINE_LAYER,
   }
 }

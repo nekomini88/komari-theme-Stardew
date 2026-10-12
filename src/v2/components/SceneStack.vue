@@ -31,13 +31,12 @@ const scene = computed(() => resolveScene(props.time, props.season))
 /** 内容层（sky 单独渲染色带，不参与视差层循环） */
 const contentLayers = computed(() => scene.value.layers.filter(l => l.id !== 'sky'))
 
-/** 交叉淡化：时间 tint 与季节 tint 各一套，场景底图单独一套 */
+/** 交叉淡化：时间 tint 与季节 tint 各一套（场景本身是分层贴图，不再切整幅底图） */
 const timeFade = useCrossfade(computed(() => scene.value.timeTint), TRANSITION_MS)
 const seasonFade = useCrossfade(computed(() => scene.value.seasonTint), TRANSITION_MS)
-const bgFade = useCrossfade(computed(() => scene.value.backgroundUrl), TRANSITION_MS)
 
 const isTransitioning = computed(
-  () => timeFade.isTransitioning.value || seasonFade.isTransitioning.value || bgFade.isTransitioning.value,
+  () => timeFade.isTransitioning.value || seasonFade.isTransitioning.value,
 )
 
 function layerStyle(parallax: number) {
@@ -53,14 +52,6 @@ function tintStyle(t: TintSpec | null) {
   return {
     background: t?.color ?? 'transparent',
     opacity: String(t?.opacity ?? 0),
-    transitionDuration: `${TRANSITION_MS}ms`,
-  }
-}
-
-/** 场景底图：整幅插画铺满（cover + 顶部对齐），由 opacity 过渡做交叉淡化 */
-function bgStyle(url: string | null) {
-  return {
-    backgroundImage: url ? `url('${url}')` : 'none',
     transitionDuration: `${TRANSITION_MS}ms`,
   }
 }
@@ -83,27 +74,14 @@ defineExpose({
   leavingTint: timeFade.leaving,
   currentSeasonTint: seasonFade.current,
   leavingSeasonTint: seasonFade.leaving,
-  currentBgUrl: bgFade.current,
-  leavingBgUrl: bgFade.leaving,
 })
 </script>
 
 <template>
   <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-transitioning="isTransitioning">
-    <!-- 场景底图：整幅手绘插画，按访客本地时间交叉淡化（离开层在下、进入层在上） -->
-    <div
-      v-if="bgFade.leaving.value"
-      class="vk-scene-bg"
-      data-bg="leave"
-      :style="bgStyle(bgFade.leaving.value)"
-    />
-    <div
-      :key="bgFade.current.value"
-      class="vk-scene-bg"
-      data-bg="enter"
-      :style="bgStyle(bgFade.current.value)"
-    />
-    <!-- 天空：4 段色带（夜间/兜底）+ 手绘天空插画（昼间叠加，云在山影之上） -->
+    <!-- 天空：4 段色带（夜间使用）+ 中性天空插画（昼/昏）
+         场景本身是**分层贴图**（far/mid/near/ground 各自一张，见 scene.css），
+         不再有「整幅烘焙底图」→ 昼夜/季节一律由整栈 tint 驱动，任何组合都连续可过渡。 -->
     <div class="vk-sky" data-layer="sky">
       <div
         v-for="(band, i) in scene.skyBands"

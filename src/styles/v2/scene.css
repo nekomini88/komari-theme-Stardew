@@ -9,7 +9,7 @@
  * 取色：全部 ⊆ src/assets/palette.json 母板；渐变/径向柔光均允许（像素时代的口径已废除），但仍保持平滑、无硬边块。
  */
 
-/* 场景底：兜底为天空色，避免任何缝隙露出 */
+/* 场景底：兜底为「天空色 → 草色」的纯 CSS 渐变，避免任何缝隙露出 */
 .vk-scene {
   position: absolute;
   inset: 0;
@@ -19,32 +19,12 @@
   /* 通透感：整栈统一的饱和度/对比度提升（只作用于场景层，卡片在 .vk-main 内不受影响） */
   filter: saturate(var(--vk-scene-saturate, 1.18)) contrast(var(--vk-scene-contrast, 1.04))
     brightness(var(--vk-scene-bright, 1.03));
-  /* 兜底：白天插画（首帧/切换空窗期间不至于露底），实际视觉由 .vk-scene-bg 按时间提供 */
-  background:
-    url('/images/v2-scene/ui-farm-bg.png') center top / cover no-repeat,
-    var(--vk-sky-day);
-}
-
-/* ---- 场景底图：整幅手绘插画，按访客本地时间交叉淡化 ----
- * 进入层始终存在（opacity 1，按 URL 换 key → 重新挂载并淡入），
- * 离开层仅在过渡期间存在（淡出后移除）→ 两帧叠加即交叉淡化，非硬切。 */
-.vk-scene-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-position: center top;
-  background-size: cover;
-  background-repeat: no-repeat;
-  transition-property: opacity;
-  transition-timing-function: linear;
-}
-
-.vk-scene-bg[data-bg='enter'] {
-  animation: vk-tint-in var(--vk-transition-ms) linear both;
-}
-
-.vk-scene-bg[data-bg='leave'] {
-  animation: vk-tint-out var(--vk-transition-ms) linear both;
+  /* 兜底：上半天空色 + 下半草色（各分层贴图未加载时也不露白） */
+  background: linear-gradient(180deg,
+    var(--vk-sky-day) 0%,
+    var(--vk-sky-day-lo) 46vh,
+    var(--vk-grass-day) 46vh,
+    var(--vk-grass-day-lo) 100%);
 }
 
 /* ---- 天空：以视口为锚，占地平线以上的全部高度（首屏可见天空带） ---- */
@@ -222,9 +202,9 @@
 /* ---- 月亮 + 星星（夜间替代太阳；由 SceneDecor 在 night 时才渲染）---- */
 .vk-decor-moon {
   position: absolute;
-  right: 4%;
-  top: 6px;
-  width: 340px;
+  right: 3%;
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-reveal) - 118px);
+  width: 260px;
   height: auto;
   user-select: none;
   filter: drop-shadow(0 0 18px color-mix(in srgb, var(--vk-paper-cream) 46%, transparent));
@@ -319,80 +299,61 @@
 /* 远山：手绘远山插画（1600×296，透明上方留白已裁掉、背景已抠为 alpha）。
    带以视口为锚：底边落在地平线（= 卡片网格顶），高度 = --vk-scene-band-h；
    卡片网格上方的「露台带」正是远山可见区。cover + 底部对齐贴合视口、几乎不拉伸。 */
+/* 远山：far-hills.png 横带（1600×296 透明抠图）。
+   底边落在地平线，盒高略高于露台带 → 山脊完整不被切。 */
 .vk-layer[data-layer='far'] .vk-layer-base {
   left: 0;
   right: 0;
-  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
-  height: var(--vk-scene-band-h);
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h) * 1.15);
+  height: calc(var(--vk-scene-band-h) * 1.15);
   border-radius: 0;
-  background: none; /* 已由整幅底图 ui-farm-bg.png 包含,避免重复绘制 */
+  background: url('/images/v2-scene/far-hills.png') center bottom / 100% auto no-repeat;
 }
 
-/* 中景：手绘栅栏 + 树丛（1600×900，透明上方留白已抠为 alpha）。
-   与远山同带、底边同落在地平线：cover + 底部对齐 → 栅栏（原图 75%–95% 高度处）
-   正好落在露台带下半，成为卡片上方一眼可辨的栅栏横带。 */
+/* 中景：mid-ground.png（栅栏 + 树丛，1600×900 透明抠图）。
+   底边同落在地平线：cover + 底部对齐 → 栅栏（原图 75%–95% 高度处）正好落在
+   露台带下半，成为卡片上方一眼可辨的栅栏横带。 */
 .vk-layer[data-layer='mid'] .vk-layer-base {
   left: 0;
   right: 0;
-  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h));
-  height: var(--vk-scene-band-h);
+  top: calc(var(--vk-scene-horizon) - var(--vk-scene-band-h) * 1.6);
+  height: calc(var(--vk-scene-band-h) * 1.6);
   border-radius: 0;
-  background: none; /* 已由整幅底图包含 */
+  background: url('/images/v2-scene/mid-ground.png') center bottom / 100% auto no-repeat;
 }
 
 /* 草沿：地平线处一条矮绿色坡沿（顶边柔圆），压在卡片网格顶沿之下，
-   让「远山 → 栅栏 → 草地」的过渡在露台带底部收口（不再是整块盖住场景的色带）。 */
+   让「远山 → 栅栏 → 草地」的过渡在露台带底部收口。 */
 .vk-layer[data-layer='near'] .vk-layer-base {
   left: -6%;
   right: -6%;
   top: calc(var(--vk-scene-horizon) - 2.2vh);
   height: 4.4vh;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background-color: var(--vk-grass-day);
+  background-image: linear-gradient(180deg, var(--vk-grass-hi), var(--vk-grass-day));
 }
 
-/* 田野：卡片「站」在其上的共享基线 —— 从地平线一路铺到文档底部（首屏外继续延伸） */
+/* 田野：ground-neutral.png（中性草地，1600×555 已填底为不透明）。
+   从地平线一路铺到文档底部（repeat-y，不做放大 → 不糊）。 */
 .vk-layer[data-layer='ground'] .vk-layer-base {
   top: var(--vk-scene-horizon);
   bottom: 0;
   border-radius: 0;
+  background: url('/images/v2-scene/ground-neutral.png') center top / 100% auto repeat-y;
 }
 
-/* ---- 昼/昏：草地/近沿配色（远山与中景改用插画，不在此着色，避免覆盖 background-image） ---- */
-.vk-scene[data-time='day'] .vk-layer[data-layer='near'] .vk-layer-base,
-.vk-scene[data-time='dusk'] .vk-layer[data-layer='near'] .vk-layer-base {
-  background: none; /* 整幅底图已含草地/坡沿;保留元素供时间/季节 tint 使用 */
-}
-
-.vk-scene[data-time='day'] .vk-layer[data-layer='ground'] .vk-layer-base,
-.vk-scene[data-time='dusk'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: none; /* 同上:地面不再铺色,避免盖住插画 */
-}
-
-/* ---- 夜：整幅底图已是夜色插画，各层不再另铺色（避免盖住插画）；
-        关键：夜景必须「看得见的夜空田园」——
-        ① 不再用 4 段深色带盖住插画自带星空/月亮（色带退为透明兜底，元素仍在）；
-        ② 给夜色底图抬一层亮度，使远山轮廓 / 栅栏 / 草地仍可辨认；
-        ③ 时间 tint 只留极淡冷调，不再压暗。 ---- */
+/* ---- 夜：中性分层底 + 更强的整栈夜色 tint（不再有「预暗好的夜景底图」可依赖）---- */
 .vk-scene[data-time='night'] .vk-sky-band {
-  opacity: 0; /* 露出底图自带的星空 + 月亮 */
-}
-
-.vk-scene[data-time='night'] .vk-scene-bg {
-  filter: brightness(1.42) saturate(1.06) contrast(1.02);
+  opacity: 1; /* 露出 4 段夜色天空色带（月亮/星星由 SceneDecor 的 moon-stars 提供） */
 }
 
 .vk-scene[data-time='night'] .vk-layer[data-layer='far'] .vk-layer-base,
 .vk-scene[data-time='night'] .vk-layer[data-layer='mid'] .vk-layer-base {
-  filter: brightness(0.94) saturate(0.9);
+  filter: brightness(0.9) saturate(0.86);
 }
 
-.vk-scene[data-time='night'] .vk-layer[data-layer='near'] .vk-layer-base,
-.vk-scene[data-time='night'] .vk-layer[data-layer='ground'] .vk-layer-base {
-  background: none; /* 夜间插画自带草地/坡沿，不再铺冷色渐变遮盖 */
-}
-
-/* 夜晚：天空改由插画自带星空承载 → 收回 CSS 太阳/月亮与 CSS 云，
-   避免与插画里的月亮/云重影；地平线奶白雾也压淡。 */
+/* 夜晚：地平线奶白雾压淡（夜色下不该有奶白亮边） */
 .vk-scene[data-time='night'] .vk-sky::after {
   opacity: 0.22;
 }
