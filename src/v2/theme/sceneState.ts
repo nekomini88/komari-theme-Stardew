@@ -6,7 +6,7 @@
  *  - 变化 = 整栈同步套一层 tint + 换天空色带；季节只改整栈 tint，绝不每层各换一套图。
  *  - 过渡 = 交叉淡化（crossfade），禁止硬切。
  *
- * 所有颜色均取自 src/assets/palette.json 的 38 色母板（见 palette.ts / 单测校验）。
+ * 所有颜色均取自 src/assets/palette.json 的 41 色母板（见 palette.ts / 单测校验）。
  */
 
 import { PALETTE_HEXES } from './palette'
