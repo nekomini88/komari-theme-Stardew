@@ -13,14 +13,17 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--vk-space-3);
-  background-color: color-mix(in srgb, var(--vk-paper-cream) 52%, transparent);
-  backdrop-filter: blur(7px) saturate(1.06);
-  border: 1px solid color-mix(in srgb, var(--vk-moss) 30%, transparent);
-  border-radius: var(--vk-radius-lg);
-  box-shadow: var(--vk-shadow-2);
-  color: var(--vk-text);
-  padding: var(--vk-space-3) var(--vk-space-4);
-  backdrop-filter: blur(3px);
+  /* 像素纸面板：与总览区/卡片同一套口径（实底纸色 + 硬边 + 硬投影 + 小圆角），
+     不再用半透明毛玻璃 —— 场景有昼/昏/夜三种明暗，半透明底在夜景上必然读不清。 */
+  color: var(--vk-panel-text);
+  background-color: var(--vk-ref-paper);
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-panel-border) 5%, transparent) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--vk-panel-border) 4%, transparent) 0 1px, transparent 1px 4px);
+  border: 1px solid var(--vk-panel-border);
+  border-radius: var(--vk-panel-radius);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 50%, transparent);
+  padding: 12px 14px;
 }
 
 .vk-field {

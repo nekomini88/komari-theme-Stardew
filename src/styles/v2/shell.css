@@ -175,3 +175,17 @@
   opacity: 0;
   transform: translateY(6px);
 }
+
+/* ---- 窄屏（手机）顶栏：允许折成两行，避免按钮被挤成竖排 ---- */
+@media (max-width: 640px) {
+  .vk-topbar-inner {
+    flex-wrap: wrap;
+    gap: var(--vk-space-2) var(--vk-space-3);
+    padding: 10px 12px;
+  }
+
+  .vk-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
