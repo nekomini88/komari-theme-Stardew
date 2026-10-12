@@ -1,133 +1,69 @@
 <script setup lang="ts">
 /**
- * SceneStack —— 五层场景图层栈（ART_SYSTEM.md §2）
+ * SceneStack —— 整幅场景背景（像素风 · 复刻《星露谷物语主题.pdf》）
  *
- * - 单一状态源：props.time × props.season
- * - 五层结构：sky / far(0.2) / mid(0.5) / near(0.8) / ground(1.0)
- * - 场景覆盖整份文档高度（随内容自适应），故卡片网格/长列表滚动时场景始终在背后，不留空白带
- * - 变化 = 整栈套 tint + 换天空色带；时间 tint 与季节 tint 各自 1.2s 交叉淡化
- * - 所有角色/建筑共享 ground 基线（本组件把 ground 层暴露为具名插槽）
+ * 口径（用户 2026-10-12 定）：
+ *  - 「不用切画面」→ 场景**不再分层拼接**，直接用 ListenHub 生成的**整幅像素风插画**当背景
+ *  - 光照已烘焙在图里 → **不做整栈 tint**，时间档直接选图
+ *  - 时间来源 = 服务端世界时钟（@/utils/serverClock，UTC+8），**不跟访客本地时钟**
+ *  - 四季系统 / 雷电天气：用户明确「后期再做」，此组件不涉
+ *
+ * 素材：public/images/v2-scene/full/{day,dusk,night}.png（ListenHub Nano Banana Pro 生成，
+ *      原图 2752×1536，进仓前降到 1920×1072 + 256 色量化，平均色差 <2/255）
  */
 import type { Season, TimeOfDay, Weather } from '@/v2/theme/sceneState'
-import type { TintSpec } from '@/v2/theme/sceneState'
 import { computed } from 'vue'
-import SceneDecor from '@/v2/components/SceneDecor.vue'
-import SceneLife from '@/v2/components/SceneLife.vue'
-import { resolveScene, TRANSITION_MS } from '@/v2/theme/sceneState'
 import { useCrossfade } from '@/v2/theme/useCrossfade'
 
 const props = withDefaults(defineProps<{
+  /** 时段（由服务端世界时钟解析，见 App.vue） */
   time?: TimeOfDay
+  /** 季节（本期「先不做」，保留入参以免上层调用点作废） */
   season?: Season
-  /** 天气（参考稿 §2.3）：晴 / 雨 / 雪 / 风 / 雾 —— 只影响装饰层的精灵与动画 */
+  /** 天气（本期只支持晴；只保留入参） */
   weather?: Weather
-  /** 彩蛋取证开关：把一只动物钉在画面里（截图/探针用），默认不计 */
-  forceLife?: boolean
 }>(), {
   time: 'day',
   season: 'summer',
   weather: 'clear',
-  forceLife: false,
 })
 
-/** 时间 × 季节 → 场景状态机；天气不属于该状态机（由日期推出），单独并入 */
-const scene = computed(() => ({ ...resolveScene(props.time, props.season), weather: props.weather }))
+const SCENE_DIR = '/images/v2-scene/full'
 
-/** 内容层（sky 单独渲染色带，不参与视差层循环） */
-const contentLayers = computed(() => scene.value.layers.filter(l => l.id !== 'sky'))
+/** 已出图的时段。**night 出图后加进来即可**，其余代码无需改动。
+ *  未出图的时段回退到最近可用的时段，避免 404 破图。 */
+const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk']
+const FALLBACK_TIME: TimeOfDay = 'dusk'
 
-/** 交叉淡化：时间 tint 与季节 tint 各一套（场景本身是分层贴图，不再切整幅底图） */
-const timeFade = useCrossfade(computed(() => scene.value.timeTint), TRANSITION_MS)
-const seasonFade = useCrossfade(computed(() => scene.value.seasonTint), TRANSITION_MS)
+/** 实际渲染用时段：请求的时段没图时回退 */
+const effectiveTime = computed<TimeOfDay>(() =>
+  AVAILABLE.includes(props.time) ? props.time : FALLBACK_TIME)
 
-const isTransitioning = computed(
-  () => timeFade.isTransitioning.value || seasonFade.isTransitioning.value,
-)
-
-function layerStyle(parallax: number) {
-  return {
-    '--vk-layer-parallax': String(parallax),
-    'zIndex': String(SCENE_Z[parallax] ?? 0),
-  }
-}
-// 视差系数 → z 序（保持图层叠放次序）
-const SCENE_Z: Record<number, number> = { 0: 0, 0.2: 1, 0.5: 2, 0.8: 3, 1: 4 }
-
-function tintStyle(t: TintSpec | null) {
-  return {
-    background: t?.color ?? 'transparent',
-    opacity: String(t?.opacity ?? 0),
-    transitionDuration: `${TRANSITION_MS}ms`,
-  }
+function sceneUrl(t: TimeOfDay): string {
+  return `${SCENE_DIR}/${t}.png`
 }
 
-/** 天空色带：每段从自己的色平滑过渡到下一段，四段拼出无硬缝的整片渐变天空 */
-function bandStyle(i: number) {
-  const bands = scene.value.skyBands
-  const c0 = bands[i]!
-  const c1 = bands[i + 1] ?? c0
-  return {
-    background: `linear-gradient(180deg, ${c0} 0%, ${c1} 100%)`,
-    top: `${i * 25}%`,
-  }
-}
+/** 时段切换 → 1.2s 交叉淡化（禁止硬切，沿用 ART_SYSTEM 的过渡口径） */
+const fade = useCrossfade(effectiveTime)
 
-defineExpose({
-  scene,
-  isTransitioning,
-  currentTint: timeFade.current,
-  leavingTint: timeFade.leaving,
-  currentSeasonTint: seasonFade.current,
-  leavingSeasonTint: seasonFade.leaving,
-})
+defineExpose({ effectiveTime, isTransitioning: fade.isTransitioning })
 </script>
 
 <template>
-  <div class="vk-scene" :data-time="scene.time" :data-season="scene.season" :data-transitioning="isTransitioning">
-    <!-- 天空：4 段色带（夜间使用）+ 中性天空插画（昼/昏）
-         场景本身是**分层贴图**（far/mid/near/ground 各自一张，见 scene.css），
-         不再有「整幅烘焙底图」→ 昼夜/季节一律由整栈 tint 驱动，任何组合都连续可过渡。 -->
-    <div class="vk-sky" data-layer="sky">
-      <div
-        v-for="(band, i) in scene.skyBands"
-        :key="`band-${i}`"
-        class="vk-sky-band"
-        :style="bandStyle(i)"
-      />
-      <!-- 手绘天空插画：昼/昏显示（自带云与地平线奶白过渡）；夜隐藏 → 露出色带夜空。
-           tint 仍是整栈叠加层（见下方 .vk-tint），与天空色带/各层无关地统一生效。 -->
-      <span class="vk-sky-img" />
-    </div>
-
-    <!-- 场景关键素材层：太阳(带笑脸光芒) / 蓬松云 / 层叠丘陵 / 风车 / 房屋 / 灌木 / 小路
-         —— 一律为 ListenHub 生成的透明 PNG 插画（/images/v2-scene/*.png），非 CSS/SVG 手搓 -->
-    <SceneDecor :time="scene.time" :season="scene.season" :weather="scene.weather" />
-
-    <!-- 视差层：far / mid / near / ground（背景由 scene.css 按时间着色） -->
+  <div class="vk-scene" :data-time="effectiveTime" data-arch="full-bleed" :data-transitioning="fade.isTransitioning.value">
+    <!-- 退场层：仅过渡期间存在，压在进入层之下 -->
     <div
-      v-for="layer in contentLayers"
-      :key="layer.id"
-      class="vk-layer"
-      :data-layer="layer.id"
-      :data-parallax="layer.parallax"
-      :style="layerStyle(layer.parallax)"
-    >
-      <span class="vk-layer-base" />
-      <slot :name="layer.id" />
-      <!-- 生态层（植物生长循环 + 动物彩蛋）：仅在共享地面基线层内，随季节播种、确定性摆放 -->
-      <SceneLife
-        v-if="layer.id === 'ground'"
-        :time="scene.time"
-        :season="scene.season"
-        :force="forceLife"
-      />
-    </div>
-
-    <!-- 整栈 tint：进入层（始终存在） -->
-    <div class="vk-tint" data-tint="time-enter" :style="tintStyle(timeFade.current.value)" />
-    <div class="vk-tint" data-tint="season-enter" :style="tintStyle(seasonFade.current.value)" />
-    <!-- 整栈 tint：离开层（仅在过渡期间存在 → 交叉淡化而非硬切） -->
-    <div v-if="timeFade.leaving.value" class="vk-tint" data-tint="time-leave" :style="tintStyle(timeFade.leaving.value)" />
-    <div v-if="seasonFade.leaving.value" class="vk-tint" data-tint="season-leave" :style="tintStyle(seasonFade.leaving.value)" />
+      v-if="fade.leaving.value"
+      class="vk-scene-plate"
+      data-role="leave"
+      :style="{ backgroundImage: `url(${sceneUrl(fade.leaving.value)})` }"
+    />
+    <!-- 进入层：key 绑定 URL，换图时重放淡入动画 → 与退场层构成交叉淡化 -->
+    <div
+      :key="sceneUrl(fade.current.value)"
+      class="vk-scene-plate"
+      data-role="enter"
+      :style="{ backgroundImage: `url(${sceneUrl(fade.current.value)})` }"
+    />
   </div>
 </template>

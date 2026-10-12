@@ -2,8 +2,6 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { PALETTE, PALETTE_HEXES, PALETTE_META, isPaletteColor, offPaletteColors, OUTLINE_COLOR } from '@/v2/theme/palette'
-import { resolveScene, sceneColorsAreInPalette, SCENE_LAYERS } from '@/v2/theme/sceneState'
-import type { Season, TimeOfDay } from '@/v2/theme/sceneState'
 
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g
 const v2StyleDir = resolve(__dirname, '..', '..', 'src', 'styles', 'v2')
@@ -111,26 +109,28 @@ describe('v2 令牌引用完整性（防 --vk-soil-day 类静默失效）', () =
   })
 })
 
-describe('场景状态机取色 ⊆ 母板（全部 time × season 组合）', () => {
-  const times: TimeOfDay[] = ['day', 'dusk', 'night']
-  const seasons: Season[] = ['spring', 'summer', 'autumn', 'winter']
+describe('场景素材预算（整幅像素风插画，不做取色约束——它是渲染图不是代码着色）', () => {
+  const dir = resolve(__dirname, '..', '..', 'public', 'images', 'v2-scene', 'full')
 
-  it('9 … 12 组合下所有颜色都在母板内', () => {
-    for (const t of times) {
-      for (const s of seasons) {
-        const preset = resolveScene(t, s)
-        expect(sceneColorsAreInPalette(preset)).toBe(true)
-        expect(offPaletteColors([
-          ...preset.skyBands,
-          ...Object.values(preset.layerColors),
-          preset.timeTint.color,
-          preset.seasonTint.color,
-        ])).toEqual([])
-      }
+  it('每张整幅场景图都在包体预算内（≤400KB）且为 16:9', () => {
+    const files = readdirSync(dir).filter(f => f.endsWith('.png'))
+    expect(files.length).toBeGreaterThan(0)
+    for (const f of files) {
+      const buf = readFileSync(resolve(dir, f))
+      expect(buf.length, `${f} 体积超预算`).toBeLessThanOrEqual(400 * 1024)
+      // PNG 尺寸头：宽高各 4 字节（大端），位于 IHDR
+      const w = buf.readUInt32BE(16)
+      const h = buf.readUInt32BE(20)
+      expect(Math.abs(w / h - 16 / 9), `${f} 不是 16:9`).toBeLessThan(0.02)
     }
   })
 
-  it('图层视差系数是 ART_SYSTEM 规定的硬值', () => {
-    expect(SCENE_LAYERS.map(l => l.parallax)).toEqual([0, 0.2, 0.5, 0.8, 1])
+  it('场景图以 256 色量化收敛体积（PNG 色彩类型 = 3，索引色）', () => {
+    for (const f of readdirSync(dir).filter(f => f.endsWith('.png'))) {
+      const buf = readFileSync(resolve(dir, f))
+      // IHDR 的 color type 位于偏移 25
+      expect(buf[25], `${f} 未量化为索引色`).toBe(3)
+    }
   })
 })
+
