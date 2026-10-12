@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.121.0] - 2026-10-12
+
+### Changed
+- **场景世界的时间基准改为「我们的时间（UTC+8）」**：时间 / 季节 / 天气不再由访客本地时钟驱动，
+  改为取服务端 HTTP `Date` 响应头建立锚点（复用启动时既有的 `/api/public` 等请求，**零额外请求**），
+  并用请求往返中点抵消 RTT，访客时钟只当滴答器。访客系统时间不准或身处其他时区，看到的世界完全一致。
+- 场景状态改为每 60s 重算一次，日夜与季节会自然推进（原来仅在页面加载时算一次就固定）。
+- 天气判定新增按显式「年月日」取种的 `weatherFromDaySeed()`，避免 `Date` 本地 getter 按访客时区取错日期；
+  `weatherFromDate()` 保留但仅作兼容。
+
+### Added
+- 新增 6 个后台配置项（`komari-theme.json` → 分组「场景世界（时间 / 季节 / 天气）」）：
+  `sceneTimeMode` / `sceneFixedTime` / `sceneSeasonMode` / `sceneFixedSeason` /
+  `weatherMode`（`off` / `auto` / `fixed` 三态，默认 `auto`）/ `weatherFixed`
+- 新增 `utils/serverClock.ts`（世界时钟）与 `v2/theme/sceneConfig.ts`（配置解析），均带单测；
+  并新增契约测试：配置项 `options` 白名单必须与代码枚举逐项一致，防止脱钩
+
+### Removed
+- **移除全部 URL 覆盖口**（`?scene=` / `?season=` / `?weather=` / `?life=`）：
+  此前任何访客改 URL 即可改世界，与「场景由管理员设置」冲突。今后手动覆盖只走配置项。
+
 ## [0.114.0] - 2026-10-11
 
 ### Added

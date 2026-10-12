@@ -2,7 +2,7 @@
   "name": "Komari Stardew",
   "short": "Komari-Stardew",
   "description": "Stardew Valley pixel-art theme for Komari Monitor — sky, grass, fence, wood cards, pixel fonts",
-  "version": "0.120.0",
+  "version": "0.121.0",
   "author": "Neko",
   "url": "https://github.com/nekomini88/komari-theme-Stardew",
   "preview": "preview.png",
@@ -255,6 +255,55 @@
         "type": "number",
         "default": 0,
         "help": "背景遮罩强度（-100 到 100）：负数降低背景透明度，0 表示关闭，正数为黑色遮罩，绝对值越大效果越明显"
+      },
+      { "name": "场景世界（时间 / 季节 / 天气）", "type": "title" },
+      {
+        "key": "sceneTimeMode",
+        "name": "时间来源",
+        "type": "select",
+        "default": "auto",
+        "options": "auto,fixed",
+        "help": "auto = 跟随我们的时间（UTC+8，取自服务端时钟，与访客本地时区无关）；fixed = 固定为下面选定的时段"
+      },
+      {
+        "key": "sceneFixedTime",
+        "name": "固定时段",
+        "type": "select",
+        "default": "day",
+        "options": "day,dusk,night",
+        "help": "仅当「时间来源」选 fixed 时生效：day=白天、dusk=黄昏、night=夜间"
+      },
+      {
+        "key": "sceneSeasonMode",
+        "name": "季节来源",
+        "type": "select",
+        "default": "auto",
+        "options": "auto,fixed",
+        "help": "auto = 跟随我们的时间自动换季；fixed = 固定为下面选定的季节"
+      },
+      {
+        "key": "sceneFixedSeason",
+        "name": "固定季节",
+        "type": "select",
+        "default": "spring",
+        "options": "spring,summer,autumn,winter",
+        "help": "仅当「季节来源」选 fixed 时生效：spring=春、summer=夏、autumn=秋、winter=冬"
+      },
+      {
+        "key": "weatherMode",
+        "name": "天气",
+        "type": "select",
+        "default": "auto",
+        "options": "off,auto,fixed",
+        "help": "off = 关闭天气（恒为晴）；auto = 每天按日期确定性随机（晴占多数、季节自洽）；fixed = 固定为下面选定的天气"
+      },
+      {
+        "key": "weatherFixed",
+        "name": "固定天气",
+        "type": "select",
+        "default": "clear",
+        "options": "clear,rain,snow,wind,fog",
+        "help": "仅当「天气」选 fixed 时生效：clear=晴、rain=雨、snow=雪、wind=大风、fog=雾"
       }
     ]
   }

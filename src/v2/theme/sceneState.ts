@@ -16,6 +16,11 @@ export type TimeOfDay = 'day' | 'dusk' | 'night'
 /** 季节 */
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter'
 
+/** 时段枚举（配置项白名单共用同一份，避免多处手抄） */
+export const TIMES_OF_DAY: readonly TimeOfDay[] = ['day', 'dusk', 'night'] as const
+/** 季节枚举（配置项白名单共用同一份） */
+export const SEASONS: readonly Season[] = ['spring', 'summer', 'autumn', 'winter'] as const
+
 /** 图层定义：id + 视差系数（ART_SYSTEM §2） */
 export interface SceneLayerSpec {
   id: 'sky' | 'far' | 'mid' | 'near' | 'ground'
@@ -67,9 +72,11 @@ export interface ScenePreset {
   groundBaseline: typeof GROUND_BASELINE_LAYER
 }
 
-/** 各时段的天空 4 段色带（top → bottom），全部 ⊆ 母板。
+/**
+ * 各时段的天空 4 段色带（top → bottom），全部 ⊆ 母板。
  *  黄昏不再是昼色带：黄昏改用暖色带（蜜色高光 → 黄昏橙 → 蜜橘 → 土色），
- *  与昼的冷蓝天色真正不同，避免「昼/昏天空完全一致」。 */
+ *  与昼的冷蓝天色真正不同，避免「昼/昏天空完全一致」。
+ */
 const SKY_BANDS: Record<TimeOfDay, string[]> = {
   day: ['#a6dcf7', '#7ec8f2', '#7ec8f2', '#4f9fd0'],
   dusk: ['#f2c574', '#e8a05c', '#d99a4e', '#a9764b'],
@@ -83,19 +90,23 @@ const LAYER_COLORS: Record<TimeOfDay, Record<'far' | 'mid' | 'near' | 'ground', 
   night: { far: '#2f4a56', mid: '#5a4034', near: '#3f6b4c', ground: '#5a4034' },
 }
 
-/** 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜压暗成夜色。
+/**
+ * 时间 tint：昼无叠加、黄昏统一 #e8a05c、夜压暗成夜色。
  *  【口径变更 2026-10-12】中性分层底之后，夜不能再靠「预暗好的夜景底图」，
- *  必须由整栈 tint 真正压暗（原 0.05 是给烘焙夜景底图让路的，现在会白得像白天）。 */
+ *  必须由整栈 tint 真正压暗（原 0.05 是给烘焙夜景底图让路的，现在会白得像白天）。
+ */
 const TIME_TINTS: Record<TimeOfDay, TintSpec> = {
   day: { color: '#7ec8f2', opacity: 0 },
   dusk: { color: '#e8a05c', opacity: 0.4 },
   night: { color: '#1e2c4c', opacity: 0.7 },
 }
 
-/** 季节 tint：只对整栈套一层，颜色取自母板的季节色。
+/**
+ * 季节 tint：只对整栈套一层，颜色取自母板的季节色。
  *  【口径修正 2026-10-12】原先各季 opacity 只有 0.06–0.18，配合「烘焙好的季节底图」够用；
  *  但改成中性分层底之后，这类强度根本压不住底色 —— 冬天依旧是绿草如茵。
- *  现在把季节色强度提到"真的能改变观感"的量级（冬季同时另加各层的去饱和/提亮，见 scene.css）。 */
+ *  现在把季节色强度提到"真的能改变观感"的量级（冬季同时另加各层的去饱和/提亮，见 scene.css）。
+ */
 const SEASON_TINTS: Record<Season, TintSpec> = {
   spring: { color: '#8fc9a6', opacity: 0.12 },
   summer: { color: '#f4d9a0', opacity: 0.06 },
@@ -123,7 +134,6 @@ export const SCENE_LAYER_IMAGES = {
   ground: '/images/v2-scene/ground-neutral.png',
 } as const
 
-
 /** 小时 → 时段（昼夜由真实时间驱动，保证场景自然切换） */
 export function timeOfDayFromHour(hour: number): TimeOfDay {
   if (hour >= 6 && hour < 17)
@@ -150,15 +160,18 @@ export type Weather = 'clear' | 'rain' | 'snow' | 'wind' | 'fog'
 export const WEATHERS: readonly Weather[] = ['clear', 'rain', 'snow', 'wind', 'fog'] as const
 
 /**
- * 日期 × 季节 → 当天天气。
+ * 年月日 × 季节 → 当天天气。
  *
  * 口径：
  *  - **确定性**（同一天同一结果，可测、不会每次刷新乱跳）——用日序做哈希，不用 Math.random。
  *  - **多为晴朗**（0.55）：天气是点缀，不该天天糊住场景。
  *  - **季节自洽**：冬天不下雨（改下雪），非冬天不下雪。
+ *
+ * 取种用显式年月日而非 `Date`，因为本地 getter 会按访客时区取值；
+ * 世界时钟下应走本函数，`weatherFromDate` 仅为兼容旧调用保留。
  */
-export function weatherFromDate(date: Date, season: Season): Weather {
-  const seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate()
+export function weatherFromDaySeed(year: number, month: number, day: number, season: Season): Weather {
+  const seed = year * 10000 + month * 100 + day
   let h = Math.imul(seed, 2654435761) >>> 0
   h = (h ^ (h >>> 13)) >>> 0
   const r = h / 4294967296
@@ -169,6 +182,10 @@ export function weatherFromDate(date: Date, season: Season): Weather {
   if (r < 0.85)
     return 'wind'
   return 'fog'
+}
+
+export function weatherFromDate(date: Date, season: Season): Weather {
+  return weatherFromDaySeed(date.getFullYear(), date.getMonth() + 1, date.getDate(), season)
 }
 
 /** 解析时间 × 季节 → 整栈场景参数 */
