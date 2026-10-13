@@ -181,9 +181,8 @@ defineExpose({ viewStatus, statusLabel })
     :style="{
       '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
       '--vk-node-shadow': `var(--vk-node-shadow-${accentSlot + 1})`,
-      '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
-      // 每台一个不同的角饰（用户 2026-10-13：装饰物要做成不同物品）
-      '--vk-orn': `var(--vk-orn-${accentSlot + 1})`,
+      // 整卡底色（用户 2026-10-13：颜色框覆盖整个服务器名称卡片；角饰已按用户要求全部删除）
+      '--vk-node-bg': `var(--vk-node-bg-${accentSlot + 1})`,
     }"
   >
     <!-- ① 绿色木匾标题栏 -->

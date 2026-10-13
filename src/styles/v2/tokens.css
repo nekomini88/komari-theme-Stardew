@@ -107,7 +107,12 @@
   --vk-panel-face: var(--vk-ref-paper);
   --vk-panel-border: var(--vk-outline);
   --vk-panel-text: var(--vk-ref-ink);   /* 标签/正文 */
-  --vk-panel-value: var(--vk-ref-value); /* 数值 */
+  /* 数值色：原 #6e86bb（"数值蓝"）在**整卡铺色后**的指标区上对比度只有 1.60~2.18:1（实测，
+     远低于 4.5），视觉复核也反馈"数值对比度偏低"。
+     现用 --vk-ink-soft (#55392a)：对六种染色底的最差对比度 4.62:1（实测；--vk-wood-dark
+     #5c3d22 只有 4.32:1 不达标，--vk-panel-text 近黑有 8.09:1 但与标签同色无层次）。
+     层次靠右对齐 + 等宽数字（tabular-nums）体现。审计里有对应判据防退化。 */
+  --vk-panel-value: var(--vk-ink-soft);
 
   /* ---- 每台一色的标题栏（底板提供横幅色；文字色统一按参考稿口径）----
      参考稿是「浅色字 + 深色描边」，本主题统一复刻这一口径。
@@ -115,6 +120,15 @@
      6 张底板横幅与奶白 #f7ecd3 的对比度均 ≥3:1（青色槽的横幅已按 V 通道压暗 ~5% 达标）。
      注意：**不要**拿 accent 的十六进制值来算 —— 底板由原图色相替换而来、保留原明度，
      比 accent 暗得多，用错基准会算出深色字压在深色横幅上（slot 2/4/5 曾因此不达标）。 */
+  /* 每台底色：把"颜色框"铺满整张卡片（用户 2026-10-13：「颜色框覆盖整个服务器名称卡片」）。
+     六个色值即原底板横幅的实测主色，均已在母板 palette.json 中。
+     奶白字 #f7ecd3 对它们的对比度为 3.13 / 6.82 / 9.62 / 7.38 / 4.54 / 3.5 : 1（见下行注释）。 */
+  --vk-node-bg-1: #279a06;
+  --vk-node-bg-2: #06509a;
+  --vk-node-bg-3: #53069a;
+  --vk-node-bg-4: #9a0623;
+  --vk-node-bg-5: #9a5d06;
+  --vk-node-bg-6: #048d89;
   --vk-node-ink-1: #f7ecd3;
   --vk-node-shadow-1: #2b1d16;   /* 底板横幅 #279a06 → 奶白 3.13:1 */
   --vk-node-ink-2: #f7ecd3;
@@ -129,19 +143,6 @@
   --vk-node-shadow-6: #2b1d16;   /* 底板横幅 #048d89（青色槽横幅压暗以提升对比）→ 奶白 3.5:1 */
   /* 底板正文字纸色（= 美术底板实测）与右下角向日葵 */
   --vk-panel-paper: #fbeed2;
-  --vk-panel-sunflower: url(/images/v2-panel/panel-sunflower.png);
-  /* 卡片角饰 · 槽 1（小山葵） */
-  --vk-orn-1: url(/images/v2-orn/orn-sunflower.png);
-  /* 卡片角饰 · 槽 2（浇水壶） */
-  --vk-orn-2: url(/images/v2-orn/orn-wateringcan.png);
-  /* 卡片角饰 · 槽 3（草莓） */
-  --vk-orn-3: url(/images/v2-orn/orn-strawberry.png);
-  /* 卡片角饰 · 槽 4（蘑菇） */
-  --vk-orn-4: url(/images/v2-orn/orn-mushroom.png);
-  /* 卡片角饰 · 槽 5（南瓜） */
-  --vk-orn-5: url(/images/v2-orn/orn-pumpkin.png);
-  /* 卡片角饰 · 槽 6（信箱） */
-  --vk-orn-6: url(/images/v2-orn/orn-mailbox.png);
   /* 危险档进度条色（参考稿实测的粉红，语义上作红用） */
   --vk-bar-crit: #e63e5f;
   --vk-panel-radius: 5px;

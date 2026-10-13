@@ -94,7 +94,7 @@ describe('NodeCard 数据：关键指标一律走 metrics 格式化', () => {
 })
 
 describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
-  it('标题栏：名称唯一 + 叶片装饰 + 状态圆点 + 每台一色', () => {
+  it('标题栏：名称唯一 + 状态圆点 + 每台一色（整卡铺色）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const heads = w.findAll('.vk-card-head')
     expect(heads).toHaveLength(1)
@@ -104,9 +104,10 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     // 标题栏的叶藤造型与配色由**参考稿美术底板**提供（每台一色 = 6 张底板变体），
     // CSS 不再手搓叶边；文字色仍取 accent 配对的 ink
     const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
-    expect(css).toMatch(/\.vk-panel\s*\{[^}]*background-image:\s*var\(--vk-panel-art\)/)
+    // 整卡底色 = 该节点色槽的颜色（用户 2026-10-13：颜色框覆盖整个服务器名称卡片）
+    expect(css).toMatch(/\.vk-panel\s*\{[^}]*background-color:\s*var\(--vk-node-bg/)
     expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
-    expect(w.attributes('style')).toContain('--vk-panel-art: url(/images/v2-panel/panel-')
+    expect(w.attributes('style')).toContain('--vk-node-bg: var(--vk-node-bg-')
     expect(w.attributes('style')).toContain('--vk-node-ink: var(--vk-node-ink-')
   })
 
