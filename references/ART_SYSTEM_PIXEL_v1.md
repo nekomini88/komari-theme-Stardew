@@ -1,8 +1,8 @@
-# Komari-Stardew 美术系统规范 v1（像素风 · 复刻《星露谷物语主题.pdf》）
+# Komari-Farmer 美术系统规范 v1（像素风 · 按参考稿复刻）
 
 > 口径来源：用户 2026-10-12 明确「**全部重做，做成像素风格，完美复刻 PDF**」（推翻 10-11 的"不要像素风"）。
 > 参考稿：NodeSeek 帖 `post-844876-1`《探针仙人有灵感了！来看》（作者 nekomini）的打印稿 7 页。
-> PDF 原件 `/root/.hermes/cache/documents/doc_5fb19a64fd3b_星露谷物语主题.pdf`；抽出原图 `/root/v2_art/pdfsrc/img/`；
+> 参考稿原件 `/root/.hermes/cache/documents/doc_5fb19a64fd3b_星露谷物语主题.pdf`；抽出原图 `/root/v2_art/pdfsrc/img/`；
 > 高清设计稿 `p1-071 / p2-002 / p2-004 / p3-002 / p3-004 / p4-002 / p4-004 / p5-012 / p5-014`（1448×1086 级）。
 
 **本规范是所有素材的唯一验收标准。任何素材：先对规范，再看单张好不好看。**

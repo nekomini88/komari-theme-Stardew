@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.3.0] - 2026-10-13
+
+主题更名：**Komari-Stardew → Komari-Farmer**（用户口径：「修改为 Komari-famer（农场，与星露谷物语没有关系）」）。
+
+本次按用户选定的 **A 档口径**执行：只改「活的身份标识 + 文档」，不动任何业务代码与历史记录。
+
+### Changed
+- 主题清单 `komari-theme.json`：`name` / `short` 改为 `Komari-Farmer`；`description` 去掉星露谷品牌、
+  改为农场主题描述；`url` 指向新仓库 `komari-theme-farmer`；设置组名 `Emerald 设置` → `Komari-Farmer 设置`；
+  设置里视觉风格项的说明文案去掉品牌字样。
+- 产物命名：`komari-theme-Komari-Stardew-<版本>-<hash>.zip` → `komari-theme-Komari-Farmer-<版本>-<hash>.zip`；
+  package.json 的 `name` 同步为 `komari-theme-farmer`；自动发版工作流的附件 glob 同步。
+- 文档：README / AGENTS / spec.yaml / CHANGELOG / docs/rollback.md 的对外名称与描述全部换新；
+  `references/stardew-visual-style.md` → `references/farmer-visual-style.md`；
+  `docs/adr/ADR-001-stardew-theme.md` → `docs/adr/ADR-001-farmer-theme.md`；
+  `STARDew-V7-README.md` → `FARMER-V7-README.md`。
+- 活代码注释里点名的参考稿说法改为中性的「参考稿」。
+
+### Unchanged（A 档显式保留，非遗漏）
+- **视觉风格内部键 `data-theme='stardew'` 与 `useVisualStyle` 的 `['stardew','baseline']` 白名单原样保留**：
+  该键与 12 个 legacy 样式文件的选择器、3 个既有测试断言绑定，属内部标识符而非主题名；
+  改动它需要同时动 legacy 死文件或删测试断言，超出本档范围。对外不可见（仅内部数据键）。
+- v1 时代 legacy 组件与样式文件（`src/components/{Background,FloraFaunaOverlay,TopStatsGrid,…}.vue`、
+  `src/styles/{main,visual-styles,matte-pixel,hard-pixel-core,…}.css`）按口径整体不动，其中仍含旧品牌字样。
+- CHANGELOG 与 ADR 的历史条目保持原样（记录即记录，不回改历史）。
+
+### 验证
+- 单测全绿（含 spec.yaml 规格断言、产物命名断言）
+- 发布包名、部署目录名、GitHub 仓库名三者一致
+
 ## [3.0.0] - 2026-10-13
 
 像素风面板的正式版：卡片本体按《星露谷物语主题.pdf》逐项对齐，数据密度补到「有实际容量」为止。
@@ -94,7 +124,7 @@
 
 ### Added
 - 新增 `stardew` 主题，对齐 Header 主题选择菜单
-- `data-theme="stardew"` CSS 变量集合：matte cream / hard shadow / Nunito / pixel pill / dotted border
+- `data-theme="farmer"` CSS 变量集合：matte cream / hard shadow / Nunito / pixel pill / dotted border
 - `vitest` 单测 + 集成测试 + v8 coverage（lines >= 80%）
 - `tests/unit/` + `tests/integration/` + `tests/fixtures/`
 - GitHub Actions Release On Version Bump workflow
@@ -103,7 +133,7 @@
 
 ### Changed
 - README 增加验收标准 DoD、使用说明、测试命令
-- `vite.config.ts` zip 产物名改为 `komari-theme-stardew-build-*.zip`
+- `vite.config.ts` zip 产物名改为 `komari-theme-Komari-Farmer-v-*.zip`
 - `.gitignore` 修正 regex 警告，增加 `bun.lock` / `komari-theme-*.zip`
 
 ### Fixed

@@ -85,7 +85,7 @@ watch(
   { immediate: true },
 )
 
-// Visual style persistence: stardew vs baseline
+// Visual style persistence: farmer vs baseline
 const settingsVisualStyle = computed((): VisualStyle | undefined => publicSettings.value?.theme_settings?.themeVisualStyle as VisualStyle)
 
 onMounted(() => {

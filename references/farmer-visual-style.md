@@ -1,7 +1,7 @@
-# Stardew Visual Style Schema
+# Farmer Visual Style Schema
 
 Version: v0.2.0
-Activation: `data-theme="stardew"` on `<html>` via `useVisualStyle`
+Activation: `data-theme="farmer"` on `<html>` via `useVisualStyle`
 
 ## Theme options
 
@@ -35,7 +35,7 @@ Must declare for both light and dark appearances:
 
 ## Background contract
 
-- Replace default shader with static panoramic when `data-theme="stardew"`.
+- Replace default shader with static panoramic when `data-theme="farmer"`.
 - Both modes define `--bg-image-desktop|mobile` via `/private-assets/stardew/day.png`.
 - Provide `--bg-scrim`, `--bg-size`, `--bg-position`.
 

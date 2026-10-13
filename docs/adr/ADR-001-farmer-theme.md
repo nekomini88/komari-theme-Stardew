@@ -1,4 +1,7 @@
-# ADR-001: Stardew 主题选型与实现
+# ADR-001: 农场主题选型与实现
+
+> 2026-10-13 补注：本主题已于 3.3.0 更名为 **Komari-Farmer**（与星露谷物语品牌脱钩）。
+> 下文的决策背景与论证保持原样，作为历史记录。
 
 日期：2026-07-31
 状态：已采纳
@@ -29,7 +32,7 @@ komari-theme-Neko 提供翠绿/日出/沙漠等 8 套主题，无像素风/农�
 - 新主题命名为 `stardew`，接入 Header 主题选择菜单。
 - 视觉参考 Stardew Valley：像素字体 Nunito + 像素风圆角 + 浅米色 matte cream + hard shadow。
 - 不改动 `src/utils` 业务逻辑，只修改 `src/styles/main.css` 与 `src/components/Header.vue`。
-- 构建产物 zip 命名对齐 `komari-theme-stardew-build-<commit>.zip`。
+- 构建产物 zip 命名对齐 `komari-theme-Komari-Farmer-v-<commit>.zip`。
 
 ## 影响
 

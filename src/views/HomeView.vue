@@ -275,7 +275,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
 </template>
 
 <style scoped>
-/* 星露谷风格 header 按钮（羊皮纸 + 像素图标） */
+/* 顶部 header 按钮（羊皮纸 + 像素图标） */
 .sd-header-btn {
   display: inline-flex;
   align-items: center;

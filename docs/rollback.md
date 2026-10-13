@@ -1,6 +1,6 @@
 # Rollback 回滚策略
 
-适用于 komari-theme-Stardew 发布版本。
+适用于 komari-theme-farmer 发布版本。
 
 ## 代码回滚（MUST）
 

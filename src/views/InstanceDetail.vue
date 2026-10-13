@@ -243,7 +243,7 @@ const trafficUsageText = computed(() => {
   return `${formatBytes(trafficUsed.value)} / ${formatBytes(data.value?.traffic_limit ?? 0)}`
 })
 
-// ==================== 星露谷风格 MEMORY/CPU/DISK/LOAD 实时卡 ====================
+// ==================== MEMORY/CPU/DISK/LOAD 实时卡 ====================
 const sdMemPct = computed(() => {
   const n = data.value
   if (!n)
@@ -441,7 +441,7 @@ const sdResourceCards = computed<SdResourceCard[]>(() => {
 </template>
 
 <style scoped>
-/* 星露谷风格资源四卡（MEMORY/CPU/DISK/LOAD） */
+/* 资源四卡（MEMORY/CPU/DISK/LOAD） */
 .sd-resource-card {
   border: 18px solid transparent;
   border-image: url('/images/card/frame-slice.png') 64 round;

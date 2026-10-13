@@ -1,3 +1,3 @@
-# Stardew Valley Server Farm Dashboard v7
+# Komari-Farmer Server Farm Dashboard v7
 
 FarmMap + BuildingCard + Save UI foundation.

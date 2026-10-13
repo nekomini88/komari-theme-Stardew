@@ -3,8 +3,8 @@ version: 1.2.0
 
 project:
   type: web_fullstack
-  name: komari-theme-Stardew
-  description: Stardew Valley theme for Komari based on komari-theme-Neko UI
+  name: komari-theme-farmer
+  description: Pixel-art farm theme for Komari based on komari-theme-Neko UI
   base: komari-theme-Neko
 
 references:
@@ -14,7 +14,7 @@ references:
     - testing
     - devops
     - security
-    - stardew-visual-style
+    - farmer-visual-style
 
 themes:
   color_palette_options:

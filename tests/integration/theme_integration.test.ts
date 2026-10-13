@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 // 契约对齐（依据：当前 main @3ec71b7 实际源码/产物）：
-// - 主题键真身 = 'Komari-Stardew'（komari-theme.json short，旧 'stardew' 键已废弃）。
+// - 主题键真身 = 'Komari-Farmer'（komari-theme.json short，旧 'stardew' 键已废弃）。
 // - 视觉风格由 useVisualStyle 把 data-theme='stardew' 挂到 document.documentElement，
 //   CSS 选择器统一用【单引号】[data-theme='stardew']，分布在 visual-styles.css /
 //   matte-pixel.css / hard-pixel-core.css；main.css 只经 @import 引入这些分层文件。

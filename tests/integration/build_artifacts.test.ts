@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(__dirname, '..', '..')
 
 // 契约对齐（依据：scripts/package-theme.ts L62）：
-// 打包产物 = release/komari-theme-Komari-Stardew-v<version>-<hash>.zip
-// （主题键为 'Komari-Stardew'，旧断言 glob 的 komari-theme-stardew-build-*.zip 在仓库根已不存在）
-const zipGlob = `${root}/release/komari-theme-Komari-Stardew-v*.zip`
+// 打包产物 = release/komari-theme-Komari-Farmer-v<version>-<hash>.zip
+// （主题键为 'Komari-Farmer'，旧断言 glob 的 komari-theme-Komari-Farmer-v-*.zip 在仓库根已不存在）
+const zipGlob = `${root}/release/komari-theme-Komari-Farmer-v*.zip`
 
 function latestZip(): string {
   return execSync(`ls -t ${zipGlob} | head -1`, { encoding: 'utf-8' }).trim()
@@ -34,10 +34,10 @@ describe('build artifacts integration', () => {
 
   it('mUST have valid manifest', () => {
     const manifest = JSON.parse(readFileSync(resolve(root, 'komari-theme.json'), 'utf-8'))
-    expect(manifest.name).toBe('Komari Stardew')
-    // 依据：komari-theme.json L3 short = 'Komari-Stardew'（旧 'stardew' 键已废弃）
-    expect(manifest.short).toBe('Komari-Stardew')
-    expect(manifest.url).toContain('komari-theme-Stardew')
+    expect(manifest.name).toBe('Komari-Farmer')
+    // 依据：komari-theme.json L3 short = 'Komari-Farmer'（旧 'farmer' 键已废弃）
+    expect(manifest.short).toBe('Komari-Farmer')
+    expect(manifest.url).toContain('komari-theme-farmer')
   })
 
   it('mUST have preview.png', () => {

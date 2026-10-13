@@ -1,7 +1,7 @@
 /**
  * 像素图标资源表。
  *
- * 主题原先用 Iconify 矢量图标(tabler/mdi/lucide/icon-park),细线风格和星露谷像素主题不搭。
+ * 主题原先用 Iconify 矢量图标(tabler/mdi/lucide/icon-park),细线风格和本主题的像素拟物感不搭。
  * 这里换成 AI 生成的像素 sprite(1px 深棕描边 + 受限调色板);同时保留 iconify 名 → 像素图 key 的映射,
  * 找不到像素图时 PixelIcon 自动回落到矢量图标,不会空白。
  *
