@@ -126,24 +126,24 @@
      槽1 把基色按同色相压暗 8% 以让文字过 4.5:1。
      每槽的文字色与描边**明暗相反**（浅底配深字深描边反之），实测对比度：
        槽1 奶白字 4.73:1 ｜ 槽2 近黑字 5.29:1 ｜ 槽3 6.93:1 ｜ 槽4 8.60:1 ｜ 槽5 11.86:1 ｜ 槽6 16.32:1 */
-  --vk-node-bg-1: #7956b2;
-  --vk-node-bg-2: #d65db1;
-  --vk-node-bg-3: #ff6f91;
-  --vk-node-bg-4: #ff9671;
-  --vk-node-bg-5: #ffc75f;
-  --vk-node-bg-6: #f9f871;
+  --vk-node-bg-1: #279a06;
+  --vk-node-bg-2: #06509a;
+  --vk-node-bg-3: #53069a;
+  --vk-node-bg-4: #9a0623;
+  --vk-node-bg-5: #9a5d06;
+  --vk-node-bg-6: #048d89;
   --vk-node-ink-1: #f7ecd3;
   --vk-node-shadow-1: #2b1d16;
-  --vk-node-ink-2: #101702;
-  --vk-node-shadow-2: #f7ecd3;
-  --vk-node-ink-3: #101702;
-  --vk-node-shadow-3: #f7ecd3;
-  --vk-node-ink-4: #101702;
-  --vk-node-shadow-4: #f7ecd3;
-  --vk-node-ink-5: #101702;
-  --vk-node-shadow-5: #f7ecd3;
-  --vk-node-ink-6: #101702;
-  --vk-node-shadow-6: #f7ecd3;
+  --vk-node-ink-2: #f7ecd3;
+  --vk-node-shadow-2: #2b1d16;
+  --vk-node-ink-3: #f7ecd3;
+  --vk-node-shadow-3: #2b1d16;
+  --vk-node-ink-4: #f7ecd3;
+  --vk-node-shadow-4: #2b1d16;
+  --vk-node-ink-5: #f7ecd3;
+  --vk-node-shadow-5: #2b1d16;
+  --vk-node-ink-6: #f7ecd3;
+  --vk-node-shadow-6: #2b1d16;
   /* 底板正文字纸色（= 美术底板实测）与右下角向日葵 */
   --vk-panel-paper: #fbeed2;
   /* 危险档进度条色（参考稿实测的粉红，语义上作红用） */

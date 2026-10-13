@@ -69,6 +69,12 @@
      贴图左端此前已用干净列回填 ⇒ 丝带本身现在从 x0 就开始，天然铺满整卡宽度。
      注意别让通用纸面规则（--vk-paper-fiber/--vk-paper-face 的大面积径向渐变）盖住它。 */
   background-image: var(--vk-panel-art);
+  /* 这三行缺一不可：漏掉时 428x56 的名牌贴图会以原尺寸**纵向平铺**，
+     左端的陶盆/植物像素就一路铺满整张卡片（用户截图里两列花盆 + 卡片里的小图标就是这个 bug）。
+     之前改配色那轮把这三行连同贴图一起删了，只补回 background-image，因此复发过一次。 */
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: top center;
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
   box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);

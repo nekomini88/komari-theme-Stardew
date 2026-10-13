@@ -64,7 +64,7 @@
 
 /* 随机模式没有固定色：用斜纹示意"随机" */
 .vk-palette-swatch i[data-random='on'] {
-  background-image: repeating-linear-gradient(45deg, #7956b2 0 2px, #ff9671 2px 4px, #ffc75f 4px 6px) !important;
+  background-image: repeating-linear-gradient(45deg, #279a06 0 2px, #9a5d06 2px 4px, #048d89 4px 6px) !important;
 }
 
 .vk-palette-text {

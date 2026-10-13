@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import {
-  colorAt, contrast, CREAM, INK_DARK, MIN_CONTRAST, PALETTES, PALETTE_MODES,
-  randomColors, resolveNode, withLightness,
+  colorAt, contrast, CREAM, INK_DARK, MIN_CONTRAST, nodeColorAt, PALETTES, PALETTE_MODES,
+  randomColors, resolveNode, SHADOW_DARK, withLightness,
 } from '@/v2/data/palettes'
 import { setPaletteMode, usePalette } from '@/v2/data/paletteStore'
 import PaletteMenu from '@/v2/components/PaletteMenu.vue'
@@ -42,19 +42,38 @@ describe('调色板：三种配色来源正确', () => {
 })
 
 describe('调色板：文字可读性硬约束（核心不变量）', () => {
-  it('三套配色的每一台都能配出 ≥4.5:1 的文字色', () => {
-    for (const [name, def] of Object.entries(PALETTES)) {
-      for (const c of def.colors) {
+  it('可切换的三套配色，每一台都能配出 ≥4.5:1 的文字色', () => {
+    for (const name of ['flatpaper', 'emerald'] as const) {
+      for (const c of PALETTES[name].colors) {
         const node = resolveNode(c)
         expect(contrast(node.bg, node.ink), `${name} ${c} 文字对比度不足`).toBeGreaterThanOrEqual(MIN_CONTRAST)
       }
     }
   })
 
+  it('默认配色沿用参考稿固定配对（奶白字 + 深描边），不参与自动挑选', () => {
+    // 用户 2026-10-13 复核认定参考稿这套最好看 → 必须原样保留，不能因自动挑选把浅底换成深色字
+    const def = PALETTES.default
+    expect(def.pairs, '默认配色必须有固定配对').toHaveLength(6)
+    for (const [i, p2] of def.pairs!.entries()) {
+      expect(p2.bg).toBe(def.colors[i])
+      expect(p2.ink, `第 ${i + 1} 台文字色应为参考稿的奶白`).toBe(CREAM)
+      expect(p2.shadow, `第 ${i + 1} 台描边应为深色`).toBe(SHADOW_DARK)
+      // 参考稿口径：深底 × 奶白字，对比度 ≥3:1（WCAG 大号文本 AA）
+      expect(contrast(p2.bg, p2.ink), `第 ${i + 1} 台对比度不足`).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('nodeColorAt 对默认配色返回固定配对', () => {
+    const n = nodeColorAt('default', 1)
+    expect(n.ink).toBe(CREAM)
+    expect(n.bg).toBe(PALETTES.default.colors[1])
+  })
+
   it('文字与描边明暗相反（否则描边起不到分离作用）', () => {
     for (const def of Object.values(PALETTES)) {
       for (const c of def.colors) {
-        const n = resolveNode(c)
+        const n = def.pairs?.find((x) => x.bg === c) ?? resolveNode(c)
         const inkIsDark = contrast(n.ink, '#000000') > contrast(n.ink, '#ffffff')
         const shadowIsDark = contrast(n.shadow, '#000000') > contrast(n.shadow, '#ffffff')
         expect(inkIsDark, `${c} 文字与描边明暗同向`).not.toBe(shadowIsDark)

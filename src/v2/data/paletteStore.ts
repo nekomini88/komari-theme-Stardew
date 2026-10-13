@@ -8,7 +8,7 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 
 import {
-  colorAt, PALETTES, randomColors, resolveNode,
+  nodeColorAt, PALETTES, randomColors,
   type NodeColor, type PaletteMode,
 } from './palettes'
 
@@ -60,7 +60,7 @@ export interface UsePalette {
 export function usePalette(): UsePalette {
   const nodeColors = computed<NodeColor[]>(() =>
     Array.from({ length: SLOT_COUNT }, (_, i) =>
-      resolveNode(colorAt(mode.value, i, randomList.value))),
+      nodeColorAt(mode.value, i, randomList.value)),
   )
 
   const options = VALID.map((m) => {

@@ -2,7 +2,7 @@
  * 调色板（用户 2026-10-13：「设置一个按钮控制服务器颜色, 名称为调色板」）。
  *
  * 三种可选配色 + 默认配色：
- *   default   —— mycolor.space 以基色 #845ec2 生成的 Classy Palette（本主题原配色）
+ *   default   —— 原参考稿实测六色（绿/蓝/紫/红/橙/青，用户认定最好看的一套）
  *   flatpaper —— hexo-theme-flatpaper 的命名色（同是纸感主题，气质最贴）
  *   emerald   —— komari-theme-emerald 的语义色（oklch 经画布转 sRGB 得到 hex）
  *   random    —— 随机生成，但**必须落在可读区间**（见 resolveNode）
@@ -28,7 +28,11 @@ export interface PaletteDef {
   label: string
   hint: string
   colors: string[]
+  /** 固定配对（默认配色用）：给定美术口径，不参与 resolveNode 的自动挑选 */
+  pairs?: NodeColor[]
 }
+
+const PALETTES_DEFAULT_COLORS = ['#279a06', '#06509a', '#53069a', '#9a0623', '#9a5d06', '#048d89']
 
 export const CREAM = '#f7ecd3'
 export const INK_DARK = '#101702'
@@ -119,11 +123,23 @@ export function resolveNode(bg: string): NodeColor {
   return wantDarkInk ? { bg: cur, ...inkDark } : { bg: cur, ...inkCream }
 }
 
+/**
+ * 参考稿原色是**深底配奶白字**的既定美术口径（奶白字对它们 3.13~9.62:1），
+ * 若交给 resolveNode 自动挑选，浅底那几槽会被换成深色字 —— 那等于改外观，
+ * 而用户明确认定这套最好看。故默认配色固定配对，不参与自动挑选。
+ */
+const REFERENCE_PAIRS: NodeColor[] = PALETTES_DEFAULT_COLORS.map((bg) => ({
+  bg,
+  ink: CREAM,
+  shadow: SHADOW_DARK,
+}))
+
 export const PALETTES: Record<Exclude<PaletteMode, 'random'>, PaletteDef> = {
   default: {
-    label: '默认（mycolor.space）',
-    hint: '基色 #845ec2 生成的 Classy Palette',
-    colors: ['#7956b2', '#d65db1', '#ff6f91', '#ff9671', '#ffc75f', '#f9f871'],
+    label: '默认（参考稿原色）',
+    hint: '原参考稿实测的绿/蓝/紫/红/橙/青',
+    colors: [...PALETTES_DEFAULT_COLORS],
+    pairs: REFERENCE_PAIRS,
   },
   flatpaper: {
     label: 'hexo-theme-flatpaper',
@@ -161,6 +177,16 @@ export function randomColors(rand: () => number = Math.random): string[] {
     out.push(bg)
   }
   return out
+}
+
+/** 取某配色下第 i 台的完整配色（默认配色走固定配对） */
+export function nodeColorAt(mode: PaletteMode, index: number, randomList?: string[]): NodeColor {
+  const def = mode === 'random' ? null : PALETTES[mode]
+  if (def?.pairs?.length) {
+    const p = def.pairs[index % def.pairs.length]
+    if (p) return p
+  }
+  return resolveNode(colorAt(mode, index, randomList))
 }
 
 /** 取某模式下台 i（0 起）的颜色；随机模式由调用方传入已生成的色表 */
