@@ -151,16 +151,22 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
 describe('进度条与角饰让位（用户 2026-10-13 口径）', () => {
   const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
 
-  it('进度条必须连续实心（不要 repeating-gradient 分段留空）', () => {
+  it('进度条是「连续块」：允许分块纹理，但细缝不得透明（不得露出底色 = 不得"空"）', () => {
     const raw = css.match(/\.vk-seg-fill \{[\s\S]*?\}/)?.[0] ?? ''
     expect(raw, '未找到 .vk-seg-fill 规则').not.toBe('')
-    // 先剥注释再断言：CSS 注释里会写到历史做法（repeating-linear-gradient），
-    // 直接扫原文会被注释里的字面量打红（这个坑已踩过两次）
+    // 先剥注释再断言：注释里会写到历史做法（transparent 缝、整条实心），
+    // 直接扫原文会被注释里的字面量打红（此坑已踩三次，列为默认动作）
     const fill = raw.replace(/\/\*[\s\S]*?\*\//g, '')
-    expect(fill, '分段渐变会让进度条看着"空了一截"')
-      .not.toContain('repeating-linear-gradient')
-    expect(fill.replace(/\s+/g, ' '), '应为实心填充 --vk-seg-color')
-      .toContain('background: var(--vk-seg-color')
+    // 只审 background 声明：box-shadow 里本来就有 transparent（是阴影，不是缝），别误伤
+    const bg = fill.match(/background:\s*([\s\S]*?);/)?.[1].replace(/\s+/g, ' ') ?? ''
+    expect(bg, '未取到 .vk-seg-fill 的 background').not.toBe('')
+    // 用户 2026-10-13 口径：像 komari.vickypig.com 那样的一排小块（连续块）
+    expect(bg, '应按参考站做成一排小块').toContain('repeating-linear-gradient')
+    expect(bg, '细缝必须同色系压暗，不能用 transparent（否则条上会露出底色 = 出现"空"）')
+      .not.toContain('transparent')
+    expect(bg, '块色仍应取 --vk-seg-color').toContain('var(--vk-seg-color')
+    // 块距 8px（7px 块 + 1px 缝）：条宽 168.3px ⇒ 约 21 格，与参考站 20 格同比例
+    expect(bg).toMatch(/0 7px,[\s\S]*?7px 8px/)
   })
 
   it('最后一行右格必须给右下角向日葵留净空（否则压住 Uptime 数值）', () => {

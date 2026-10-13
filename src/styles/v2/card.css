@@ -266,12 +266,19 @@
 .vk-seg-fill {
   display: block;
   height: 100%;
-  /* 连续实心填充（用户口径：不要分段留空）。
-     原来用 repeating-linear-gradient 做分段，段间透明 → 看着像"空了一截"。
-     保留顶部一道内高光，维持像素厚条观感。 */
-  background: var(--vk-seg-color, var(--vk-ref-leaf));
+  /* 「连续块」= 一排等距小块 + 1px 细缝（用户 2026-10-13 指着 komari.vickypig.com 给的参考）。
+     参考站实测：块 5.06x11px、块距 6.06px（≈1px 细缝）、20 格。
+     我们条宽 168.3px（参考站 120.5px）→ 同比例约 20 格 ⇒ 块距取 8px（7 块 + 1 缝）。
+     细则：**细缝不透明**，用同色系压暗一档 —— 条上永不露底色（"不要出现空"），
+     又保住分块观感。（早期曾用 transparent 做 3px 缝 → 看着空了一截；后来又改成整条实心
+     → 分块结构全没了，都不对，这里取中点。） */
+  background: repeating-linear-gradient(
+    90deg,
+    var(--vk-seg-color, var(--vk-ref-leaf)) 0 7px,
+    color-mix(in srgb, var(--vk-seg-color, var(--vk-ref-leaf)) 58%, var(--vk-panel-border)) 7px 8px
+  );
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--vk-ref-paper) 45%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--vk-ref-paper) 30%, transparent),
     inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
 }
 
