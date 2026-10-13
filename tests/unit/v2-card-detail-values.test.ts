@@ -119,17 +119,19 @@ const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', '
     expect(headBlock.replace(/\s+/g, ' '), '.vk-panel-head 必须是 grid 容器，否则 track 列表无效')
       .toContain('display: grid')
     expect(headBlock.replace(/\s+/g, ' '), '两翼必须等宽，否则名称会被国旗宽度推偏')
-      .toContain('grid-template-columns: 1fr minmax(0, 56%) 1fr')
-    // 中列上限必须是百分比：若上限是 auto(=max-content)，长名会撑破容器把两翼压成 0，
-    // 名称就偏左了（实测长名偏 10px）。百分比上限 + 0 下限 ⇒ 长名省略号截断且保持居中。
+      .toMatch(/grid-template-columns: 1fr minmax\((auto|max-content), \d+%\) 1fr/)
+    // 中列下限用 auto（收缩到名称内容宽）—— 徽标才能贴着名称右缘（用户：「太割裂了」）。
+    // 但**上限必须是百分比**：若上限也写成 auto(=max-content)，长名会撑破容器把两翼压成 0，
+    // 名称就偏左了（实测长名偏 10px）。百分比上限 ⇒ 长名省略号截断且保持居中。
     expect(headBlock.replace(/\s+/g, ' '), '中列上限须为百分比，长名才截断而不是挤掉两翼')
-      .toContain('minmax(0, 56%)')
-    const nameBlock = mainRule(css, '.vk-panel-name')
-    expect(nameBlock).toContain('grid-column: 2')
-    expect(nameBlock).toContain('justify-self: center')
+      .toMatch(/minmax\((auto|max-content), \d+%\)/)
+    // 栅格定位由名称外壳承担（名称本身不再是栅格项 —— 徽标要相对外壳定位）
+    const wrapBlock = mainRule(css, '.vk-name-wrap')
+    expect(wrapBlock).toContain('grid-column: 2')
+    expect(wrapBlock).toContain('justify-self: center')
   })
 
-  it('国旗与状态点同组，**绝对定位到横幅右侧**（用户口径：国旗放在右边）', () => {
+  it('OS 图标/国旗/状态点同组，**锚在名称右缘**（用户 2026-10-13：割裂 → 收紧）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const meta = w.find('.vk-panel-meta')
     expect(meta.exists()).toBe(true)
@@ -138,11 +140,20 @@ const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', '
 
     const metaBlock = mainRule(css, '.vk-panel-meta')
     expect(metaBlock, '未找到 .vk-panel-meta 规则').not.toBe('')
-    // 口径从「紧跟名称右侧」改为「放到横幅右边」：必须是右侧绝对定位
-    expect(metaBlock.replace(/\s+/g, ' '), '国旗要放在右边 → 需右侧绝对定位')
-      .toContain('position: absolute')
-    expect(metaBlock.replace(/\s+/g, ' ')).toMatch(/right:\s*\d+px/)
-    expect(metaBlock, '不再占网格列').not.toContain('grid-column')
+    const flat = metaBlock.replace(/\s+/g, ' ')
+    // 口径演进全过程（三次实测）：
+    //  a. 徽标钉在横幅右缘 → 各卡间隙 10.5~40.8px 不等，短名字的卡上像挂件（用户：「太割裂了」）
+    //  b. 改栅格第三列 + 中列 minmax(auto|max-content, 48%) → 无效：中列恒为上限 92.63px
+    //  c. 徽标 left:100% 想相对名称 → 无效：徽标是名称的兄弟节点，offsetParent 是横幅
+    // 最终：徽标相对 **.vk-name-wrap 收缩壳** 绝对定位 ⇒ 与栅格轨道无关，恒定 8px
+    expect(flat, '徽标要相对名称外壳定位').toContain('position: absolute')
+    expect(flat, 'left:100% = 紧贴名称右缘').toContain('left: 100%')
+
+    const wrap = mainRule(css, '.vk-name-wrap').replace(/\s+/g, ' ')
+    expect(wrap, '缺 .vk-name-wrap：徽标会相对横幅定位（实测溢出 6/6）').not.toBe('')
+    expect(wrap, '外壳必须是定位祖先').toContain('position: relative')
+    expect(wrap, '外壳必须收缩到名称宽度（inline-block）').toContain('display: inline-block')
+    expect(wrap, '外壳在栅格里居中 ⇒ 名称仍精确居中').toContain('justify-self: center')
 
     // 名称**不得**再被额外扣净空：曾写 max-width: calc(100% - 96px) 想把名字让开国旗，
     // 实测把名称盒压到 85.4px（内容要 95~144px）→ 6 个名字全被截断成 "…"。

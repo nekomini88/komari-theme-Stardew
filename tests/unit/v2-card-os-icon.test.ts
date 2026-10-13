@@ -70,8 +70,10 @@ describe('操作系统图标（用户 2026-10-13 口径：参考 komari.vickypig
 
   it('名称中列上限已为右侧集群让位（集群多了 16px 图标 + 6px 缝）', () => {
     const head = css.match(/\.vk-panel-head \{[\s\S]*?\}/)?.[0] ?? ''
-    // 集群：OS 16 + 缝 6 + 旗 22 + 缝 6 + 圆点 12 = 62px，右边距 14 → 名称右缘须 ≤ ~306px
-    expect(head.replace(/\s+/g, ' '), '右侧集群变宽后必须收窄名称上限，否则长名会压到图标')
-      .toContain('grid-template-columns: 1fr minmax(0, 56%) 1fr')
+    // 集群：OS 16 + 缝 6 + 旗 22 + 缝 6 + 圆点 12 = 62px。
+    // 中列须收缩到名称内容宽（minmax(auto, …)），且上限留出徽标位置：
+    // 名称右缘 ≤ 141.5+67.5，徽标再占 8+62 → 279 ≤ 横幅 281。
+    expect(head.replace(/\s+/g, ' '), '中列要收缩到名称宽并给徽标留出上限')
+      .toMatch(/grid-template-columns: 1fr minmax\((auto|max-content), \d+%\) 1fr/)
   })
 })

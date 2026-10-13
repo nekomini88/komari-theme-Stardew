@@ -190,19 +190,24 @@ defineExpose({ viewStatus, statusLabel })
     <header class="vk-card-head vk-panel-head">
       <!-- 参考稿横幅里没有图标：左端只保留横幅自身的叶簇装饰。
            原先在左端挂 32px 图标，使名称在视觉上被压得偏左（实测几何居中但观感失衡） -->
-      <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
-      <!-- 国旗与状态点同组，紧贴名称右侧（不放绝对定位：绝对定位会让名称在视觉上被推偏） -->
-      <span class="vk-panel-meta">
-        <!-- 操作系统图标（用户口径：参考 komari.vickypig.com，放在国旗旁边）
-             参考站顺序 = [OS 16px] + 缝 + [国旗]；素材走既有 osImageHelper（未匹配时给默认图，不会破图） -->
-        <span v-if="osIconSrc" class="vk-panel-osicon" :title="node.os">
-          <img :src="osIconSrc" :alt="node.os" loading="lazy">
+      <!-- 名称外壳：收缩到名称自身宽度并作为定位祖先。
+           用户 2026-10-13「国旗和 os 图标放的太割裂了」的根治办法 —— 徽标用 left:100% 相对
+           **本壳**绝对定位，与栅格轨道的松紧完全无关，因此每张卡恒定只隔 8px；
+           而本壳在栅格里居中 ⇒ 名称仍然精确居中（内部绝对定位的徽标不参与尺寸计算）。 -->
+      <span class="vk-name-wrap">
+        <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
+        <span class="vk-panel-meta">
+          <!-- 操作系统图标（用户口径：参考 komari.vickypig.com，放在国旗旁边）
+               参考站顺序 = [OS 16px] + 缝 + [国旗]；素材走既有 osImageHelper（未匹配时给默认图，不会破图） -->
+          <span v-if="osIconSrc" class="vk-panel-osicon" :title="node.os">
+            <img :src="osIconSrc" :alt="node.os" loading="lazy">
+          </span>
+          <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
+            <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
+          </span>
+          <!-- 视觉上是参考稿的状态圆点；状态文字作为 tooltip + 无障碍标签，保证不只靠颜色区分 -->
+          <span class="vk-panel-dot" :data-status="viewStatus" :title="statusLabel" aria-hidden="true" />
         </span>
-        <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
-          <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
-        </span>
-        <!-- 视觉上是参考稿的状态圆点；状态文字作为 tooltip + 无障碍标签，保证不只靠颜色区分 -->
-        <span class="vk-panel-dot" :data-status="viewStatus" :title="statusLabel" aria-hidden="true" />
       </span>
       <span class="vk-card-status vk-visually-hidden">{{ statusLabel }}</span>
     </header>

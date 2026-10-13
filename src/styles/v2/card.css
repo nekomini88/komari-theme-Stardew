@@ -29,7 +29,9 @@
   }
 
   /* 降为 3 列后卡片变宽（约 345px），名称恢复大字 */
-  .vk-panel-name {
+  
+
+.vk-panel-name {
     font-size: var(--vk-fs-lg);
   }
 }
@@ -100,7 +102,11 @@
      不再占网格列，因此名称的居中不受国旗宽度影响。
      踩过的坑：曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px。 */
   display: grid;
-  grid-template-columns: 1fr minmax(0, 56%) 1fr;
+  /* 两翼 1fr 等宽 ⇒ 名称（含其外壳）精确居中。中列上限 70%（=135px）是留出徽标位置的余量：名称居中后右缘 ≤ 96.5+67.5=164px，
+     徽标再外扩 8+62=70px → 234px，仍在内容盒 237px 内（横幅 281 − 两侧各 44px 叶簇留白）。
+     注意：中列无论下限写什么都会长到上限，所以**徽标位置绝不能依赖栅格轨道**，
+     必须靠 .vk-name-wrap 这个收缩壳（详见该规则处的实测记录）。 */
+  grid-template-columns: 1fr minmax(0, 70%) 1fr;
   align-items: center;
   column-gap: 8px;
   /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
@@ -114,14 +120,33 @@
   border: none;
 }
 
-.vk-panel-name {
+/* 名称外壳 —— 徽标定位的锚。
+   用户 2026-10-13「国旗和 os 图标放的太割裂了」。实测走过的三条弯路都记在这：
+   ① 徽标钉在横幅右缘（绝对定位）→ 各卡间隙 10.5~40.8px 不等，短名字的卡上像挂件；
+   ② 给徽标加 left:100% 想相对名称 → 无效：徽标是名称的**兄弟节点**，
+      offsetParent 是 .vk-panel-head，left:100% 算成整幅横幅宽（281px）→ 直接溢出（实测 6/6 溢出）；
+   ③ 把中列改成 minmax(auto|max-content, 48%) 想收缩到名称宽 → 也无效：
+      读 getComputedStyle 的 gridTemplateColumns 发现六张卡中列恒为 92.63px
+      （= 内容盒 193px × 48%，与名称无关）。
+   根治：本壳 `display:inline-block` 收缩到名称自身宽度并做定位祖先，徽标 absolute + left:100%
+   → 与栅格轨道松紧**完全无关**，每张卡恒定 8px；壳在栅格里居中 ⇒ 名称仍精确居中
+   （壳内的绝对定位徽标不参与尺寸计算）。 */
+.vk-name-wrap {
   grid-column: 2;
   justify-self: center;
+  position: relative;
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.vk-panel-name {
+  /* 不再是栅格项：栅格定位由 .vk-name-wrap 承担（见上） */
   min-width: 0;
   /* 不要再在这里扣净空！曾写 max-width: calc(100% - 96px) 想给右下国旗让位，
      实测把名称盒压到 **85.4px**（内容要 95~144px）→ 6 个名字全被截成 "…"。
-     国旗是绝对定位在横幅右端的，净空由中列上限（minmax(0,56%)）保证：
-     66% 时名称右缘约 316px，国旗左缘约 328px，天然不重叠。 */
+     净空由中列上限（minmax(auto,48%)，上限 135px）保证：名称居中后右缘 ≤ 141.5+67.5=209px，
+     徽标（62px）作为第三列内容自中列右缘起排 → 至多 209+8+62=279px，仍在横幅（281px）内。 */
   max-width: 100%;
   text-align: center;
   overflow: hidden;
@@ -371,9 +396,12 @@
 }
 
 .vk-panel-meta {
-  /* 用户口径：国旗放在右边 → 绝对定位到横幅右侧（国旗 + 状态点横排） */
+  /* 相对 .vk-name-wrap（定位祖先）绝对定位：left:100% = 紧贴名称右缘，恒定 8px。
+     用 absolute 而非栅格列 —— 绝对定位的徽标不参与壳的尺寸计算，
+     所以"名称居中"与"徽标贴着名称"能同时成立。 */
   position: absolute;
-  right: 14px;
+  left: 100%;
+  margin-left: 8px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
