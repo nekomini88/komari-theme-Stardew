@@ -113,7 +113,11 @@
   width: 100%;
   aspect-ratio: 428 / 56;
   flex: 0 0 auto;
-  /* 两端叶簇的净空 */
+  /* 两端净空必须**对称**：左侧叶簇实测占美术 335 列中的 45 列（≈ 卡片比例的 45px），
+     右端装饰只在最右 ~5px，看似可以只留右 16px 换来 28px 空间 —— 但那样内容盒就不对称了，
+     盒内所有元素（名称、指标格）会整体左移 (44−16)/2 = **14px**，名称不再居中
+     （实测被审计判为「名称未水平居中(偏 14px)」，6/6）。名称居中是用户的硬要求，故两侧都留 44px；
+     加宽改用 --vk-canvas-w / 栅格上限（283→338px）来拿。 */
   padding: 0 44px;
   color: var(--vk-node-ink, var(--vk-panel-head-ink));
   background: none;
@@ -411,7 +415,9 @@
      所以"名称居中"与"徽标贴着名称"能同时成立。 */
   position: absolute;
   left: 100%;
-  margin-left: 8px;
+  /* 名称与标牌的间距：8px 时视觉模型复核说"几乎贴在一起、留白偏紧"（短名字更明显），
+     故放到 12px 换取呼吸感（标牌因此右移 4px，实测仍未越出横幅）。 */
+  margin-left: 12px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
@@ -425,7 +431,12 @@
      ⇒ 明亮柔和的绿丝带上贴了两块又暗又艳的贴纸；且三者宽度 16/22/12 参差。
      改法：统一到与横幅奶白名称**同一套材质**（纸色底 + 1px 深描边 + 像素风硬角） */
   min-width: max-content;
-  padding: 2px 5px;
+  /* 纵向 2px → 1px：视觉复核反馈"标牌略高于名称条、显得突出"；
+     标牌高 = 1+16+1+2(border) = 20px，与横幅内深色名称条等高。
+     横向 5px → 4px 配合 inner gap 5px → 4px：标牌宽 66 → 62px，
+     正好抵消 margin-left 8 → 12px 的增量 ⇒ **总外扩仍是 74px**，
+     窄卡上标牌不会戳出卡片（12px 间距 + 旧宽度时实测 950/1250 两档会越界）。 */
+  padding: 1px 4px;
   background: var(--vk-ref-paper);
   border: 1px solid var(--vk-outline);
   border-radius: 0;
