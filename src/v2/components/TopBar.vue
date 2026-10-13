@@ -1,7 +1,10 @@
 <script setup lang="ts">
 /**
- * v2 顶栏：站点标识 + 首页入口 + 主题/语言切换 + admin 入口。
- * 功能面保留（ART_SYSTEM 目标）：主题与语言切换、admin 入口不丢。
+ * v2 顶栏：站点标识 + 首页入口 + admin 入口。
+ *
+ * 用户 2026-10-13 口径：**不要**明/暗切换与中英文切换按钮（"不需要这些功能"）。
+ * 摘除后主题跟随系统（Provider.vue 的 auto 逻辑不变），界面语言固定中文
+ * （store 里 lang 本就是未持久化的 ref('zh-CN')，无残留状态）。
  */
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -10,30 +13,12 @@ import { useAppStore } from '@/stores/app'
 const router = useRouter()
 const appStore = useAppStore()
 
-const t = computed(() => appStore.lang === 'zh-CN'
-  ? { home: '首页', admin: '后台管理', theme: '切换主题', lang: '切换语言' }
-  : { home: 'Home', admin: 'Admin', theme: 'Switch theme', lang: 'Switch language' })
+// 语言切换已移除 → 顶栏文案固定中文，不再依赖 lang 分支
+const t = computed(() => ({ home: '首页', admin: '后台管理' }))
 
 const sitename = computed(() => appStore.publicSettings?.sitename || 'NekoVPS')
 
 const showAdmin = computed(() => appStore.isLoggedIn || !appStore.hideAdminEntryWhenLoggedOut)
-
-const themeLabel = computed(() => {
-  const labels = appStore.lang === 'zh-CN'
-    ? { auto: '自动', light: '亮', dark: '暗' }
-    : { auto: 'Auto', light: 'Light', dark: 'Dark' }
-  return labels[appStore.themeMode]
-})
-
-function cycleTheme() {
-  const order = ['auto', 'light', 'dark'] as const
-  const i = order.indexOf(appStore.themeMode)
-  appStore.updateThemeMode(order[(i + 1) % order.length]!)
-}
-
-function toggleLang() {
-  appStore.lang = appStore.lang === 'zh-CN' ? 'en-US' : 'zh-CN'
-}
 
 function goAdmin() {
   location.href = '/admin'
@@ -54,13 +39,8 @@ function goAdmin() {
         </button>
       </nav>
 
+      <!-- 按用户口径去掉「明/暗切换」与「中英文切换」按钮，只留 admin 入口 -->
       <div class="vk-actions">
-        <button class="vk-btn" type="button" :aria-label="t.theme" :title="t.theme" @click="cycleTheme">
-          {{ themeLabel }}
-        </button>
-        <button class="vk-btn" type="button" :aria-label="t.lang" :title="t.lang" @click="toggleLang">
-          {{ appStore.lang === 'zh-CN' ? '中文' : 'EN' }}
-        </button>
         <button v-if="showAdmin" class="vk-btn" type="button" :aria-label="t.admin" :title="t.admin" @click="goAdmin">
           {{ t.admin }}
         </button>

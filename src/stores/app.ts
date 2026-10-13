@@ -356,20 +356,9 @@ const useAppStore = defineStore('app', () => {
     return lightBackgroundUrl.value
   })
 
-  function updateThemeMode(mode?: ThemeMode) {
-    if (mode) {
-      themeMode.value = isValidThemeMode(mode) ? mode : 'auto'
-      return
-    }
-
-    const nextMode: Record<ThemeMode, ThemeMode> = {
-      auto: 'light',
-      light: 'dark',
-      dark: 'auto',
-    }
-
-    const currentMode = isValidThemeMode(themeMode.value) ? themeMode.value : 'auto'
-    themeMode.value = nextMode[currentMode]
+  // 只接受显式模式（Provider.vue 的 v-model setter 路径）
+  function updateThemeMode(mode: ThemeMode) {
+    themeMode.value = isValidThemeMode(mode) ? mode : 'auto'
   }
 
   function updateLoginState(loggedIn: boolean) {
