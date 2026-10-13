@@ -107,6 +107,11 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
   it('横幅用「1fr | auto | 1fr」三列网格，名称占中列 —— 两翼等宽才能让名称自身居中', () => {
     const headBlock = css.match(/\.vk-panel-head \{[\s\S]*?\}/)?.[0] ?? ''
     expect(headBlock, '未找到 .vk-panel-head 规则').not.toBe('')
+    // 必须同时断言「布局模式」：只断言 track 列表会漏掉「有 grid-template-columns 却没有 display:grid」
+    // 这种错（实测发生过 —— 规则里 grid-template-columns 在、display:grid 被删，整条网格静默失效，
+    // 名称靠 text-align 蒙对居中，国旗则掉到第二行左侧）
+    expect(headBlock.replace(/\s+/g, ' '), '.vk-panel-head 必须是 grid 容器，否则 track 列表无效')
+      .toContain('display: grid')
     expect(headBlock.replace(/\s+/g, ' '), '两翼必须等宽，否则名称会被国旗宽度推偏')
       .toContain('grid-template-columns: 1fr minmax(0, 62%) 1fr')
     // 中列上限必须是百分比：若上限是 auto(=max-content)，长名会撑破容器把两翼压成 0，

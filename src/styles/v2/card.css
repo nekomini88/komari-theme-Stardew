@@ -83,6 +83,7 @@
        ① 曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px；
        ② 中列上限若写 auto(=max-content) → 长名撑破容器把两翼压成 0，名称偏左 10px。
      故中列取 minmax(0, 62%)：必要时省略号截断，两翼始终等宽。 */
+  display: grid;
   grid-template-columns: 1fr minmax(0, 62%) 1fr;
   align-items: center;
   column-gap: 8px;
