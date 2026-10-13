@@ -132,4 +132,4 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |-
-            release/komari-theme-Komari-Stardew-v*.zip
+            release/komari-theme-Komari-Farmer-v*.zip
