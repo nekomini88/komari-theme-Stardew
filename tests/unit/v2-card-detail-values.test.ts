@@ -148,7 +148,13 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     const meta = w.find('.vk-panel-meta')
     expect(meta.exists()).toBe(true)
     expect(meta.find('.vk-panel-flag').exists()).toBe(true)
-    expect(meta.find('.vk-panel-dot').exists()).toBe(true)
+    // 状态点已按参考站移到横幅最左（参考站顺序：状态点 x=12 → 名字 → OS → 国旗 x=267）
+    expect(meta.find('.vk-panel-dot').exists(), '状态点不该再在标牌里').toBe(false)
+    const head = w.find('.vk-panel-head')
+    expect(head.find('.vk-panel-dot').exists(), '状态点应在头部').toBe(true)
+    const html = head.html()
+    expect(html.indexOf('vk-panel-dot'), '状态点要在名称之前（参考站顺序）').toBeLessThan(html.indexOf('vk-name-wrap'))
+    expect(html.indexOf('vk-panel-osicon'), 'OS 图标要在国旗之前').toBeLessThan(html.indexOf('vk-panel-flag'))
 
     const metaBlock = mainRule(css, '.vk-panel-meta')
     expect(metaBlock, '未找到 .vk-panel-meta 规则').not.toBe('')
