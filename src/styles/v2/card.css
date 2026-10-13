@@ -1,0 +1,290 @@
+/**
+ * NodeCard 样式 —— 木牌面板（复刻《星露谷物语主题.pdf》）
+ *
+ * 参考稿实测（1448×1086 原图，单块面板 427×393）：
+ *   - 标题栏：**绿色叶片藤蔓编成的横幅**，上下边缘是波浪状叶边、两端叶簇收成圆头
+ *   - 主体：奶油纸 + 轻微噪点纹理，**1px 浅棕描边**、圆角，
+ *           内部是**浅棕虚线**分隔线（不是实线）
+ *   - 角饰：左上陶土盆栽 / 右上叶芽 / 右下向日葵
+ *   - 图标约 20px 像素图；进度条是**厚分段条**（深色描边 + 内高光）
+ *   - 排版宽松：行高约 1.75，页面留白大
+ *
+ * 像素风口径：硬边、字号 12 的整数倍、`image-rendering: pixelated`、
+ *             投影用硬位移不用 blur、取色一律 var(--vk-*)
+ */
+
+/* ---------- 卡片网格：3 列，窄屏降列 ---------- */
+.vk-node-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--vk-space-4);
+  width: 100%;
+  align-items: stretch;
+  margin-top: var(--vk-scene-reveal);
+}
+
+@media (max-width: 900px) {
+  .vk-node-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .vk-node-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- 面板 ---------- */
+.vk-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 落一次基准字号：否则容器继承 16px（非像素字设计尺寸 12 的整数倍），
+     将来任何没显式设字号的文本都会以 16px 渲染 → 像素格被插值 */
+  font-family: var(--vk-font-body);
+  font-size: var(--vk-fs-sm);
+  /* 横幅必须贴面板顶端满宽（参考稿如此）。原先 padding:16px 把横幅压低了 17px，
+     看起来名称"没有居上"。留白改由 .vk-panel-body 承担（它本来就有 padding）。 */
+  padding: 0;
+  /* 正文高度由内容决定 —— 不再锁 aspect-ratio。
+     （曾锁 428/394，导致正文比卡片高 113px 被 overflow:hidden 静默裁掉最后两行指标） */
+  background-color: var(--vk-panel-paper);
+  /* 横幅条（含左上盆栽）：宽度 100%、高度按比例 → 与 .vk-panel-head 的 aspect-ratio 对齐 */
+  background-image: var(--vk-panel-art);
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: top center;
+  border: 1px solid var(--vk-panel-border);
+  border-radius: var(--vk-panel-radius);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
+  overflow: hidden;
+}
+
+/* 右下向日葵角饰：锚定到卡片角（不再依赖卡片比例与底板一致） */
+.vk-panel::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 45px;
+  height: 72px;
+  background-image: var(--vk-panel-sunflower);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+/* ---------- ① 标题栏：内容层（叶藤横幅由横幅条提供） ---------- */
+.vk-panel-head {
+  position: relative;
+  /* 三列 1fr | 中列 | 1fr：两翼等宽 ⇒ **名称自身精确居中**；国旗/状态点放第三列并左对齐
+     ⇒ 紧贴名称右侧（参考稿的关系）。两个踩过的坑：
+       ① 曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px；
+       ② 中列上限若写 auto(=max-content) → 长名撑破容器把两翼压成 0，名称偏左 10px。
+     故中列取 minmax(0, 62%)：必要时省略号截断，两翼始终等宽。 */
+  grid-template-columns: 1fr minmax(0, 62%) 1fr;
+  align-items: center;
+  column-gap: 8px;
+  /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
+  width: 100%;
+  aspect-ratio: 428 / 56;
+  flex: 0 0 auto;
+  /* 两端叶簇的净空 */
+  padding: 0 44px;
+  color: var(--vk-node-ink, var(--vk-panel-head-ink));
+  background: none;
+  border: none;
+}
+
+.vk-panel-name {
+  grid-column: 2;
+  justify-self: center;
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+  overflow: hidden;
+  /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
+     像素字只能取 12 的整数倍，12px 明显偏小（与横幅不相称），故取 24px（= 设计尺寸 2×） */
+  font-size: var(--vk-fs-lg);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* 像素字描边：四向 1px，颜色取「与文字相反的色调」（深字配浅描边 / 浅字配深描边），
+     由底板横幅实测色决定 —— 见 tokens.css 的 --vk-node-shadow-N */
+  text-shadow:
+    1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    -1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    0 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    0 -1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
+    1px 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo));
+}
+
+.vk-panel-flag {
+  /* 参考稿里国旗**紧跟名称右侧**（原来钉在 right:30px，离名称很远 → 左重右轻、名称看着偏左） */
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.vk-panel-flag img {
+  display: block;
+  width: 22px;
+  height: 16px;
+  object-fit: cover;
+  border: 1px solid var(--vk-panel-border);
+  image-rendering: pixelated;
+}
+
+/* 状态灯 */
+.vk-panel-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--vk-panel-border);
+  border-radius: 50%;
+  background: var(--vk-paper-warm);
+}
+
+.vk-panel-dot[data-status='online'] { background: var(--vk-ref-leaf-hi); }
+.vk-panel-dot[data-status='alert'] { background: var(--vk-honey); }
+.vk-panel-dot[data-status='offline'] { background: var(--vk-wood-dark); }
+.vk-panel-dot[data-status='unknown'] { background: var(--vk-paper-warm); }
+
+.vk-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- ② 奶油色纸主体 ---------- */
+.vk-panel-body {
+  display: flex;
+  flex-direction: column;
+  /* 留白按参考稿密度收紧（参考稿单面板 428x394 内含系统行 + 6 行指标） */
+  padding: 10px 16px 12px;
+  color: var(--vk-panel-text);
+}
+
+/* ③ 系统行 */
+.vk-panel-sys {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 6px;
+  padding: 0 0 6px;
+  font-size: var(--vk-fs-sm);
+  line-height: var(--vk-lh);
+  /* 参考稿是虚线分隔，不是实线 */
+  border-bottom: 1px dashed color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
+}
+
+.vk-panel-sys span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ④ 指标行：一行两列，行间虚线 */
+.vk-panel-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.vk-panel-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.vk-panel-row + .vk-panel-row {
+  border-top: 1px dashed color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
+}
+
+.vk-cell {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'icon  label  value'
+    'bar   bar    bar'
+    'detail detail detail';
+  gap: 1px 8px;
+  align-items: center;
+  min-width: 0;
+  font-size: var(--vk-fs-sm);
+  line-height: var(--vk-lh);
+}
+
+.vk-cell > :first-child { grid-area: icon; }
+
+.vk-cell-label {
+  grid-area: label;
+  color: var(--vk-panel-text);
+  white-space: nowrap;
+}
+
+.vk-cell-value {
+  grid-area: value;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  color: var(--vk-panel-value);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- ⑤ 厚分段进度条（深色描边 + 内高光） ---------- */
+.vk-seg {
+  grid-area: bar;
+  position: relative;
+  display: block;
+  height: calc(var(--vk-seg-h) + 1px);
+  margin-top: 3px;
+  overflow: hidden;
+  background: var(--vk-paper-warm);
+  border: 1px solid var(--vk-panel-border);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--vk-ref-paper) 70%, transparent);
+}
+
+.vk-seg-fill {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--vk-seg-color, var(--vk-ref-leaf)) 0 var(--vk-seg-unit),
+    transparent var(--vk-seg-unit) calc(var(--vk-seg-unit) + var(--vk-seg-gap))
+  );
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
+}
+
+/* 等级警示色：选择器必须与 usageLevel() 的返回值一致（ok/warn/crit）。
+   此前写成 alert/danger → 永远匹配不上，整条规则是死代码（实测抓出）。 */
+.vk-seg[data-level='warn'] { --vk-seg-color: var(--vk-honey); }
+.vk-seg[data-level='crit'] { --vk-seg-color: var(--vk-bar-crit); }
+
+.vk-cell-detail {
+  grid-area: detail;
+  /* 同站其它主题的做法：进度条下方一行实际容量，比标签更小更淡 */
+  font-size: var(--vk-fs-sm);
+  line-height: 1.35;
+  color: var(--vk-panel-text-muted, var(--vk-ref-value));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vk-panel-meta {
+  /* 第三列左对齐 ⇒ 紧贴名称右侧；内容横排（国旗 + 状态点） */
+  grid-column: 3;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

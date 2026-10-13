@@ -5,8 +5,8 @@ import { message } from '@/utils/message'
 import App from './App.vue'
 import router from './router'
 
-import './styles/main.css'
-import './styles/stardew-v7.css'
+// v2 全局样式入口（旧 main.css 分层链保留在磁盘供旧组件/旧测试使用，v2 壳不再引入）
+import './styles/v2.css'
 
 window.$message = message
 

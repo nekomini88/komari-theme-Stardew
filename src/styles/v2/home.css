@@ -1,0 +1,98 @@
+
+/* ============================================================
+ * 首页排版 + 顶部总览
+ *
+ * 【回归修复】这一整块原先在旧 card.css 里，我在重写 card.css 时整份覆盖 →
+ *   .vk-overview*（5 类）、.vk-home、.vk-home-hint 全部丢失样式，
+ *   而模板仍在用它们。后果：统计区没有底色（夜里深色字压在深色场景上读不清）、
+ *   数值与副值之间没有间距（出现「37.9%3.8 GB」黏连）。
+ *   现已迁到页面级样式表 shell.css，并按像素风口径重做（硬边/小圆角/12px 像素字/取色走母板）。
+ * ============================================================ */
+
+.vk-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vk-space-3);
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* 「节点总览」标题：像素纸铭牌 */
+.vk-home .vk-title {
+  align-self: flex-start;
+  display: inline-block;
+  padding: 6px 14px;
+  color: var(--vk-panel-text);
+  background-color: var(--vk-ref-paper);
+  border: 1px solid var(--vk-panel-border);
+  border-radius: var(--vk-panel-radius);
+  box-shadow: 2px 2px 0 0 color-mix(in srgb, var(--vk-panel-border) 45%, transparent);
+}
+
+.vk-home-hint {
+  color: var(--vk-panel-text);
+  font-size: var(--vk-fs-sm);
+  line-height: var(--vk-lh);
+  text-shadow: 0 1px 0 var(--vk-ref-paper);
+}
+
+/* ---- 顶部总览：像素纸面板 ----
+   用**实底**纸色（不做半透明毛玻璃）：场景有昼/昏/夜三种明暗，
+   半透明底在夜景上一定会糊到读不清 —— 实底才能保证任意场景下都可读。 */
+.vk-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vk-space-3) var(--vk-space-4);
+  padding: 10px 14px;
+  color: var(--vk-panel-text);
+  background-color: var(--vk-ref-paper);
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--vk-panel-border) 5%, transparent) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--vk-panel-border) 4%, transparent) 0 1px, transparent 1px 4px);
+  border: 1px solid var(--vk-panel-border);
+  border-radius: var(--vk-panel-radius);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 50%, transparent);
+}
+
+.vk-overview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 84px;
+}
+
+.vk-overview-label {
+  font-size: var(--vk-fs-sm);
+  line-height: 1.4;
+  /* 标签比数值弱一档：像素字只有一个字重，**不能用 font-weight 加粗**
+     （合成加粗会把像素格糊掉），层级靠颜色区分 */
+  color: color-mix(in srgb, var(--vk-panel-text) 68%, var(--vk-ref-paper));
+}
+
+.vk-overview-value {
+  font-size: var(--vk-fs-sm);
+  font-weight: 400;
+  font-variant-numeric: normal;
+  line-height: 1.4;
+  color: var(--vk-panel-text);
+}
+
+.vk-overview-sub {
+  font-size: var(--vk-fs-sm);
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--vk-panel-text) 68%, var(--vk-ref-paper));
+}
+
+/* ---- 窄屏（手机）：总览改为两列栅格，并压缩最小宽度，避免数值与副值黏连 ---- */
+@media (max-width: 640px) {
+  .vk-overview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px var(--vk-space-3);
+  }
+
+  .vk-overview-item {
+    min-width: 0;
+  }
+}

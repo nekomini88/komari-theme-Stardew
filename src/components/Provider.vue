@@ -3,16 +3,21 @@ import type { VisualStyle } from '@/composables/useVisualStyle'
 import type { ThemeMode } from '@/stores/app'
 import { useDark } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, provide, ref, watch } from 'vue'
-import { BackTop } from '@/components/ui/back-top'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useVisualStyle } from '@/composables/useVisualStyle'
 import { useAppStore } from '@/stores/app'
 
 const appStore = useAppStore()
 const { publicSettings } = storeToRefs(appStore)
 
+// isScrolled 契约保留（供 Header 等消费者注入）；v2 的可见返回顶部按钮改由
+// BackToTop.vue（木牌风）负责，这里不再渲染旧「白圆角胶囊」BackTop。
 const isScrolled = ref(false)
 provide('isScrolled', isScrolled)
+
+function handleScroll() {
+  isScrolled.value = window.scrollY > 1
+}
 
 const themeMode = computed<ThemeMode>({
   get: () => appStore.themeMode,
@@ -84,10 +89,16 @@ watch(
 const settingsVisualStyle = computed((): VisualStyle | undefined => publicSettings.value?.theme_settings?.themeVisualStyle as VisualStyle)
 
 onMounted(() => {
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
   const existing = localStorage.getItem('komaritheme:theme-visual-style-settings')
   if (!existing && settingsVisualStyle.value) {
     localStorage.setItem('komaritheme:theme-visual-style-settings', settingsVisualStyle.value)
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
 })
 
 const { setVisualStyle: setVisualStyleRaw, resetToDefault } = useVisualStyle()
@@ -97,5 +108,4 @@ provide('resetVisualStyleDefault', resetToDefault)
 
 <template>
   <slot />
-  <BackTop :visibility-height="1" @scrolled="isScrolled = $event" />
 </template>

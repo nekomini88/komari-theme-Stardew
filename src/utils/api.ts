@@ -4,6 +4,8 @@
  * @see https://www.komari.wiki/dev/api.html
  */
 
+import { recordServerClockFrom } from '@/utils/serverClock'
+
 const HTTP_PROTOCOL_REGEX = /^http/
 const HTTPS_PROTOCOL_REGEX = /^https/
 
@@ -236,6 +238,7 @@ export class KomariApi {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
+      const requestStartMs = Date.now()
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include', // 携带 Cookie
@@ -243,6 +246,8 @@ export class KomariApi {
       })
 
       clearTimeout(timeoutId)
+      // 顺手用响应 Date 头建立服务端时间基准（场景世界时钟，零额外请求）
+      recordServerClockFrom(response, requestStartMs)
 
       const result: ApiResponse<T> = await response.json()
 
@@ -270,6 +275,7 @@ export class KomariApi {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
+      const requestStartMs = Date.now()
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
@@ -277,6 +283,7 @@ export class KomariApi {
       })
 
       clearTimeout(timeoutId)
+      recordServerClockFrom(response, requestStartMs)
 
       if (!response.ok) {
         throw new ApiError(`HTTP error: ${response.status}`, 'error', response.status)
@@ -302,6 +309,7 @@ export class KomariApi {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
+      const requestStartMs = Date.now()
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -313,6 +321,7 @@ export class KomariApi {
       })
 
       clearTimeout(timeoutId)
+      recordServerClockFrom(response, requestStartMs)
 
       const result = await response.json()
 

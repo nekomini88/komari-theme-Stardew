@@ -1,0 +1,46 @@
+/**
+ * SceneStack 样式 —— 整幅场景背景（像素风 · 复刻《星露谷物语主题.pdf》）
+ *
+ * 口径：场景 = ListenHub 生成的**整幅像素风插画**（不分层、不切图、不做整栈 tint）。
+ * 光照已烘焙在素材里，时间档直接换图 → 因此这里没有 sky/far/mid/near/ground 分层，
+ * 也没有 tint 覆盖层。
+ *
+ * 过渡：时段切换用 1.2s 交叉淡化（退场层在下、进入层淡入覆盖），禁止硬切。
+ * 层叠：本层 z-index 0，内容层 .vk-main z-index 1 → 场景永不遮挡卡片。
+ */
+
+/* 场景底：兜底纯色，素材未加载完成时不露白 */
+.vk-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--vk-sky-day, #7ec8f2);
+}
+
+/* 一张场景图 = 一层。同一时刻最多两层（退场 + 进入） */
+.vk-scene-plate {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+/* 进入层：换图时重放淡入（:key 绑定 URL → 换图即重放），与下方退场层构成交叉淡化 */
+.vk-scene-plate[data-role='enter'] {
+  animation: vk-scene-plate-in var(--vk-transition-ms, 1200ms) ease both;
+}
+
+@keyframes vk-scene-plate-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 尊重「减少动态效果」偏好：不做淡入 */
+@media (prefers-reduced-motion: reduce) {
+  .vk-scene-plate[data-role='enter'] {
+    animation: none;
+  }
+}

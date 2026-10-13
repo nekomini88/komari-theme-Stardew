@@ -1,0 +1,354 @@
+{
+  "meta": {
+    "name": "NekoVPS v2 母板（木质感拟物 + 手绘平滑）",
+    "version": 7,
+    "count": 61,
+    "outline": "#2b1d16",
+    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：参考稿实测的 6 个 accent 色定义「每台一色的色相槽位」；实际底色横幅由 public/images/v2-panel/panel-1..6.png 提供（对原图做色相替换、保留原明度，故比 accent 十六进制值暗）。标题文字色必须按**底板横幅实测色**配对，拿 accent 值算会得到深字压深底（v7 修正）。",
+    "accentInkPairing": {
+      "slot1": {
+        "banner": "#279a06",
+        "ink": "#f7ecd3",
+        "contrast": 3.13,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      },
+      "slot2": {
+        "banner": "#06509a",
+        "ink": "#f7ecd3",
+        "contrast": 6.82,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      },
+      "slot3": {
+        "banner": "#53069a",
+        "ink": "#f7ecd3",
+        "contrast": 9.62,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      },
+      "slot4": {
+        "banner": "#9a0623",
+        "ink": "#f7ecd3",
+        "contrast": 7.38,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      },
+      "slot5": {
+        "banner": "#9a5d06",
+        "ink": "#f7ecd3",
+        "contrast": 4.54,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      },
+      "slot6": {
+        "banner": "#048d89",
+        "ink": "#f7ecd3",
+        "contrast": 3.46,
+        "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
+      }
+    }
+  },
+  "colors": [
+    {
+      "id": "outline",
+      "hex": "#2b1d16",
+      "role": "最深文字/极轻分隔（原描边色，转为柔和文字色）"
+    },
+    {
+      "id": "brown-dark",
+      "hex": "#4a3529",
+      "role": "棕色系降1档（旧结构线，现作暖阴影基色）"
+    },
+    {
+      "id": "warm-hi",
+      "hex": "#f4d9a0",
+      "role": "暖色高光（左上光源）"
+    },
+    {
+      "id": "wood-deep",
+      "hex": "#3d2a1a",
+      "role": "木材·深（正文/木牌暗面/柔和阴影基色）"
+    },
+    {
+      "id": "wood-dark",
+      "hex": "#5c3d22",
+      "role": "木材·暗（木牌主色/顶栏页脚）"
+    },
+    {
+      "id": "wood-mid",
+      "hex": "#7a5230",
+      "role": "木材·中（木板层次）"
+    },
+    {
+      "id": "bark",
+      "hex": "#8a5a34",
+      "role": "树皮（木牌中亮面）"
+    },
+    {
+      "id": "ink-soft",
+      "hex": "#55392a",
+      "role": "柔和次级文字（对比度 ≥7:1 于米纸）"
+    },
+    {
+      "id": "honey",
+      "hex": "#d99a4e",
+      "role": "蜜色主色（按钮/告警木牌面）"
+    },
+    {
+      "id": "honey-hi",
+      "hex": "#f2c574",
+      "role": "蜜色高光（左上 45° 受光面）"
+    },
+    {
+      "id": "paper-cream",
+      "hex": "#f7ecd3",
+      "role": "纸卡·米纸底（主卡片/正文底）"
+    },
+    {
+      "id": "paper-warm",
+      "hex": "#f0e1bf",
+      "role": "纸卡·暖纸底（内嵌区块/进度轨道）"
+    },
+    {
+      "id": "paper-deep",
+      "hex": "#d9c49a",
+      "role": "纸卡·深（纸纹纤维/木牌受光面）"
+    },
+    {
+      "id": "moss",
+      "hex": "#6b8e4e",
+      "role": "苔绿（次级强调/正常态）"
+    },
+    {
+      "id": "moss-dark",
+      "hex": "#4e6b39",
+      "role": "苔绿·暗（在线徽标底，承白字）"
+    },
+    {
+      "id": "leaf",
+      "hex": "#7fa851",
+      "role": "叶绿（进度条/曲线）"
+    },
+    {
+      "id": "leaf-hi",
+      "hex": "#9cc46b",
+      "role": "叶绿·亮（高光）"
+    },
+    {
+      "id": "sky-day",
+      "hex": "#7ec8f2",
+      "role": "昼·天基色"
+    },
+    {
+      "id": "sky-day-hi",
+      "hex": "#a6dcf7",
+      "role": "昼·天降1档（高光）"
+    },
+    {
+      "id": "sky-day-lo",
+      "hex": "#4f9fd0",
+      "role": "昼·天升1档（阴影）"
+    },
+    {
+      "id": "hill-day",
+      "hex": "#6fae8c",
+      "role": "昼·远山基色"
+    },
+    {
+      "id": "hill-day-hi",
+      "hex": "#8fc9a6",
+      "role": "昼·远山降1档"
+    },
+    {
+      "id": "hill-day-lo",
+      "hex": "#54896c",
+      "role": "昼·远山升1档"
+    },
+    {
+      "id": "grass-day",
+      "hex": "#7fc45a",
+      "role": "昼·草基色"
+    },
+    {
+      "id": "grass-day-hi",
+      "hex": "#9ed679",
+      "role": "昼·草降1档"
+    },
+    {
+      "id": "grass-day-lo",
+      "hex": "#5f9c40",
+      "role": "昼·草升1档"
+    },
+    {
+      "id": "soil-day",
+      "hex": "#a9764b",
+      "role": "昼·土基色（亦作木纹基色）"
+    },
+    {
+      "id": "soil-day-hi",
+      "hex": "#c4936a",
+      "role": "昼·土降1档（木牌亮面）"
+    },
+    {
+      "id": "soil-day-lo",
+      "hex": "#835a38",
+      "role": "昼·土升1档"
+    },
+    {
+      "id": "sky-night",
+      "hex": "#2b3f6b",
+      "role": "夜·天基色"
+    },
+    {
+      "id": "sky-night-hi",
+      "hex": "#3a548c",
+      "role": "夜·天降1档"
+    },
+    {
+      "id": "sky-night-lo",
+      "hex": "#1e2c4c",
+      "role": "夜·天升1档"
+    },
+    {
+      "id": "hill-night",
+      "hex": "#2f4a56",
+      "role": "夜·远山基色"
+    },
+    {
+      "id": "grass-night",
+      "hex": "#3f6b4c",
+      "role": "夜·草基色"
+    },
+    {
+      "id": "soil-night",
+      "hex": "#5a4034",
+      "role": "夜·土基色"
+    },
+    {
+      "id": "dusk-tint",
+      "hex": "#e8a05c",
+      "role": "黄昏·整栈统一叠加色"
+    },
+    {
+      "id": "autumn-warm",
+      "hex": "#d9c27a",
+      "role": "秋·季节 tint"
+    },
+    {
+      "id": "winter-cool",
+      "hex": "#6b8fa8",
+      "role": "冬·冷调（远山/树影压蓝）"
+    },
+    {
+      "id": "snow",
+      "hex": "#e6eef6",
+      "role": "冬·积雪 tint（中性分层底整体转雪地）"
+    },
+    {
+      "id": "plum",
+      "hex": "#7e5aa0",
+      "role": "卡片主题色·紫（承米色字 #f7ecd3，对比度 4.64:1）"
+    },
+    {
+      "id": "blossom",
+      "hex": "#d97f9a",
+      "role": "卡片主题色·粉（承深棕字 #3d2a1a，对比度 4.83:1）"
+    },
+    {
+      "id": "seafoam",
+      "hex": "#4fa8a0",
+      "role": "卡片主题色·青（承深棕字 #3d2a1a，对比度 4.82:1）"
+    },
+    {
+      "id": "ref-paper",
+      "hex": "#fcefd2",
+      "role": "参考稿面板纸底（复刻《星露谷物语主题.pdf》实测）"
+    },
+    {
+      "id": "ref-leaf-hi",
+      "hex": "#baec58",
+      "role": "参考稿横幅叶绿·亮部"
+    },
+    {
+      "id": "ref-leaf",
+      "hex": "#2a9708",
+      "role": "参考稿横幅叶绿·主色"
+    },
+    {
+      "id": "ref-leaf-lo",
+      "hex": "#0d5507",
+      "role": "参考稿横幅叶绿·暗部/叶缘"
+    },
+    {
+      "id": "ref-ink",
+      "hex": "#101702",
+      "role": "参考稿面板文字色（近黑偏绿）"
+    },
+    {
+      "id": "ref-value",
+      "hex": "#6e86bb",
+      "role": "参考稿面板数值蓝"
+    },
+    {
+      "id": "accent-leaf",
+      "hex": "#229900",
+      "role": "参考稿实测标题栏色·绿（每台一色）"
+    },
+    {
+      "id": "accent-sky",
+      "hex": "#2b8ced",
+      "role": "参考稿实测标题栏色·蓝（每台一色）"
+    },
+    {
+      "id": "accent-plum",
+      "hex": "#7a24c7",
+      "role": "参考稿实测标题栏色·紫（每台一色）"
+    },
+    {
+      "id": "accent-blossom",
+      "hex": "#e63e5f",
+      "role": "参考稿实测标题栏色·粉红（每台一色）"
+    },
+    {
+      "id": "accent-honey",
+      "hex": "#e68900",
+      "role": "参考稿实测标题栏色·橙（每台一色）"
+    },
+    {
+      "id": "accent-seafoam",
+      "hex": "#00aba7",
+      "role": "参考稿实测标题栏色·青（每台一色）"
+    },
+    {
+      "id": "panel-banner-1",
+      "hex": "#279a06",
+      "role": "美术底板 panel-1.png 的横幅实测色（色相槽位 1）"
+    },
+    {
+      "id": "panel-banner-2",
+      "hex": "#06509a",
+      "role": "美术底板 panel-2.png 的横幅实测色（色相槽位 2）"
+    },
+    {
+      "id": "panel-banner-3",
+      "hex": "#53069a",
+      "role": "美术底板 panel-3.png 的横幅实测色（色相槽位 3）"
+    },
+    {
+      "id": "panel-banner-4",
+      "hex": "#9a0623",
+      "role": "美术底板 panel-4.png 的横幅实测色（色相槽位 4）"
+    },
+    {
+      "id": "panel-banner-5",
+      "hex": "#9a5d06",
+      "role": "美术底板 panel-5.png 的横幅实测色（色相槽位 5）"
+    },
+    {
+      "id": "panel-banner-6",
+      "hex": "#048d89",
+      "role": "美术底板 panel-6.png 的横幅实测色（色相槽位 6）"
+    },
+    {
+      "id": "panel-paper",
+      "hex": "#fbeed2",
+      "role": "美术底板正文纸色（实测）"
+    }
+  ]
+}
