@@ -97,11 +97,8 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     const head = w.find('.vk-panel-head')
     expect(head.find('.vk-panel-name').exists()).toBe(true)
     expect(head.find('.vk-panel-dot').exists()).toBe(true)
-    // 国旗/状态点不得再用绝对定位（绝对定位 + 居中文本 = 视觉失衡）
-    const flagBlock = css.match(/\.vk-panel-flag \{[\s\S]*?\}/)?.[0] ?? ''
-    const dotBlock = css.match(/\.vk-panel-dot \{[\s\S]*?\}/)?.[0] ?? ''
-    expect(flagBlock).not.toContain('position: absolute')
-    expect(dotBlock).not.toContain('position: absolute')
+    // 国旗/状态点定位由「横幅右端绝对定位」实现（用户 2026-10-13 口径：国旗放在右边），
+    // 见下一个用例对 .vk-panel-meta 的断言
   })
 
   it('横幅用「1fr | auto | 1fr」三列网格，名称占中列 —— 两翼等宽才能让名称自身居中', () => {
@@ -123,15 +120,44 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     expect(nameBlock).toContain('justify-self: center')
   })
 
-  it('国旗与状态点同组，容器左对齐紧贴名称右侧', () => {
+  it('国旗与状态点同组，**绝对定位到横幅右侧**（用户口径：国旗放在右边）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const meta = w.find('.vk-panel-meta')
     expect(meta.exists()).toBe(true)
     expect(meta.find('.vk-panel-flag').exists()).toBe(true)
     expect(meta.find('.vk-panel-dot').exists()).toBe(true)
+
     const metaBlock = css.match(/\.vk-panel-meta \{[\s\S]*?\}/)?.[0] ?? ''
-    expect(metaBlock).toContain('grid-column: 3')
-    expect(metaBlock).toContain('justify-self: start')
+    expect(metaBlock, '未找到 .vk-panel-meta 规则').not.toBe('')
+    // 口径从「紧跟名称右侧」改为「放到横幅右边」：必须是右侧绝对定位
+    expect(metaBlock.replace(/\s+/g, ' '), '国旗要放在右边 → 需右侧绝对定位')
+      .toContain('position: absolute')
+    expect(metaBlock.replace(/\s+/g, ' ')).toMatch(/right:\s*\d+px/)
+    expect(metaBlock, '不再占网格列').not.toContain('grid-column')
+
+    // 名称必须为右侧国旗留出净空，否则长名会压到国旗
+    const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
+    expect(nameBlock.replace(/\s+/g, ' '), '名称需为国旗留净空').toMatch(/max-width:\s*calc\(100% - \d+px\)/)
   })
-}
-)
+})
+
+describe('进度条与角饰让位（用户 2026-10-13 口径）', () => {
+  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+
+  it('进度条必须连续实心（不要 repeating-gradient 分段留空）', () => {
+    const raw = css.match(/\.vk-seg-fill \{[\s\S]*?\}/)?.[0] ?? ''
+    expect(raw, '未找到 .vk-seg-fill 规则').not.toBe('')
+    // 先剥注释再断言：CSS 注释里会写到历史做法（repeating-linear-gradient），
+    // 直接扫原文会被注释里的字面量打红（这个坑已踩过两次）
+    const fill = raw.replace(/\/\*[\s\S]*?\*\//g, '')
+    expect(fill, '分段渐变会让进度条看着"空了一截"')
+      .not.toContain('repeating-linear-gradient')
+    expect(fill.replace(/\s+/g, ' '), '应为实心填充 --vk-seg-color')
+      .toContain('background: var(--vk-seg-color')
+  })
+
+  it('最后一行右格必须给右下角向日葵留净空（否则压住 Uptime 数值）', () => {
+    expect(css.replace(/\s+/g, ' '), '最后一行右格需要 padding-right 让开向日葵')
+      .toMatch(/\.vk-panel-row:last-child > \.vk-cell:last-child \{ padding-right: \d+px; \}/)
+  })
+})

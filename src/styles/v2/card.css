@@ -65,10 +65,12 @@
 .vk-panel::after {
   content: '';
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 45px;
-  height: 72px;
+  /* 往角里再收一点：原来 45x72 @ right:0/bottom:0 会横向压住 Uptime 数值 28px
+     （实测 Uptime x 329.7..365.7 vs 花 x 337.7..382.7），数值只剩半个字 */
+  right: -6px;
+  bottom: -8px;
+  width: 36px;
+  height: 58px;
   background-image: var(--vk-panel-sunflower);
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -78,11 +80,10 @@
 /* ---------- ① 标题栏：内容层（叶藤横幅由横幅条提供） ---------- */
 .vk-panel-head {
   position: relative;
-  /* 三列 1fr | 中列 | 1fr：两翼等宽 ⇒ **名称自身精确居中**；国旗/状态点放第三列并左对齐
-     ⇒ 紧贴名称右侧（参考稿的关系）。两个踩过的坑：
-       ① 曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px；
-       ② 中列上限若写 auto(=max-content) → 长名撑破容器把两翼压成 0，名称偏左 10px。
-     故中列取 minmax(0, 62%)：必要时省略号截断，两翼始终等宽。 */
+  /* 三列 1fr | 中列 | 1fr：两翼等宽 ⇒ **名称自身精确居中**。
+     国旗与状态点**绝对定位到横幅右侧**（用户口径：国旗放在右边），
+     不再占网格列，因此名称的居中不受国旗宽度影响。
+     踩过的坑：曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px。 */
   display: grid;
   grid-template-columns: 1fr minmax(0, 62%) 1fr;
   align-items: center;
@@ -102,7 +103,8 @@
   grid-column: 2;
   justify-self: center;
   min-width: 0;
-  max-width: 100%;
+  /* 为右侧绝对定位的国旗+状态点留对称净空（名称仍居中） */
+  max-width: calc(100% - 96px);
   text-align: center;
   overflow: hidden;
   /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
@@ -257,18 +259,24 @@
 .vk-seg-fill {
   display: block;
   height: 100%;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--vk-seg-color, var(--vk-ref-leaf)) 0 var(--vk-seg-unit),
-    transparent var(--vk-seg-unit) calc(var(--vk-seg-unit) + var(--vk-seg-gap))
-  );
-  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
+  /* 连续实心填充（用户口径：不要分段留空）。
+     原来用 repeating-linear-gradient 做分段，段间透明 → 看着像"空了一截"。
+     保留顶部一道内高光，维持像素厚条观感。 */
+  background: var(--vk-seg-color, var(--vk-ref-leaf));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--vk-ref-paper) 45%, transparent),
+    inset 0 -2px 0 color-mix(in srgb, var(--vk-panel-border) 22%, transparent);
 }
 
 /* 等级警示色：选择器必须与 usageLevel() 的返回值一致（ok/warn/crit）。
    此前写成 alert/danger → 永远匹配不上，整条规则是死代码（实测抓出）。 */
 .vk-seg[data-level='warn'] { --vk-seg-color: var(--vk-honey); }
 .vk-seg[data-level='crit'] { --vk-seg-color: var(--vk-bar-crit); }
+
+/* 最后一行右侧要让开右下角向日葵（数值不再压在花上） */
+.vk-panel-rows > .vk-panel-row:last-child > .vk-cell:last-child {
+  padding-right: 20px;
+}
 
 .vk-cell-detail {
   grid-area: detail;
@@ -282,9 +290,11 @@
 }
 
 .vk-panel-meta {
-  /* 第三列左对齐 ⇒ 紧贴名称右侧；内容横排（国旗 + 状态点） */
-  grid-column: 3;
-  justify-self: start;
+  /* 用户口径：国旗放在右边 → 绝对定位到横幅右侧（国旗 + 状态点横排） */
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   gap: 6px;
