@@ -62,16 +62,13 @@
   padding: 0;
   /* 正文高度由内容决定 —— 不再锁 aspect-ratio。
      （曾锁 428/394，导致正文比卡片高 113px 被 overflow:hidden 静默裁掉最后两行指标） */
-  /* 整卡底色 = 该节点所属色槽的颜色（用户 2026-10-13：「颜色框覆盖整个服务器名称卡片」）。
-     原先颜色只在顶部一条丝带贴图（--vk-panel-art）上，卡片主体是纸色；
-     现在整卡铺色、指标区改为内嵌的纸色面板（见 .vk-panel-body），颜色成为包围式"框"。
-     色值均取自母板；奶白字对比度 3.13~9.62:1。 */
-  background-color: var(--vk-node-bg, var(--vk-panel-paper));
-  /* 必须显式清掉纸纤维纹理：通用纸面规则会给 .vk-panel 叠上
-     `--vk-paper-fiber, --vk-paper-face`（大面积径向渐变，实测把底色盖成奶油色
-     —— 整卡铺色看起来只有顶部一条就是这么来的）。清掉后底色才是真正可见的。
-     像素风观感由像素字体 + 硬边框 + 像素进度条维持，不依赖这层纹理。 */
-  background-image: none;
+  background-color: var(--vk-panel-paper);
+  /* 彩色名牌：铺满整卡宽度的顶部色条（= 每台一色的"名称卡"行）。
+     用户 2026-10-13 给了目标图并说明「每台服务名称加入颜色 跟之前类似,但是要铺满卡片那行」：
+     颜色只应在**顶部那一行**，卡片主体仍是奶白纸（此前一轮我把整卡染色是过度解读，已回退）。
+     贴图左端此前已用干净列回填 ⇒ 丝带本身现在从 x0 就开始，天然铺满整卡宽度。
+     注意别让通用纸面规则（--vk-paper-fiber/--vk-paper-face 的大面积径向渐变）盖住它。 */
+  background-image: var(--vk-panel-art);
   border: 1px solid var(--vk-panel-border);
   border-radius: var(--vk-panel-radius);
   box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--vk-panel-border) 55%, transparent);
@@ -80,6 +77,10 @@
 
 /* ---------- ① 标题栏：内容层（叶藤横幅由横幅条提供） ---------- */
 .vk-panel-head {
+  /* 名称那一行**铺满整卡宽度**并上色（用户 2026-10-13 目标图：「每台服务名称加入颜色
+     跟之前类似，但是要铺满卡片那行」）。贴图上色在的丝带形状本身有留白，
+     故这里直接用色槽色给头部铺底 —— 与贴图同色，既保证"铺满整卡那行"、又保留像素纹理与两端装饰。 */
+  background-color: var(--vk-node-bg, transparent);
   position: relative;
   /* 三列 1fr | 中列 | 1fr：两翼等宽 ⇒ **名称自身精确居中**。
      国旗与状态点**绝对定位到横幅右侧**（用户口径：国旗放在右边），
@@ -103,7 +104,7 @@
      收窄后可用宽 +28px。 */
   padding: 0 16px;
   color: var(--vk-node-ink, var(--vk-panel-head-ink));
-  background: none;
+  /* 不能再写 background: none —— 简写会把上面刚铺的色槽底色一并重置（实测名称行算出透明） */
   border: none;
 }
 
@@ -222,15 +223,6 @@
 .vk-panel-body {
   display: flex;
   flex-direction: column;
-  /* 半透明纸面：整卡已铺每台底色，指标区用**半透明**纸色 ——
-     既不挡住底色（颜色真正覆盖整张卡片），又保住深色正文的可读性。
-     参考站的做法同源：它的指标单元格也是半透明底（oklab(... / 0.05)）叠在卡片底上。
-     用 color-mix 从母板纸色派生透明度，不引入新的色值字面量。
-     透明度 68% 是实测定的：86% 时视觉复核仍判断"颜色只集中在顶部一条"，
-     因为不透明单元格把底色挡完了；76%~60% 区间既能看清每台的色相、又不伤深色正文可读性。 */
-  margin: 0 6px 6px;
-  background: color-mix(in srgb, var(--vk-panel-paper) 68%, transparent);
-  border: 1px solid var(--vk-panel-border);
   /* 留白按参考稿密度收紧（参考稿单面板 428x394 内含系统行 + 6 行指标） */
   padding: 10px 16px 12px;
   color: var(--vk-panel-text);
@@ -409,34 +401,23 @@
 }
 
 .vk-panel-meta {
-  /* 相对 .vk-name-wrap（定位祖先）绝对定位：left:100% = 紧贴名称右缘，恒定 8px。
+  /* 相对 .vk-name-wrap（定位祖先）绝对定位：left:100% = 紧贴名称右缘。
      用 absolute 而非栅格列 —— 绝对定位的徽标不参与壳的尺寸计算，
      所以"名称居中"与"徽标贴着名称"能同时成立。 */
   position: absolute;
   left: 100%;
-  /* 名称与标牌的间距：8px 时视觉模型复核说"几乎贴在一起、留白偏紧"（短名字更明显），
-     故放到 12px 换取呼吸感（标牌因此右移 4px，实测仍未越出横幅）。 */
+  /* 名称与图标的间距 12px：8px 时视觉复核反馈"几乎贴在一起、留白偏紧"（短名字更明显） */
   margin-left: 12px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  /* min-width:max-content 是必需的：绝对定位盒是 shrink-to-fit，会被外壳宽度压扁
-     （实测 OS 图标+国旗+圆点 内容 62px 时盒子只剩 26px，子元素溢出盒子）。
-     做成「标牌」而非三个裸图标 —— 用户 2026-10-13：「国旗图标与OS图标 看起来有点突兀」。
-     实测病灶：横幅背景 亮度 .825/饱和度 .245/高饱和像素 13.2%，
-     而 OS 图标 亮度 .478/饱和度 .82/高饱和 87.9%、国旗 亮度 .351/高饱和 69.9%
-     ⇒ 明亮柔和的绿丝带上贴了两块又暗又艳的贴纸；且三者宽度 16/22/12 参差。
-     改法：统一到与横幅奶白名称**同一套材质**（纸色底 + 1px 深描边 + 像素风硬角） */
+  /* min-width:max-content 必需：绝对定位盒是 shrink-to-fit，会被外壳宽度压扁
+     （实测内容 62px 时盒子只剩 26px，子元素溢出盒子）。
+     用户 2026-10-13 给了目标图：「国旗和 os 图标不要有边框」——
+     原先三个图标收在一个奶油色"标牌"里（纸底 + 深描边 + 内边距），现全部撤掉，
+     OS 图标与国旗**裸放**在彩色名牌上，只保留图标之间的间距。 */
   min-width: max-content;
-  /* 纵向 2px → 1px：视觉复核反馈"标牌略高于名称条、显得突出"；
-     标牌高 = 1+16+1+2(border) = 20px，与横幅内深色名称条等高。
-     横向 5px → 4px 配合 inner gap 5px → 4px：标牌宽 66 → 62px，
-     正好抵消 margin-left 8 → 12px 的增量 ⇒ **总外扩仍是 74px**，
-     窄卡上标牌不会戳出卡片（12px 间距 + 旧宽度时实测 950/1250 两档会越界）。 */
-  padding: 1px 4px;
-  background: var(--vk-ref-paper);
-  border: 1px solid var(--vk-outline);
-  border-radius: 0;
 }
+

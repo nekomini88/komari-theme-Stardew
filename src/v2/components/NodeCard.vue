@@ -181,8 +181,9 @@ defineExpose({ viewStatus, statusLabel })
     :style="{
       '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
       '--vk-node-shadow': `var(--vk-node-shadow-${accentSlot + 1})`,
-      // 整卡底色（用户 2026-10-13：颜色框覆盖整个服务器名称卡片；角饰已按用户要求全部删除）
+      // 每台一色：色槽色同时用于「名称那一行的底色」与顶部名牌贴图（角饰已按用户要求删除）
       '--vk-node-bg': `var(--vk-node-bg-${accentSlot + 1})`,
+      '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
     }"
   >
     <!-- ① 绿色木匾标题栏 -->

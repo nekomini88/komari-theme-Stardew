@@ -94,7 +94,7 @@ describe('NodeCard 数据：关键指标一律走 metrics 格式化', () => {
 })
 
 describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
-  it('标题栏：名称唯一 + 状态圆点 + 每台一色（整卡铺色）', () => {
+  it('标题栏：名称唯一 + 状态圆点 + 每台一色（名称那一行铺满整卡宽度）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const heads = w.findAll('.vk-card-head')
     expect(heads).toHaveLength(1)
@@ -104,8 +104,10 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     // 标题栏的叶藤造型与配色由**参考稿美术底板**提供（每台一色 = 6 张底板变体），
     // CSS 不再手搓叶边；文字色仍取 accent 配对的 ink
     const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
-    // 整卡底色 = 该节点色槽的颜色（用户 2026-10-13：颜色框覆盖整个服务器名称卡片）
-    expect(css).toMatch(/\.vk-panel\s*\{[^}]*background-color:\s*var\(--vk-node-bg/)
+    // 颜色落在**名称那一行**且铺满整卡宽度（用户 2026-10-13 目标图口径）。
+    // 注意：不能只断言颜色存在 —— 必须先落到 .vk-panel-head 上，否则会退回"只有顶部一条丝带"
+    expect(css, '名称那一行必须铺色槽色').toMatch(/\.vk-panel-head\s*\{[^}]*background-color:\s*var\(--vk-node-bg/)
+    expect(css, '卡片主体必须仍是奶白纸（不能整卡染色）').toMatch(/\.vk-panel\s*\{[^}]*background-color:\s*var\(--vk-panel-paper\)/)
     expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
     expect(w.attributes('style')).toContain('--vk-node-bg: var(--vk-node-bg-')
     expect(w.attributes('style')).toContain('--vk-node-ink: var(--vk-node-ink-')

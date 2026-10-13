@@ -22,9 +22,9 @@ describe('卡片装饰物已按用户要求全部删除', () => {
     expect(css, '角饰规则应已删除').not.toMatch(/--vk-orn|orn-sunflower/)
   })
 
-  it('组件不得再下发 --vk-orn / --vk-panel-art（丝带贴图也已并入整卡底色）', () => {
+  it('组件不得再下发角饰 --vk-orn（名牌贴图 --vk-panel-art 是名称行的装饰，保留）', () => {
     expect(card, '组件不应再下发角饰').not.toContain('--vk-orn')
-    expect(card, '丝带贴图已由整卡底色取代').not.toContain('--vk-panel-art')
+    expect(card, '名称那一行的名牌贴图应保留').toContain("'--vk-panel-art'")
   })
 
   it('整卡底色改为按色槽下发 --vk-node-bg', () => {
