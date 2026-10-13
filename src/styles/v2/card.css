@@ -89,7 +89,7 @@
      不再占网格列，因此名称的居中不受国旗宽度影响。
      踩过的坑：曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px。 */
   display: grid;
-  grid-template-columns: 1fr minmax(0, 62%) 1fr;
+  grid-template-columns: 1fr minmax(0, 66%) 1fr;
   align-items: center;
   column-gap: 8px;
   /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
@@ -107,8 +107,11 @@
   grid-column: 2;
   justify-self: center;
   min-width: 0;
-  /* 为右侧绝对定位的国旗+状态点留对称净空（名称仍居中） */
-  max-width: calc(100% - 96px);
+  /* 不要再在这里扣净空！曾写 max-width: calc(100% - 96px) 想给右下国旗让位，
+     实测把名称盒压到 **85.4px**（内容要 95~144px）→ 6 个名字全被截成 "…"。
+     国旗是绝对定位在横幅右端的，净空由中列上限（minmax(0,62%)）保证：
+     66% 时名称右缘约 316px，国旗左缘约 328px，天然不重叠。 */
+  max-width: 100%;
   text-align: center;
   overflow: hidden;
   /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；

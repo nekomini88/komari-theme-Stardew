@@ -110,11 +110,11 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     expect(headBlock.replace(/\s+/g, ' '), '.vk-panel-head 必须是 grid 容器，否则 track 列表无效')
       .toContain('display: grid')
     expect(headBlock.replace(/\s+/g, ' '), '两翼必须等宽，否则名称会被国旗宽度推偏')
-      .toContain('grid-template-columns: 1fr minmax(0, 62%) 1fr')
+      .toContain('grid-template-columns: 1fr minmax(0, 66%) 1fr')
     // 中列上限必须是百分比：若上限是 auto(=max-content)，长名会撑破容器把两翼压成 0，
     // 名称就偏左了（实测长名偏 10px）。百分比上限 + 0 下限 ⇒ 长名省略号截断且保持居中。
     expect(headBlock.replace(/\s+/g, ' '), '中列上限须为百分比，长名才截断而不是挤掉两翼')
-      .toContain('minmax(0, 62%)')
+      .toContain('minmax(0, 66%)')
     const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
     expect(nameBlock).toContain('grid-column: 2')
     expect(nameBlock).toContain('justify-self: center')
@@ -135,9 +135,16 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     expect(metaBlock.replace(/\s+/g, ' ')).toMatch(/right:\s*\d+px/)
     expect(metaBlock, '不再占网格列').not.toContain('grid-column')
 
-    // 名称必须为右侧国旗留出净空，否则长名会压到国旗
+    // 名称**不得**再被额外扣净空：曾写 max-width: calc(100% - 96px) 想把名字让开国旗，
+    // 实测把名称盒压到 85.4px（内容要 95~144px）→ 6 个名字全被截断成 "…"。
+    // 净空应由中列上限（minmax(0,62%)）保证，名称自身用满 100%。
     const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
-    expect(nameBlock.replace(/\s+/g, ' '), '名称需为国旗留净空').toMatch(/max-width:\s*calc\(100% - \d+px\)/)
+    // 先剥注释再断言：注释里会写到历史写法（max-width: calc(...)），
+    // 直接扫原文会被自己的注释打红（这个坑已踩三次，视为默认动作而非例外）
+    const nb = nameBlock.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ')
+    expect(nb, '名称不得再用 calc(...) 扣净空，否则会截断正常长度的名字')
+      .not.toMatch(/max-width:\s*calc\(/)
+    expect(nb, '名称自身应用满所在列').toContain('max-width: 100%')
   })
 })
 
