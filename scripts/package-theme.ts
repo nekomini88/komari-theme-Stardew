@@ -9,7 +9,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = resolve(root, 'dist')
 const releaseDir = resolve(root, 'release')
 const themeJsonPath = resolve(root, 'komari-theme.json')
-const previewPath = resolve(root, 'preview.png')
+// 发布预览图的**唯一来源** = docs/preview.png（AGENTS.md 的交付契约）。
+// 仓库根那份 preview.png 是 README 用的历史副本，不要拿来打包 —— 曾经因此把 8 月 4 日的旧图打进了 3.2.0 包。
+const previewPath = resolve(root, 'docs', 'preview.png')
 
 function getCommitHash(): string {
   try {
