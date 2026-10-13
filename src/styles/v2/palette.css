@@ -113,3 +113,10 @@
   background: rgb(0 0 0 / 8%);
   box-shadow: none;
 }
+
+/* ---------- 玻璃模式的整页底色：与参考站一致（纯白、无背景图） ---------- */
+.vk-app[data-material='glass'] {
+  /* 参考站实测：body = oklch(1 0 0)、无 background-image。
+     场景图层栈在玻璃模式下由 App.vue 直接不渲染（v-if），所以这里不会被任何图盖住。 */
+  background-color: #ffffff;
+}

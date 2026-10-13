@@ -23,10 +23,17 @@ import AppFooter from '@/v2/components/AppFooter.vue'
 import BackToTop from '@/v2/components/BackToTop.vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
 import TopBar from '@/v2/components/TopBar.vue'
+import { usePalette } from '@/v2/data/paletteStore'
 import { resolveSceneConfig } from '@/v2/theme/sceneConfig'
 import { seasonFromMonth, timeOfDayFromHour, weatherFromDaySeed } from '@/v2/theme/sceneState'
 
 const appStore = useAppStore()
+
+/**
+ * 卡片外观（用户 2026-10-13：「当选择玻璃颜色时, 背景跟参考站一致 不要出现背景图」）。
+ * 玻璃模式 = 参考站那套干净底色，**不铺场景图** ⇒ 场景图层栈直接不渲染（比藏起来干净，不留死元素）。
+ */
+const { material } = usePalette()
 
 /** 世界时钟滴答间隔：只为让日夜/季节推进，无需每帧重绘 */
 const WORLD_TICK_MS = 60_000
@@ -95,8 +102,15 @@ onUnmounted(() => {
 
 <template>
   <Provider>
-    <div class="vk-app" :data-scene-time="sceneTime" :data-scene-season="sceneSeason" :data-scene-weather="sceneWeather">
-      <SceneStack :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" />
+    <div
+      class="vk-app"
+      :data-material="material"
+      :data-scene-time="sceneTime"
+      :data-scene-season="sceneSeason"
+      :data-scene-weather="sceneWeather"
+    >
+      <!-- 玻璃模式不铺背景图（对齐参考站）；纸卡模式照常渲染整幅场景 -->
+      <SceneStack v-if="material !== 'glass'" :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" />
       <TopBar />
       <main class="vk-main">
         <RouterView />

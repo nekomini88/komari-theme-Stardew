@@ -371,6 +371,11 @@
       "hex": "#0b0b0d",
       "name": "玻璃卡文字色",
       "note": "对齐参考站近黑，玻璃模式下替代深棕正文色"
+    },
+    {
+      "hex": "#ffffff",
+      "name": "玻璃模式整页底色",
+      "note": "对齐参考站 komari.vickypig.com 的 oklch(1 0 0)"
     }
   ]
 }

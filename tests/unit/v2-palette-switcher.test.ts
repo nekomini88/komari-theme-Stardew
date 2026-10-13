@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
@@ -7,6 +9,9 @@ import {
 } from '@/v2/data/palettes'
 import { setPaletteMode, usePalette } from '@/v2/data/paletteStore'
 import PaletteMenu from '@/v2/components/PaletteMenu.vue'
+
+const ROOT = resolve(__dirname, '..', '..')
+const v2StyleDir = resolve(ROOT, 'src/styles/v2')
 
 /**
  * 卡片外观控件（用户 2026-10-13 定稿）：
@@ -189,5 +194,20 @@ describe('调色板控件：按钮 + 菜单', () => {
     await w.find('button').trigger('click')
     const swatches = w.findAll('.vk-palette-swatch')
     expect(swatches[1]!.attributes('data-material')).toBe('glass')
+  })
+})
+
+describe('玻璃模式：整页不铺背景图（用户：当选择玻璃颜色时, 背景跟参考站一致 不要出现背景图）', () => {
+  it('场景图层栈只在纸卡模式渲染', () => {
+    const app = readFileSync(resolve(ROOT, 'src/App.vue'), 'utf8')
+    expect(app, '场景图层栈必须按材质条件渲染，玻璃模式下不得挂载')
+      .toMatch(/<SceneStack v-if="material !== 'glass'"/)
+    expect(app, '根节点必须把材质挂出来供样式判断').toContain(':data-material="material"')
+  })
+
+  it('玻璃模式整页底色为纯白（参考站实测 oklch(1 0 0)、无背景图）', () => {
+    const css = readFileSync(resolve(v2StyleDir, 'palette.css'), 'utf8')
+    expect(css, '玻璃模式缺少整页底色规则')
+      .toMatch(/\.vk-app\[data-material='glass'\] \{[\s\S]*?background-color: #ffffff/)
   })
 })
