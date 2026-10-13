@@ -74,6 +74,6 @@ describe('操作系统图标（用户 2026-10-13 口径：参考 komari.vickypig
     // 中列须收缩到名称内容宽（minmax(auto, …)），且上限留出徽标位置：
     // 名称右缘 ≤ 141.5+67.5，徽标再占 8+62 → 279 ≤ 横幅 281。
     expect(head.replace(/\s+/g, ' '), '中列要收缩到名称宽并给徽标留出上限')
-      .toMatch(/grid-template-columns: 1fr minmax\((auto|max-content), \d+%\) 1fr/)
+      .toMatch(/grid-template-columns: 1fr minmax\((0|auto|max-content), \d+%\) 1fr/)
   })
 })

@@ -193,10 +193,13 @@
 
 .vk-panel-flag img {
   display: block;
-  width: 22px;
+  /* 与 OS 图标同高、同用 contain：各国旗比例不同（3:2 / 2:1…），
+     之前写死 22x16 + cover 会拉伸变形，且宽度与 OS 图标的 16 参差 ⇒ 观感突兀 */
+  width: 16px;
   height: 16px;
-  object-fit: cover;
-  border: 1px solid var(--vk-panel-border);
+  object-fit: contain;
+  /* 不再自加描边：描边统一由 .vk-panel-meta 标牌承担，否则边框套边框 */
+  border: none;
   image-rendering: pixelated;
 }
 
@@ -406,5 +409,17 @@
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  /* min-width:max-content 是必需的：绝对定位盒是 shrink-to-fit，会被外壳宽度压扁
+     （实测 OS 图标+国旗+圆点 内容 62px 时盒子只剩 26px，子元素溢出盒子）。
+     做成「标牌」而非三个裸图标 —— 用户 2026-10-13：「国旗图标与OS图标 看起来有点突兀」。
+     实测病灶：横幅背景 亮度 .825/饱和度 .245/高饱和像素 13.2%，
+     而 OS 图标 亮度 .478/饱和度 .82/高饱和 87.9%、国旗 亮度 .351/高饱和 69.9%
+     ⇒ 明亮柔和的绿丝带上贴了两块又暗又艳的贴纸；且三者宽度 16/22/12 参差。
+     改法：统一到与横幅奶白名称**同一套材质**（纸色底 + 1px 深描边 + 像素风硬角） */
+  min-width: max-content;
+  padding: 2px 5px;
+  background: var(--vk-ref-paper);
+  border: 1px solid var(--vk-outline);
+  border-radius: 0;
 }

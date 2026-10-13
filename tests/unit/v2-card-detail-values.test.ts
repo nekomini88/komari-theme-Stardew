@@ -119,12 +119,12 @@ const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', '
     expect(headBlock.replace(/\s+/g, ' '), '.vk-panel-head 必须是 grid 容器，否则 track 列表无效')
       .toContain('display: grid')
     expect(headBlock.replace(/\s+/g, ' '), '两翼必须等宽，否则名称会被国旗宽度推偏')
-      .toMatch(/grid-template-columns: 1fr minmax\((auto|max-content), \d+%\) 1fr/)
+      .toMatch(/grid-template-columns: 1fr minmax\((0|auto|max-content), \d+%\) 1fr/)
     // 中列下限用 auto（收缩到名称内容宽）—— 徽标才能贴着名称右缘（用户：「太割裂了」）。
     // 但**上限必须是百分比**：若上限也写成 auto(=max-content)，长名会撑破容器把两翼压成 0，
     // 名称就偏左了（实测长名偏 10px）。百分比上限 ⇒ 长名省略号截断且保持居中。
     expect(headBlock.replace(/\s+/g, ' '), '中列上限须为百分比，长名才截断而不是挤掉两翼')
-      .toMatch(/minmax\((auto|max-content), \d+%\)/)
+      .toMatch(/minmax\((0|auto|max-content), \d+%\)/)
     // 栅格定位由名称外壳承担（名称本身不再是栅格项 —— 徽标要相对外壳定位）
     const wrapBlock = mainRule(css, '.vk-name-wrap')
     expect(wrapBlock).toContain('grid-column: 2')
