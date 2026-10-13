@@ -37,6 +37,7 @@ import {
 } from '@/v2/data/metrics'
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
 import { getRegionCode } from '@/utils/regionHelper'
+import { getOSImage } from '@/utils/osImageHelper'
 
 const props = defineProps<{ node: Node, accentIndex?: number }>()
 
@@ -123,6 +124,10 @@ const flagCode = computed(() => {
   return code && /^[A-Z]{2}$/.test(code) ? code : null
 })
 
+/** 操作系统图标（放国旗旁边，参考 komari.vickypig.com）。
+ *  node.os 为空时不渲染 —— 不给"未知系统"的默认图，免得图标与实际系统对不上。 */
+const osIconSrc = computed(() => (node.value.os ? getOSImage(node.value.os) : ''))
+
 /** 进度条颜色：Load 用橙，其余用绿（对齐参考稿） */
 /* 进度条绿：参考稿实测为高饱和亮绿 #2a9708（此前用旧母板的 --vk-leaf #7fa851，偏灰、与参考稿不一致） */
 const GREEN = 'var(--vk-ref-leaf)'
@@ -152,6 +157,11 @@ defineExpose({ viewStatus, statusLabel })
       <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
       <!-- 国旗与状态点同组，紧贴名称右侧（不放绝对定位：绝对定位会让名称在视觉上被推偏） -->
       <span class="vk-panel-meta">
+        <!-- 操作系统图标（用户口径：参考 komari.vickypig.com，放在国旗旁边）
+             参考站顺序 = [OS 16px] + 缝 + [国旗]；素材走既有 osImageHelper（未匹配时给默认图，不会破图） -->
+        <span v-if="osIconSrc" class="vk-panel-osicon" :title="node.os">
+          <img :src="osIconSrc" :alt="node.os" loading="lazy">
+        </span>
         <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
           <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
         </span>

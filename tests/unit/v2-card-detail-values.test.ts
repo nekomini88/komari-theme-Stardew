@@ -110,11 +110,11 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     expect(headBlock.replace(/\s+/g, ' '), '.vk-panel-head 必须是 grid 容器，否则 track 列表无效')
       .toContain('display: grid')
     expect(headBlock.replace(/\s+/g, ' '), '两翼必须等宽，否则名称会被国旗宽度推偏')
-      .toContain('grid-template-columns: 1fr minmax(0, 66%) 1fr')
+      .toContain('grid-template-columns: 1fr minmax(0, 56%) 1fr')
     // 中列上限必须是百分比：若上限是 auto(=max-content)，长名会撑破容器把两翼压成 0，
     // 名称就偏左了（实测长名偏 10px）。百分比上限 + 0 下限 ⇒ 长名省略号截断且保持居中。
     expect(headBlock.replace(/\s+/g, ' '), '中列上限须为百分比，长名才截断而不是挤掉两翼')
-      .toContain('minmax(0, 66%)')
+      .toContain('minmax(0, 56%)')
     const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
     expect(nameBlock).toContain('grid-column: 2')
     expect(nameBlock).toContain('justify-self: center')

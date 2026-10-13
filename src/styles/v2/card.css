@@ -89,7 +89,7 @@
      不再占网格列，因此名称的居中不受国旗宽度影响。
      踩过的坑：曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px。 */
   display: grid;
-  grid-template-columns: 1fr minmax(0, 66%) 1fr;
+  grid-template-columns: 1fr minmax(0, 56%) 1fr;
   align-items: center;
   column-gap: 8px;
   /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
@@ -131,6 +131,20 @@
     0 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
     0 -1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
     1px 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo));
+}
+
+/* 操作系统图标：16px（16 的整数倍 = 项目像素纪律），与参考站 size-4 一致 */
+.vk-panel-osicon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.vk-panel-osicon img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .vk-panel-flag {
