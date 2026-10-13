@@ -1,39 +1,35 @@
 /**
- * 调色板状态（用户 2026-10-13：一键切换服务器配色）。
+ * 卡片外观状态（用户 2026-10-13 定稿：两选一，选择持久化）。
  *
- * 模块级响应式单例（v2 目录不使用 Pinia），选择持久化到 localStorage。
- * 卡片通过 usePalette() 读取每台的底色/文字色/描边色；名牌贴图只在默认配色下显示
- * —— 贴图里的颜色是烘死的，动态配色跟不上，硬留着会出现色差接缝。
+ * 模块级响应式单例（v2 目录不使用 Pinia）。
+ * 卡片通过 usePalette() 读取材质与每台名称行的底色/文字色/描边色。
+ * 名牌贴图只在纸卡模式显示 —— 贴图里的颜色是烘死的，玻璃模式不需要它。
  */
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 
 import {
-  nodeColorAt, PALETTES, randomColors,
-  type NodeColor, type PaletteMode,
+  DEFAULT_MODE, materialOf, nodeColorAt, PALETTES, PALETTE_MODES,
+  SLOT_COUNT,
+  type Material, type NodeColor, type PaletteMode,
 } from './palettes'
 
 const STORAGE_KEY = 'vk-palette-mode'
-const SLOT_COUNT = 6
 
-const VALID: PaletteMode[] = ['default', 'flatpaper', 'emerald', 'random']
-
+/** 只有当前有效的模式会被接受；历史值（default/random 等已废弃的模式）一律回落到默认 */
 function loadMode(): PaletteMode {
   try {
     const v = localStorage.getItem(STORAGE_KEY)
-    return VALID.includes(v as PaletteMode) ? (v as PaletteMode) : 'default'
+    return PALETTE_MODES.includes(v as PaletteMode) ? (v as PaletteMode) : DEFAULT_MODE
   } catch {
-    return 'default'
+    return DEFAULT_MODE
   }
 }
 
 const mode = ref<PaletteMode>(loadMode())
-const randomList = ref<string[]>(randomColors())
 
 export function setPaletteMode(next: PaletteMode): void {
-  if (!VALID.includes(next)) return
+  if (!PALETTE_MODES.includes(next)) return
   mode.value = next
-  // 每次切到随机都重新掷一次，避免看起来"没变"
-  if (next === 'random') randomList.value = randomColors()
   try {
     localStorage.setItem(STORAGE_KEY, next)
   } catch {
@@ -41,42 +37,40 @@ export function setPaletteMode(next: PaletteMode): void {
   }
 }
 
-/** 随机模式下再掷一次 */
-export function rerollRandom(): void {
-  randomList.value = randomColors()
+export interface PaletteOption {
+  mode: PaletteMode
+  label: string
+  hint: string
+  material: Material
+  colors: string[]
 }
 
 export interface UsePalette {
   mode: Ref<PaletteMode>
-  /** 六台的颜色（底色 + 文字色 + 描边），已保证文字对比度 ≥4.5:1 */
+  material: ComputedRef<Material>
+  /** 六台名称行的配色（玻璃模式为透明底 + 近黑字） */
   nodeColors: ComputedRef<NodeColor[]>
-  /** 是否显示名牌贴图（仅默认配色） */
+  /** 是否显示名牌贴图（只纸卡模式有） */
   showArt: ComputedRef<boolean>
-  options: { mode: PaletteMode; label: string; hint: string; colors: string[] }[]
+  options: PaletteOption[]
   setPaletteMode: typeof setPaletteMode
-  rerollRandom: typeof rerollRandom
 }
 
 export function usePalette(): UsePalette {
-  const nodeColors = computed<NodeColor[]>(() =>
-    Array.from({ length: SLOT_COUNT }, (_, i) =>
-      nodeColorAt(mode.value, i, randomList.value)),
-  )
-
-  const options = VALID.map((m) => {
-    if (m === 'random') {
-      return { mode: m, label: '随机颜色', hint: '每次切换重新生成（避开不可读的明度区间）', colors: [] }
-    }
-    const def = PALETTES[m]
-    return { mode: m, label: def.label, hint: def.hint, colors: def.colors }
-  })
-
   return {
     mode,
-    nodeColors,
-    showArt: computed(() => mode.value === 'default'),
-    options,
+    material: computed(() => materialOf(mode.value)),
+    nodeColors: computed<NodeColor[]>(() =>
+      Array.from({ length: SLOT_COUNT }, (_, i) => nodeColorAt(mode.value, i)),
+    ),
+    showArt: computed(() => materialOf(mode.value) === 'paper'),
+    options: PALETTE_MODES.map((m) => ({
+      mode: m,
+      label: PALETTES[m].label,
+      hint: PALETTES[m].hint,
+      material: PALETTES[m].material,
+      colors: PALETTES[m].colors,
+    })),
     setPaletteMode,
-    rerollRandom,
   }
 }

@@ -2,209 +2,183 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import {
-  colorAt, contrast, CREAM, INK_DARK, MIN_CONTRAST, nodeColorAt, PALETTES, PALETTE_MODES,
-  randomColors, resolveNode, SHADOW_DARK, withLightness,
+  contrast, CREAM, DEFAULT_MODE, GLASS_INK, hexToRgb, MIN_CONTRAST, nodeColorAt,
+  PALETTES, PALETTE_MODES, relLum, SHADOW_DARK, SLOT_COUNT,
 } from '@/v2/data/palettes'
 import { setPaletteMode, usePalette } from '@/v2/data/paletteStore'
 import PaletteMenu from '@/v2/components/PaletteMenu.vue'
 
 /**
- * 调色板控件（用户 2026-10-13：「设置一个按钮控制服务器颜色, 名称为调色板」）。
- * 三种可选配色 + 默认配色，核心不变量是**任何配色下文字都要能看清**。
+ * 卡片外观控件（用户 2026-10-13 定稿）：
+ *   flatpaper —— 奶白纸卡 + 六台各一色（默认）
+ *   emerald   —— 玻璃透明卡（对齐参考站 komari.vickypig.com 的实测配方）
+ * 只留这两种；此前那套「四套配色 + 随机」已废弃。
  */
 
-const SOURCES = {
-  // hexo-theme-flatpaper: source/css/_partials/var.styl 的命名色
-  flatpaper: ['#f0bd4d', '#ec9b5b', '#6fa9d9', '#9c8feb', '#6fa67c', '#d4716c'],
-  // komari-theme-emerald: src/styles/main.css 的语义色（oklch 经画布转 sRGB）
-  emerald: ['#00bc7d', '#088cb9', '#f1a029', '#e7000b', '#104e64', '#ffb900'],
+/** 把 sRGB 与 alpha 合成到给定底上（用于验证玻璃卡的文字可读性） */
+function over(fg: [number, number, number], alpha: number, bg: [number, number, number]): string {
+  const mix = fg.map((v, i) => Math.round(v * alpha + (bg[i] ?? 0) * (1 - alpha)))
+  return '#' + mix.map((v) => v.toString(16).padStart(2, '0')).join('')
 }
 
-describe('调色板：三种配色来源正确', () => {
-  it('flatpaper 六色与上游 var.styl 的命名色一一对应', () => {
-    expect(PALETTES.flatpaper.colors).toEqual(SOURCES.flatpaper)
+describe('外观：只剩两种，且默认是纸卡', () => {
+  it('模式清单 = flatpaper / emerald', () => {
+    expect(PALETTE_MODES).toEqual(['flatpaper', 'emerald'])
+    expect(DEFAULT_MODE).toBe('flatpaper')
   })
 
-  it('emerald 六色与上游语义色（oklch → hex）一一对应', () => {
-    expect(PALETTES.emerald.colors).toEqual(SOURCES.emerald)
+  it('flatpaper：奶白纸卡 + 六台各一色（6 色互不相同）', () => {
+    const def = PALETTES.flatpaper
+    expect(def.material).toBe('paper')
+    expect(def.colors).toHaveLength(SLOT_COUNT)
+    expect(new Set(def.colors).size).toBe(SLOT_COUNT)
   })
 
-  it('每个配色都是 6 台一色且互不相同', () => {
-    for (const [name, def] of Object.entries(PALETTES)) {
-      expect(def.colors, `${name} 必须是 6 色`).toHaveLength(6)
-      expect(new Set(def.colors).size, `${name} 六色必须互不相同`).toBe(6)
-    }
-  })
-
-  it('模式清单齐备（默认 + 三种可选）', () => {
-    expect(PALETTE_MODES).toEqual(['default', 'flatpaper', 'emerald', 'random'])
+  it('emerald：玻璃材质且无色（"玻璃是透明无色场景"）', () => {
+    const def = PALETTES.emerald
+    expect(def.material).toBe('glass')
+    expect(def.colors).toEqual([])
   })
 })
 
-describe('调色板：文字可读性硬约束（核心不变量）', () => {
-  it('可切换的三套配色，每一台都能配出 ≥4.5:1 的文字色', () => {
-    for (const name of ['flatpaper', 'emerald'] as const) {
-      for (const c of PALETTES[name].colors) {
-        const node = resolveNode(c)
-        expect(contrast(node.bg, node.ink), `${name} ${c} 文字对比度不足`).toBeGreaterThanOrEqual(MIN_CONTRAST)
-      }
+describe('纸卡：参考稿固定配对，文字看得清', () => {
+  it('六台的文字色 = 奶白、描边 = 深色（不参与自动挑选，否则浅底会被换成深色字 = 改外观）', () => {
+    const pairs = PALETTES.flatpaper.pairs ?? []
+    expect(pairs).toHaveLength(SLOT_COUNT)
+    for (const [i, p] of pairs.entries()) {
+      expect(p.bg).toBe(PALETTES.flatpaper.colors[i])
+      expect(p.ink).toBe(CREAM)
+      expect(p.shadow).toBe(SHADOW_DARK)
+      // 参考稿口径：深底 × 奶白字 ≥3:1（WCAG 大号文本 AA）
+      expect(contrast(p.bg, p.ink), `第 ${i + 1} 台对比度不足`).toBeGreaterThanOrEqual(3)
     }
-  })
-
-  it('默认配色沿用参考稿固定配对（奶白字 + 深描边），不参与自动挑选', () => {
-    // 用户 2026-10-13 复核认定参考稿这套最好看 → 必须原样保留，不能因自动挑选把浅底换成深色字
-    const def = PALETTES.default
-    expect(def.pairs, '默认配色必须有固定配对').toHaveLength(6)
-    for (const [i, p2] of def.pairs!.entries()) {
-      expect(p2.bg).toBe(def.colors[i])
-      expect(p2.ink, `第 ${i + 1} 台文字色应为参考稿的奶白`).toBe(CREAM)
-      expect(p2.shadow, `第 ${i + 1} 台描边应为深色`).toBe(SHADOW_DARK)
-      // 参考稿口径：深底 × 奶白字，对比度 ≥3:1（WCAG 大号文本 AA）
-      expect(contrast(p2.bg, p2.ink), `第 ${i + 1} 台对比度不足`).toBeGreaterThanOrEqual(3)
-    }
-  })
-
-  it('nodeColorAt 对默认配色返回固定配对', () => {
-    const n = nodeColorAt('default', 1)
-    expect(n.ink).toBe(CREAM)
-    expect(n.bg).toBe(PALETTES.default.colors[1])
   })
 
   it('文字与描边明暗相反（否则描边起不到分离作用）', () => {
-    for (const def of Object.values(PALETTES)) {
-      for (const c of def.colors) {
-        const n = def.pairs?.find((x) => x.bg === c) ?? resolveNode(c)
-        const inkIsDark = contrast(n.ink, '#000000') > contrast(n.ink, '#ffffff')
-        const shadowIsDark = contrast(n.shadow, '#000000') > contrast(n.shadow, '#ffffff')
-        expect(inkIsDark, `${c} 文字与描边明暗同向`).not.toBe(shadowIsDark)
-      }
+    for (const p of PALETTES.flatpaper.pairs ?? []) {
+      const inkDark = contrast(p.ink, '#000000') > contrast(p.ink, '#ffffff')
+      const shadowDark = contrast(p.shadow, '#000000') > contrast(p.shadow, '#ffffff')
+      expect(inkDark).not.toBe(shadowDark)
     }
   })
 
-  it('落在"明度死区"的底色会被推出死区（同色相，肉眼几乎无感）', () => {
-    // #845ec2 是实测落在死区里的例子：奶白字 4.10:1、近黑字 3.8:1，两头都不达标
-    const before = '#845ec2'
-    expect(contrast(before, CREAM)).toBeLessThan(MIN_CONTRAST)
-    expect(contrast(before, INK_DARK)).toBeLessThan(MIN_CONTRAST)
-    const after = resolveNode(before)
-    expect(contrast(after.bg, after.ink), '推出死区后仍不达标').toBeGreaterThanOrEqual(MIN_CONTRAST)
-    // 必须只是压暗/提亮，不能换色相：色相角变化应 < 12°
-    const hue = (h: string) => {
-      const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
-      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn
-      let x = 0
-      if (d) {
-        if (mx === r) x = ((g - b) / d) % 6
-        else if (mx === g) x = (b - r) / d + 2
-        else x = (r - g) / d + 4
-        x *= 60
-        if (x < 0) x += 360
-      }
-      return x
-    }
-    const dh = Math.abs(hue(before) - hue(after.bg))
-    expect(Math.min(dh, 360 - dh), '压暗后色相偏了').toBeLessThan(12)
-  })
-
-  it('withLightness 只改明度：纯黑/纯白不被染色', () => {
-    expect(withLightness('#000000', 0.5)).toBe('#000000')
-    expect(withLightness('#ffffff', 1.5)).toBe('#ffffff')
-  })
-
-  it('随机的每一批都满足：6 台互不相同 + 全部可读', () => {
-    for (let round = 0; round < 40; round++) {
-      const list = randomColors()
-      expect(list).toHaveLength(6)
-      expect(new Set(list).size, `第 ${round} 批出现重复色`).toBe(6)
-      for (const c of list) {
-        const n = resolveNode(c)
-        expect(contrast(n.bg, n.ink), `第 ${round} 批 ${c} 不可读`).toBeGreaterThanOrEqual(MIN_CONTRAST)
-      }
-    }
+  it('nodeColorAt 按台取色、超出 6 台取模不越界', () => {
+    expect(nodeColorAt('flatpaper', 1).bg).toBe(PALETTES.flatpaper.colors[1])
+    expect(nodeColorAt('flatpaper', 6).bg).toBe(PALETTES.flatpaper.colors[0])
   })
 })
 
-describe('调色板：状态与持久化', () => {
+describe('玻璃卡：无色，但信息必须看得清', () => {
+  it('玻璃模式不着台色：底色透明 + 近黑字', () => {
+    const n = nodeColorAt('emerald', 0)
+    expect(n.bg).toBe('transparent')
+    expect(n.ink).toBe(GLASS_INK)
+    // 无色 ⇒ 六台取到的配色完全一致
+    for (let i = 0; i < SLOT_COUNT; i++) expect(nodeColorAt('emerald', i)).toEqual(n)
+  })
+
+  it('玻璃文字色是近黑（参考站口径）', () => {
+    expect(relLum(GLASS_INK)).toBeLessThan(0.02)
+  })
+
+  it('玻璃卡在"最暗的场景"下文字仍 ≥4.5:1', () => {
+    // 参考站配方：底色 = 白 50%（+ blur）。玻璃后面是本站时间场景，
+    // 最坏情况是夜景（近黑）。取纯黑作最暗底来算下界。
+    const glassOnBlack = over([255, 255, 255], 0.5, [0, 0, 0])
+    expect(contrast(glassOnBlack, GLASS_INK)).toBeGreaterThanOrEqual(MIN_CONTRAST)
+    // 白天亮场景
+    const glassOnWhite = over([255, 255, 255], 0.5, [255, 255, 255])
+    expect(contrast(glassOnWhite, GLASS_INK)).toBeGreaterThanOrEqual(MIN_CONTRAST)
+  })
+
+  it('旧的深棕正文色在玻璃上确实不达标（说明这个覆盖是必要的）', () => {
+    const glassOnBlack = over([255, 255, 255], 0.5, [0, 0, 0])
+    const oldInk = '#55392a'
+    expect(hexToRgb(oldInk)).toHaveLength(3)
+    expect(contrast(glassOnBlack, oldInk)).toBeLessThan(MIN_CONTRAST)
+  })
+})
+
+describe('状态与持久化', () => {
   beforeEach(() => {
     localStorage.clear()
-    setPaletteMode('default')
+    setPaletteMode(DEFAULT_MODE)
   })
 
-  it('默认是 default', () => {
-    expect(usePalette().mode.value).toBe('default')
-  })
-
-  it('切换后写入 localStorage 并能读回', () => {
-    setPaletteMode('emerald')
-    expect(localStorage.getItem('vk-palette-mode')).toBe('emerald')
-    setPaletteMode('flatpaper')
-    expect(localStorage.getItem('vk-palette-mode')).toBe('flatpaper')
-  })
-
-  it('非法值被忽略（不会把状态写坏）', () => {
-    setPaletteMode('emerald')
-    setPaletteMode('nonsense' as never)
-    expect(usePalette().mode.value).toBe('emerald')
-  })
-
-  it('每台的颜色随模式变化，且始终是 6 台', () => {
+  it('默认 flatpaper、材质是纸卡、显示名牌贴图', () => {
     const p = usePalette()
-    setPaletteMode('default')
-    const a = p.nodeColors.value.map((c) => c.bg)
-    setPaletteMode('emerald')
-    const b = p.nodeColors.value.map((c) => c.bg)
-    expect(a).toHaveLength(6)
-    expect(b).toHaveLength(6)
-    expect(a).not.toEqual(b)
-  })
-
-  it('名牌贴图只在默认配色下显示（贴图颜色烘死，动态配色跟不上）', () => {
-    const p = usePalette()
-    setPaletteMode('default')
+    expect(p.mode.value).toBe('flatpaper')
+    expect(p.material.value).toBe('paper')
     expect(p.showArt.value).toBe(true)
-    setPaletteMode('random')
+  })
+
+  it('切到 emerald：材质变玻璃、不再显示名牌贴图', () => {
+    const p = usePalette()
+    setPaletteMode('emerald')
+    expect(p.material.value).toBe('glass')
     expect(p.showArt.value).toBe(false)
   })
 
-  it('colorAt 对超出 6 台的索引取模（不会越界）', () => {
-    expect(colorAt('emerald', 6)).toBe(PALETTES.emerald.colors[0])
-    expect(colorAt('emerald', 7)).toBe(PALETTES.emerald.colors[1])
+  it('选择写入 localStorage 并能读回', () => {
+    setPaletteMode('emerald')
+    expect(localStorage.getItem('vk-palette-mode')).toBe('emerald')
+  })
+
+  it('已废弃的历史值（default / random）会被回落成默认，不会把状态写坏', () => {
+    setPaletteMode('default' as never)
+    expect(usePalette().mode.value).toBe('flatpaper')
+    setPaletteMode('random' as never)
+    expect(usePalette().mode.value).toBe('flatpaper')
+    setPaletteMode('nonsense' as never)
+    expect(usePalette().mode.value).toBe('flatpaper')
+  })
+
+  it('六台的配色随模式变化：纸卡是六色、玻璃只有一种', () => {
+    const p = usePalette()
+    const paper = p.nodeColors.value.map((c) => c.bg)
+    expect(new Set(paper).size).toBe(SLOT_COUNT)
+    setPaletteMode('emerald')
+    expect(new Set(p.nodeColors.value.map((c) => c.bg)).size).toBe(1)
+  })
+
+  it('options 只暴露两项，且带材质标记', () => {
+    expect(usePalette().options.map((o) => o.mode)).toEqual(['flatpaper', 'emerald'])
+    expect(usePalette().options.map((o) => o.material)).toEqual(['paper', 'glass'])
   })
 })
 
 describe('调色板控件：按钮 + 菜单', () => {
   it('按钮文案是「调色板」', () => {
-    const w = mount(PaletteMenu)
-    expect(w.find('button').text()).toContain('调色板')
+    expect(mount(PaletteMenu).find('button').text()).toContain('调色板')
   })
 
-  it('菜单默认收起，点击后展开且列出全部模式', async () => {
+  it('菜单默认收起，点击后展开且只有两项', async () => {
     const w = mount(PaletteMenu)
     expect(w.find('.vk-palette-menu').exists()).toBe(false)
     await w.find('button').trigger('click')
     const items = w.findAll('.vk-palette-item')
-    expect(items).toHaveLength(4)
-    const labels = items.map((i) => i.text())
-    expect(labels.join('|')).toContain('随机颜色')
-    expect(labels.join('|')).toContain('komari-theme-emerald')
-    expect(labels.join('|')).toContain('hexo-theme-flatpaper')
+    expect(items).toHaveLength(2)
+    const text = items.map((i) => i.text()).join('|')
+    expect(text).toContain('flatpaper')
+    expect(text).toContain('emerald')
+    // 随机配色已按用户口径删除，菜单里不应再有它
+    expect(text).not.toContain('随机')
   })
 
-  it('点选某一项会切模式并收起菜单', async () => {
+  it('点选 emerald 会切模式并收起菜单', async () => {
     localStorage.clear()
+    setPaletteMode('flatpaper')
     const w = mount(PaletteMenu)
     await w.find('button').trigger('click')
-    const items = w.findAll('.vk-palette-item')
-    await items[1].trigger('click')
-    expect(usePalette().mode.value).toBe('flatpaper')
+    await w.findAll('.vk-palette-item')[1]!.trigger('click')
+    expect(usePalette().mode.value).toBe('emerald')
     expect(w.find('.vk-palette-menu').exists()).toBe(false)
   })
 
-  it('随机模式下出现「换一批」按钮', async () => {
-    localStorage.clear()
-    setPaletteMode('random')
+  it('玻璃项自带材质标记（供样式画半透明示意块）', async () => {
     const w = mount(PaletteMenu)
     await w.find('button').trigger('click')
-    expect(w.find('.vk-palette-reroll').exists()).toBe(true)
+    const swatches = w.findAll('.vk-palette-swatch')
+    expect(swatches[1]!.attributes('data-material')).toBe('glass')
   })
 })

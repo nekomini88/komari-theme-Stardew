@@ -3,7 +3,6 @@
  * 放在 styles/v2/ 而非组件 scoped 块 —— 本主题的 v2 样式统一走 @import 链，
  * 且有单测校验「模板用到的每个 vk- 类名都要有样式定义」，scoped 块不参与该校验。
  */
-/* 控件自身的样式放这里；配色相关一律走 vk-* 令牌，避免与主题体系脱节 */
 .vk-palette {
   position: relative;
   display: inline-flex;
@@ -16,17 +15,10 @@
   z-index: 60;
   min-width: 268px;
   padding: 8px;
-  background: var(--vk-panel-paper, #fbeed2);
-  border: 2px solid var(--vk-panel-border, #2b1d16);
+  background: var(--vk-panel-paper);
+  border: 2px solid var(--vk-panel-border);
   border-radius: 0;
-  box-shadow: 4px 4px 0 0 color-mix(in srgb, var(--vk-panel-border, #2b1d16) 40%, transparent);
-}
-
-.vk-palette-title {
-  margin: 2px 6px 8px;
-  font-size: 12px;
-  color: var(--vk-panel-text, #101702);
-  opacity: 0.75;
+  box-shadow: 4px 4px 0 0 color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
 }
 
 .vk-palette-item {
@@ -43,11 +35,11 @@
 }
 
 .vk-palette-item:hover {
-  background: color-mix(in srgb, var(--vk-panel-text, #101702) 8%, transparent);
+  background: color-mix(in srgb, var(--vk-panel-text) 8%, transparent);
 }
 
-.vk-palette-item[data-active='on'] {
-  border-color: var(--vk-panel-border, #2b1d16);
+.vk-palette-item-on {
+  border-color: var(--vk-panel-border);
 }
 
 .vk-palette-swatch {
@@ -56,15 +48,21 @@
   gap: 1px;
 }
 
-.vk-palette-swatch i {
+.vk-palette-chip {
   width: 8px;
   height: 16px;
-  border: 1px solid var(--vk-panel-border, #2b1d16);
+  border: 1px solid var(--vk-panel-border);
 }
 
-/* 随机模式没有固定色：用斜纹示意"随机" */
-.vk-palette-swatch i[data-random='on'] {
-  background-image: repeating-linear-gradient(45deg, #279a06 0 2px, #9a5d06 2px 4px, #048d89 4px 6px) !important;
+/* 玻璃模式没有台色：用半透明格子示意"透" */
+.vk-palette-swatch[data-material='glass'] .vk-palette-chip {
+  width: 47px;
+  background-color: rgb(255 255 255 / 55%);
+  background-image: repeating-conic-gradient(
+    color-mix(in srgb, var(--vk-panel-border) 22%, transparent) 0% 25%,
+    transparent 0% 50%
+  );
+  background-size: 8px 8px;
 }
 
 .vk-palette-text {
@@ -73,31 +71,45 @@
   min-width: 0;
 }
 
-.vk-palette-text b {
+.vk-palette-label {
   font-size: 12px;
   font-weight: normal;
-  color: var(--vk-panel-text, #101702);
+  color: var(--vk-panel-text);
 }
 
-.vk-palette-text small {
+.vk-palette-hint {
   font-size: 12px;
-  color: var(--vk-panel-text, #101702);
+  font-style: normal;
+  color: var(--vk-panel-text);
   opacity: 0.65;
 }
 
-.vk-palette-check {
-  margin-left: auto;
-  color: var(--vk-panel-text, #101702);
+/* ---------- 玻璃卡（emerald）：对齐参考站 komari.vickypig.com 的实测配方 ---------- */
+.vk-panel[data-material='glass'] {
+  /* 参考站实测：底色 50% 白 + backdrop-filter blur(8px) + 8px 圆角 + 细边框 */
+  background-color: rgb(255 255 255 / 50%);
+  background-image: none;
+  /* 顺序不能反：写成"标准在前、前缀在后"时，构建（lightningcss）会把标准声明当重复项删掉，
+     产物里只剩 -webkit-，实测浏览器算出 none ⇒ 玻璃完全不模糊。
+     与 .vk-topbar 保持同序（前缀在前）就两项都在。 */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid oklch(0.92 0.004 286.32);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+  /* 玻璃上没有纸面：正文/数值改用近黑色。原来的深棕（#55392a 一类）在玻璃上对比度不足 ——
+     它当初是按奶白纸底（亮度 0.85）挑的，玻璃透出场景后底会变暗。 */
+  --vk-panel-text: var(--vk-glass-ink);
+  --vk-panel-value: var(--vk-glass-ink);
 }
 
-.vk-palette-reroll {
-  width: 100%;
-  margin-top: 6px;
-  padding: 6px;
-  font-family: inherit;
-  font-size: 12px;
-  color: var(--vk-panel-text, #101702);
-  background: color-mix(in srgb, var(--vk-panel-text, #101702) 10%, transparent);
-  border: 1px solid var(--vk-panel-border, #2b1d16);
-  cursor: pointer;
+/* 名称行不着色（"玻璃是透明无色场景"）：靠网格居中 + 近黑字 */
+.vk-panel[data-material='glass'] .vk-panel-head {
+  background-color: transparent;
+}
+
+/* 进度条槽底原本是不透明纸色，玻璃上会露出纸块 */
+.vk-panel[data-material='glass'] .vk-seg {
+  background: rgb(0 0 0 / 8%);
+  box-shadow: none;
 }

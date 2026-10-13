@@ -1,54 +1,84 @@
 /**
- * 调色板（用户 2026-10-13：「设置一个按钮控制服务器颜色, 名称为调色板」）。
+ * 卡片外观（用户 2026-10-13 定稿：只留两种）。
  *
- * 三种可选配色 + 默认配色：
- *   default   —— 原参考稿实测六色（绿/蓝/紫/红/橙/青，用户认定最好看的一套）
- *   flatpaper —— hexo-theme-flatpaper 的命名色（同是纸感主题，气质最贴）
- *   emerald   —— komari-theme-emerald 的语义色（oklch 经画布转 sRGB 得到 hex）
- *   random    —— 随机生成，但**必须落在可读区间**（见 resolveNode）
+ *   flatpaper —— 奶白纸卡 + 六台各一色（默认）。这是站点原本的样子：
+ *                "flatpaper 是6色混搭"、"现在的配色就是默认配置保留"。
+ *   emerald   —— 玻璃透明卡：对齐参考站 https://komari.vickypig.com/ 的实测配方
+ *                （半透明底 + backdrop-filter blur(8px) + 8px 圆角 + 细边框）。
+ *                "玻璃是透明无色场景" —— 不着色，让背后的时间场景透出来。
  *
- * 核心约束：任何底色都必须能配出 ≥4.5:1 的文字色。
- * 明度上存在一段"死区"——奶白字要求底色很暗、近黑字要求底色够亮，
- * 中间那段两头都不达标（实测 #845ec2 正落在里面）。resolveNode 会把死区里的底色
- * 沿明度推出去（同色相，肉眼几乎无感），保证对比度达标。
+ * 之前那套「四套配色（默认/随机/emerald/flatpaper 各自六色）」已按用户口径废弃：
+ * 随机配色整块删掉，不留死代码。
  */
 
-export type PaletteMode = 'default' | 'flatpaper' | 'emerald' | 'random'
+export type PaletteMode = 'flatpaper' | 'emerald'
+
+/** 材质：paper = 奶白纸卡；glass = 玻璃透明卡 */
+export type Material = 'paper' | 'glass'
 
 export interface NodeColor {
-  /** 名称那一行的底色 */
+  /** 名称行底色 */
   bg: string
-  /** 文字色 */
+  /** 名称行文字色 */
   ink: string
-  /** 文字描边（必须与文字明暗相反，否则起不到分离作用） */
+  /** 名称行描边色（与文字明暗相反，用于像素描边） */
   shadow: string
 }
 
 export interface PaletteDef {
   label: string
   hint: string
+  material: Material
+  /** 六台色槽（玻璃模式无色，故为空） */
   colors: string[]
-  /** 固定配对（默认配色用）：给定美术口径，不参与 resolveNode 的自动挑选 */
+  /** 固定配对：参考稿既定美术口径，不做自动挑选（否则浅底会被换成深色字 = 改外观） */
   pairs?: NodeColor[]
 }
-
-const PALETTES_DEFAULT_COLORS = ['#279a06', '#06509a', '#53069a', '#9a0623', '#9a5d06', '#048d89']
 
 export const CREAM = '#f7ecd3'
 export const INK_DARK = '#101702'
 export const SHADOW_DARK = '#2b1d16'
+/** 玻璃卡上的文字色：对齐参考站的 oklch(0.141 0.005 285.823) ≈ 近黑 */
+export const GLASS_INK = '#0b0b0d'
 export const MIN_CONTRAST = 4.5
+
+/** 站点默认的六台色槽（绿/蓝/紫/红/橙/青），与 tokens.css 的 --vk-node-bg-1..6 一致 */
+const SLOT_COLORS = ['#279a06', '#06509a', '#53069a', '#9a0623', '#9a5d06', '#048d89']
+
+export const SLOT_COUNT = SLOT_COLORS.length
+
+export const DEFAULT_MODE: PaletteMode = 'flatpaper'
+
+export const PALETTES: Record<PaletteMode, PaletteDef> = {
+  flatpaper: {
+    label: 'flatpaper（纸卡 · 六色）',
+    hint: '奶白纸卡，六台各一色（默认）',
+    material: 'paper',
+    colors: [...SLOT_COLORS],
+    pairs: SLOT_COLORS.map((bg) => ({ bg, ink: CREAM, shadow: SHADOW_DARK })),
+  },
+  emerald: {
+    label: 'emerald（玻璃）',
+    hint: '透明玻璃卡，让背后场景透出来',
+    material: 'glass',
+    colors: [],
+  },
+}
+
+export const PALETTE_MODES: PaletteMode[] = ['flatpaper', 'emerald']
+
+/* ---------- 可读性工具（供实现与单测共同使用，保证"信息看得清"是可验证的） ---------- */
 
 export function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '')
-  const s = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
-  return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)]
+  return [
+    parseInt(h.slice(0, 2), 16),
+    parseInt(h.slice(2, 4), 16),
+    parseInt(h.slice(4, 6), 16),
+  ]
 }
 
-function rgbToHex(rgb: [number, number, number]): string {
-  return '#' + rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')
-}
-
+/** WCAG 相对亮度 */
 export function relLum(hex: string): number {
   const lin = (v: number): number => {
     const c = v / 255
@@ -58,145 +88,26 @@ export function relLum(hex: string): number {
   return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
 }
 
+/** WCAG 对比度 */
 export function contrast(a: string, b: string): number {
   const la = relLum(a)
   const lb = relLum(b)
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
 }
 
-/** rgb → hsv（只用于按明度推拉，不引入依赖） */
-function rgbToHsv(rgb: [number, number, number]): [number, number, number] {
-  const r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255
-  const mx = Math.max(r, g, b), mn = Math.min(r, g, b)
-  const d = mx - mn
-  let h = 0
-  if (d !== 0) {
-    if (mx === r) h = ((g - b) / d) % 6
-    else if (mx === g) h = (b - r) / d + 2
-    else h = (r - g) / d + 4
-    h /= 6
-    if (h < 0) h += 1
-  }
-  return [h, mx === 0 ? 0 : d / mx, mx]
-}
-
-function hsvToRgb(h: number, s: number, v: number): [number, number, number] {
-  const i = Math.floor(h * 6)
-  const f = h * 6 - i
-  const p = v * (1 - s)
-  const q = v * (1 - f * s)
-  const t = v * (1 - (1 - f) * s)
-  const mod = ((i % 6) + 6) % 6
-  const table: [number, number, number][] = [
-    [v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q],
-  ]
-  return table[mod]!.map((x) => x * 255) as [number, number, number]
-}
-
-/** 只改明度、保持色相与饱和度（压暗/提亮都走这条路，避免偏色） */
-export function withLightness(hex: string, factor: number): string {
-  const [h, s, v] = rgbToHsv(hexToRgb(hex))
-  return rgbToHex(hsvToRgb(h, s, Math.max(0, Math.min(1, v * factor))))
+export function materialOf(mode: PaletteMode): Material {
+  return PALETTES[mode].material
 }
 
 /**
- * 给一个底色挑可读的文字色与相反明暗的描边。
- * 底色落在"死区"（两头都 <4.5:1）时，沿明度把它推到能过线的一侧，返回推过的底色。
+ * 取某外观下第 i 台（0 起）的名称行配色。
+ * 玻璃模式无色 ⇒ 底色透明、文字用玻璃专用近黑色。
  */
-export function resolveNode(bg: string): NodeColor {
-  const inkDark = { ink: INK_DARK, shadow: CREAM }
-  const inkCream = { ink: CREAM, shadow: SHADOW_DARK }
-
-  const cd = contrast(bg, INK_DARK)
-  const cc = contrast(bg, CREAM)
-  if (cd >= MIN_CONTRAST || cc >= MIN_CONTRAST) {
-    return cd >= cc ? { bg, ...inkDark } : { bg, ...inkCream }
-  }
-  // 死区：往对比度更高的方向推明度，直到過线（同色相）
-  const wantDarkInk = cd > cc
-  let cur = bg
-  for (let i = 1; i <= 40; i++) {
-    cur = withLightness(bg, wantDarkInk ? 1 + i * 0.03 : 1 - i * 0.03)
-    const ok = wantDarkInk ? contrast(cur, INK_DARK) : contrast(cur, CREAM)
-    if (ok >= MIN_CONTRAST) break
-  }
-  return wantDarkInk ? { bg: cur, ...inkDark } : { bg: cur, ...inkCream }
-}
-
-/**
- * 参考稿原色是**深底配奶白字**的既定美术口径（奶白字对它们 3.13~9.62:1），
- * 若交给 resolveNode 自动挑选，浅底那几槽会被换成深色字 —— 那等于改外观，
- * 而用户明确认定这套最好看。故默认配色固定配对，不参与自动挑选。
- */
-const REFERENCE_PAIRS: NodeColor[] = PALETTES_DEFAULT_COLORS.map((bg) => ({
-  bg,
-  ink: CREAM,
-  shadow: SHADOW_DARK,
-}))
-
-export const PALETTES: Record<Exclude<PaletteMode, 'random'>, PaletteDef> = {
-  default: {
-    label: '默认（参考稿原色）',
-    hint: '原参考稿实测的绿/蓝/紫/红/橙/青',
-    colors: [...PALETTES_DEFAULT_COLORS],
-    pairs: REFERENCE_PAIRS,
-  },
-  flatpaper: {
-    label: 'hexo-theme-flatpaper',
-    hint: '取自 Homulilly/hexo-theme-flatpaper 的命名色',
-    colors: ['#f0bd4d', '#ec9b5b', '#6fa9d9', '#9c8feb', '#6fa67c', '#d4716c'],
-  },
-  emerald: {
-    label: 'komari-theme-emerald',
-    hint: '取自 Tokinx/komari-theme-emerald 的语义色（oklch → sRGB）',
-    colors: ['#00bc7d', '#088cb9', '#f1a029', '#e7000b', '#104e64', '#ffb900'],
-  },
-}
-
-const SLOT_COUNT = 6
-
-/**
- * 随机配色：色相均分不重复（保证六台彼此好区分），
- * 明度直接落在可过线的一侧（不靠 resolveNode 事后救），再统一 resolveNode 兜底。
- */
-export function randomColors(rand: () => number = Math.random): string[] {
-  const start = rand() * 360
-  const out: string[] = []
-  const taken = new Set<string>()
-  // 色相均分保证基调分散；抖动与 resolveNode 的明度推拉都可能造成撞色，故最后去重
-  for (let attempt = 0; out.length < SLOT_COUNT && attempt < 60; attempt++) {
-    const i = out.length
-    const hue = (start + (360 / SLOT_COUNT) * i + (rand() * 24 - 12) + attempt * 7) % 360
-    const s = 0.45 + rand() * 0.45
-    // 一半暗底配奶白字、一半亮底配近黑字，避开中间死区
-    const dark = rand() < 0.5
-    const v = dark ? 0.32 + rand() * 0.3 : 0.72 + rand() * 0.26
-    const bg = resolveNode(rgbToHex(hsvToRgb(hue / 360, s, v))).bg
-    if (taken.has(bg)) continue
-    taken.add(bg)
-    out.push(bg)
-  }
-  return out
-}
-
-/** 取某配色下第 i 台的完整配色（默认配色走固定配对） */
-export function nodeColorAt(mode: PaletteMode, index: number, randomList?: string[]): NodeColor {
-  const def = mode === 'random' ? null : PALETTES[mode]
-  if (def?.pairs?.length) {
-    const p = def.pairs[index % def.pairs.length]
-    if (p) return p
-  }
-  return resolveNode(colorAt(mode, index, randomList))
-}
-
-/** 取某模式下台 i（0 起）的颜色；随机模式由调用方传入已生成的色表 */
-export function colorAt(mode: PaletteMode, index: number, randomList?: string[]): string {
-  if (mode === 'random') {
-    const list = randomList && randomList.length ? randomList : randomColors()
-    return list[index % list.length] ?? INK_DARK
-  }
+export function nodeColorAt(mode: PaletteMode, index: number): NodeColor {
   const def = PALETTES[mode]
-  return def.colors[index % def.colors.length] ?? INK_DARK
+  if (def.material === 'glass') {
+    return { bg: 'transparent', ink: GLASS_INK, shadow: '#ffffff' }
+  }
+  const pairs = def.pairs ?? []
+  return pairs[index % pairs.length] ?? { bg: SLOT_COLORS[0]!, ink: CREAM, shadow: SHADOW_DARK }
 }
-
-export const PALETTE_MODES: PaletteMode[] = ['default', 'flatpaper', 'emerald', 'random']
