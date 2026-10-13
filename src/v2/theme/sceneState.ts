@@ -1,10 +1,14 @@
 /**
- * 场景世界的**纯逻辑**：时段 / 季节 / 天气的枚举与推导（无副作用 → 可单测）
+ * 场景世界的**纯逻辑**：时段 / 季节 / 天气 / 素材组的枚举与推导（无副作用 → 可单测）
  *
- * 【口径变更 2026-10-12】场景改为「**整幅像素风插画 + 按时间换图**」（复刻《星露谷物语主题.pdf》，
- * 用户明确「不用切画面」），因此原先的分层状态机已退役：
- * 不再有 SCENE_LAYERS / resolveScene / skyBands / 整栈 tint / layerOffset —— 光照直接烘在图里。
- * 本模块只保留「时间/季节/天气怎么算出来」，渲染归 SceneStack.vue。
+ * 【口径变更 2026-10-13】场景从「白天/黄昏/夜晚 三张」升级为
+ * **「季节 × 时段」12 张 × 两套素材**（用户：12 张农场场景 + 界面按钮切换两套）。
+ * 光照仍烘在图里，不分层、不做整栈 tint。
+ *
+ * 素材：public/images/v2-scene/<组>/<季节>_<时段>.webp
+ *   组 gpt      —— gpt-image-2 那套（细节写实、层次多）＝ 默认
+ *   组 seedream —— seedream 5.0 pro 那套（柔和绘本感、留白多）
+ * 编码口径见 /root/v2_art/farm12/install_farm_scene_assets.py（WebP q=88，实测优于 PNG 索引色）。
  *
  * 时间基准：我们的时间（UTC+8），见 @/utils/serverClock；不跟随访客本地时钟。
  */
@@ -40,6 +44,26 @@ export function seasonFromMonth(month: number): Season {
   if (month >= 9 && month <= 11)
     return 'autumn'
   return 'winter'
+}
+
+/**
+ * 场景素材组（两套同题材、不同画风的 12 张，界面按钮可切换）。
+ * 用户 2026-10-13：「使用 gpt-image-2 那套, seedream 暂时保留（界面按钮可以切换）」。
+ */
+export type SceneSet = 'gpt' | 'seedream'
+
+/** 素材组枚举（控件与测试共用同一份，避免多处手抄） */
+export const SCENE_SETS: readonly SceneSet[] = ['gpt', 'seedream'] as const
+
+/** 默认素材组 = gpt-image-2 那套（用户指定） */
+export const DEFAULT_SCENE_SET: SceneSet = 'gpt'
+
+/** 场景素材根目录（`/images/v2-scene/<组>/<季节>_<时段>.webp`） */
+export const SCENE_DIR = '/images/v2-scene'
+
+/** 季节 × 时段 × 素材组 → 素材 URL（纯函数，可单测；素材是否存在由单测守） */
+export function sceneUrlFor(set: SceneSet, season: Season, time: TimeOfDay): string {
+  return `${SCENE_DIR}/${set}/${season}_${time}.webp`
 }
 
 /** 天气（本期只支持 clear；保留枚举供配置项白名单使用） */

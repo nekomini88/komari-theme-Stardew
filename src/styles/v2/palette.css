@@ -1,14 +1,17 @@
 /**
- * 调色板控件的样式（用户 2026-10-13 新增）。
+ * 顶栏外观类控件的样式：调色板（服务器配色）+ 场景组（农场 12 景的两套素材）。
+ * 用户 2026-10-13 先后新增这两个控件；两者都是「顶栏按钮 + 下拉」，故共用同一套视觉规则。
  * 放在 styles/v2/ 而非组件 scoped 块 —— 本主题的 v2 样式统一走 @import 链，
  * 且有单测校验「模板用到的每个 vk- 类名都要有样式定义」，scoped 块不参与该校验。
  */
-.vk-palette {
+.vk-palette,
+.vk-sceneset {
   position: relative;
   display: inline-flex;
 }
 
-.vk-palette-menu {
+.vk-palette-menu,
+.vk-sceneset-menu {
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
@@ -21,7 +24,8 @@
   box-shadow: 4px 4px 0 0 color-mix(in srgb, var(--vk-panel-border) 40%, transparent);
 }
 
-.vk-palette-item {
+.vk-palette-item,
+.vk-sceneset-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -34,11 +38,13 @@
   font-family: inherit;
 }
 
-.vk-palette-item:hover {
+.vk-palette-item:hover,
+.vk-sceneset-item:hover {
   background: color-mix(in srgb, var(--vk-panel-text) 8%, transparent);
 }
 
-.vk-palette-item-on {
+.vk-palette-item-on,
+.vk-sceneset-item-on {
   border-color: var(--vk-panel-border);
 }
 
@@ -54,19 +60,32 @@
   border: 1px solid var(--vk-panel-border);
 }
 
-.vk-palette-text {
+/* 场景组的预览图：两套画风的差别看缩略图最直观 */
+.vk-sceneset-thumb {
+  flex: none;
+  width: 62px;
+  height: 34px;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--vk-panel-border);
+}
+
+.vk-palette-text,
+.vk-sceneset-text {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.vk-palette-label {
+.vk-palette-label,
+.vk-sceneset-label {
   font-size: 12px;
   font-weight: normal;
   color: var(--vk-panel-text);
 }
 
-.vk-palette-hint {
+.vk-palette-hint,
+.vk-sceneset-hint {
   font-size: 12px;
   font-style: normal;
   color: var(--vk-panel-text);

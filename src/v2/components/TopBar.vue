@@ -10,6 +10,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import PaletteMenu from '@/v2/components/PaletteMenu.vue'
+import SceneSetMenu from '@/v2/components/SceneSetMenu.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -40,9 +41,10 @@ function goAdmin() {
         </button>
       </nav>
 
-      <!-- 按用户口径去掉「明/暗切换」与「中英文切换」按钮；新增「调色板」控件 -->
+      <!-- 按用户口径去掉「明/暗切换」与「中英文切换」按钮；新增「调色板」与「场景」两个外观控件 -->
       <div class="vk-actions">
         <PaletteMenu />
+        <SceneSetMenu />
         <button v-if="showAdmin" class="vk-btn" type="button" :aria-label="t.admin" :title="t.admin" @click="goAdmin">
           {{ t.admin }}
         </button>

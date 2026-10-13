@@ -109,28 +109,5 @@ describe('v2 令牌引用完整性（防 --vk-soil-day 类静默失效）', () =
   })
 })
 
-describe('场景素材预算（整幅像素风插画，不做取色约束——它是渲染图不是代码着色）', () => {
-  const dir = resolve(__dirname, '..', '..', 'public', 'images', 'v2-scene', 'full')
-
-  it('每张整幅场景图都在包体预算内（≤400KB）且为 16:9', () => {
-    const files = readdirSync(dir).filter(f => f.endsWith('.png'))
-    expect(files.length).toBeGreaterThan(0)
-    for (const f of files) {
-      const buf = readFileSync(resolve(dir, f))
-      expect(buf.length, `${f} 体积超预算`).toBeLessThanOrEqual(400 * 1024)
-      // PNG 尺寸头：宽高各 4 字节（大端），位于 IHDR
-      const w = buf.readUInt32BE(16)
-      const h = buf.readUInt32BE(20)
-      expect(Math.abs(w / h - 16 / 9), `${f} 不是 16:9`).toBeLessThan(0.02)
-    }
-  })
-
-  it('场景图以 256 色量化收敛体积（PNG 色彩类型 = 3，索引色）', () => {
-    for (const f of readdirSync(dir).filter(f => f.endsWith('.png'))) {
-      const buf = readFileSync(resolve(dir, f))
-      // IHDR 的 color type 位于偏移 25
-      expect(buf[25], `${f} 未量化为索引色`).toBe(3)
-    }
-  })
-})
+/* 场景素材的包体/尺寸闸门已随「季节×时段 × 两套素材」迁到 v2-scene-set.test.ts */
 

@@ -1,10 +1,12 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
 import {
+  SCENE_DIR,
+  sceneUrlFor,
   seasonFromMonth,
   timeOfDayFromHour,
   TRANSITION_MS,
@@ -13,14 +15,11 @@ import {
 
 const root = resolve(__dirname, '..', '..')
 
-/** 场景图的落盘位置（与 SceneStack 内的 SCENE_DIR 必须一致） */
-const SCENE_DIR = 'public/images/v2-scene/full'
-
 const stackSrc = readFileSync(resolve(root, 'src/v2/components/SceneStack.vue'), 'utf8')
 const sceneCss = readFileSync(resolve(root, 'src/styles/v2/scene.css'), 'utf8')
 
-describe('SceneStack 架构：整幅场景图（复刻 PDF 的像素风，不做分层拼接）', () => {
-  it('时段切换用 1.2s 交叉淡化，且 CSS 令牌与常量一致', () => {
+describe('SceneStack 架构：整幅场景图（季节 × 时段，不做分层拼接）', () => {
+  it('换图用 1.2s 交叉淡化，且 CSS 令牌与常量一致', () => {
     expect(TRANSITION_MS).toBe(1200)
     const tokens = readFileSync(resolve(root, 'src/styles/v2/tokens.css'), 'utf8')
     expect(tokens).toContain(`--vk-transition-ms: ${TRANSITION_MS}ms`)
@@ -36,50 +35,59 @@ describe('SceneStack 架构：整幅场景图（复刻 PDF 的像素风，不做
     expect(stackSrc).not.toContain('SceneLife')
   })
 
-  it('组件只引用整幅场景图目录，不含内联 SVG/CSS 手搓图案', () => {
-    expect(stackSrc).toContain("const SCENE_DIR = '/images/v2-scene/full'")
+  it('素材路径只由 sceneUrlFor 推导，组件里不写死任何图片路径/扩展名', () => {
+    expect(stackSrc, '组件必须走 sceneUrlFor').toContain('sceneUrlFor')
+    expect(stackSrc, '组件不该再自己拼目录').not.toContain("'/images/v2-scene")
+    expect(stackSrc, '扩展名应由 sceneState 决定').not.toContain('.png')
     expect(stackSrc).not.toContain('<svg')
-  })
-
-  it('三个时段都有真实素材（day / dusk / night）', () => {
-    expect(stackSrc).toContain("const AVAILABLE: readonly TimeOfDay[] = ['day', 'dusk', 'night']")
-    for (const t of ['day', 'dusk', 'night']) {
-      const f = resolve(root, `${SCENE_DIR}/${t}.png`)
-      expect(existsSync(f), `缺少场景素材 ${t}.png`).toBe(true)
-    }
-  })
-
-  it('回退机制仍在：素材缺失/非法时段不会 404 破图', () => {
-    expect(stackSrc).toContain('const FALLBACK_TIME')
-    // 传一个不在 AVAILABLE 里的时段 → 回退到 dusk，且引用的是已存在的图
-    const wrapper = mount(SceneStack, { props: { time: 'noon' as never } })
-    expect(wrapper.attributes('data-time')).toBe('dusk')
-    expect(wrapper.get('.vk-scene-plate').attributes('style')).toContain('dusk.png')
   })
 })
 
 describe('SceneStack 渲染行为', () => {
-  it('按 props.time 选图，且始终只有「进入层」一张', () => {
-    const wrapper = mount(SceneStack, { props: { time: 'day' } })
-    expect(wrapper.attributes('data-time')).toBe('day')
+  it('按 props.set/season/time 选图，且始终只有「进入层」一张', () => {
+    const wrapper = mount(SceneStack, { props: { set: 'gpt', season: 'autumn', time: 'dusk' } })
+    expect(wrapper.attributes('data-time')).toBe('dusk')
+    expect(wrapper.attributes('data-season')).toBe('autumn')
+    expect(wrapper.attributes('data-set')).toBe('gpt')
     expect(wrapper.attributes('data-arch')).toBe('full-bleed')
     const plates = wrapper.findAll('.vk-scene-plate')
     expect(plates).toHaveLength(1)
     expect(plates[0]!.attributes('data-role')).toBe('enter')
-    expect(plates[0]!.attributes('style')).toContain('/images/v2-scene/full/day.png')
+    expect(plates[0]!.attributes('style')).toContain(sceneUrlFor('gpt', 'autumn', 'dusk'))
+  })
+
+  it('默认组 = gpt-image-2（用户指定），默认季节夏天', () => {
+    const w = mount(SceneStack)
+    expect(w.attributes('data-set')).toBe('gpt')
+    expect(w.attributes('data-season')).toBe('summer')
+    expect(w.get('.vk-scene-plate').attributes('style')).toContain('/images/v2-scene/gpt/summer_day.webp')
+  })
+
+  it('换素材组也走交叉淡化（两套之间切换不是硬切）', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(SceneStack, { props: { set: 'gpt', season: 'autumn', time: 'dusk' } })
+    await wrapper.setProps({ set: 'seedream' })
+    await nextTick()
+    expect(wrapper.findAll('.vk-scene-plate')).toHaveLength(2)
+    expect(wrapper.get('.vk-scene-plate[data-role="leave"]').attributes('style')).toContain('/v2-scene/gpt/autumn_dusk.webp')
+    expect(wrapper.get('.vk-scene-plate[data-role="enter"]').attributes('style')).toContain('/v2-scene/seedream/autumn_dusk.webp')
+    vi.advanceTimersByTime(TRANSITION_MS + 10)
+    await nextTick()
+    expect(wrapper.findAll('.vk-scene-plate')).toHaveLength(1)
+    vi.useRealTimers()
   })
 
   it('切换时段时同时保留「退场层 + 进入层」→ 交叉淡化而非硬切', async () => {
     vi.useFakeTimers()
-    const wrapper = mount(SceneStack, { props: { time: 'day' } })
+    const wrapper = mount(SceneStack, { props: { set: 'gpt', season: 'spring', time: 'day' } })
     await wrapper.setProps({ time: 'dusk' })
     await nextTick()
 
     const plates = wrapper.findAll('.vk-scene-plate')
     expect(plates).toHaveLength(2)
     const leave = wrapper.get('.vk-scene-plate[data-role="leave"]')
-    expect(leave.attributes('style')).toContain('day.png')
-    expect(wrapper.get('.vk-scene-plate[data-role="enter"]').attributes('style')).toContain('dusk.png')
+    expect(leave.attributes('style')).toContain(sceneUrlFor('gpt', 'spring', 'day'))
+    expect(wrapper.get('.vk-scene-plate[data-role="enter"]').attributes('style')).toContain(sceneUrlFor('gpt', 'spring', 'dusk'))
     expect(wrapper.attributes('data-transitioning')).toBe('true')
 
     // 过渡结束后退场层被移除
@@ -100,7 +108,13 @@ describe('SceneStack 渲染行为', () => {
   })
 })
 
-describe('时间 / 季节 / 天气推导（纯函数）', () => {
+describe('素材路径规则 + 时间/季节/天气推导（纯函数）', () => {
+  it('路径 = <根目录>/<组>/<季节>_<时段>.webp', () => {
+    expect(SCENE_DIR).toBe('/images/v2-scene')
+    expect(sceneUrlFor('gpt', 'winter', 'night')).toBe('/images/v2-scene/gpt/winter_night.webp')
+    expect(sceneUrlFor('seedream', 'spring', 'day')).toBe('/images/v2-scene/seedream/spring_day.webp')
+  })
+
   it('小时 → 时段', () => {
     expect(timeOfDayFromHour(0)).toBe('night')
     expect(timeOfDayFromHour(5)).toBe('night')
@@ -131,10 +145,8 @@ describe('时间 / 季节 / 天气推导（纯函数）', () => {
 
   it('天气季节自洽：冬天只可能下雪（不下雨），非冬天不下雪', () => {
     for (let d = 1; d <= 28; d++) {
-      const winter = weatherFromDaySeed(2026, 1, d, 'winter')
-      expect(winter).not.toBe('rain')
-      const summer = weatherFromDaySeed(2026, 7, d, 'summer')
-      expect(summer).not.toBe('snow')
+      expect(weatherFromDaySeed(2026, 1, d, 'winter')).not.toBe('rain')
+      expect(weatherFromDaySeed(2026, 7, d, 'summer')).not.toBe('snow')
     }
   })
 

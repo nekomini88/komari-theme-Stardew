@@ -36,8 +36,8 @@ describe('顶栏不该有明暗/语言切换（用户 2026-10-13 口径）', () 
     expect(actions.exists(), '未找到 .vk-actions').toBe(true)
     const texts = actions.findAll('button').map(b => b.text().trim()).filter(Boolean)
     for (const t of texts)
-      // 2026-10-13 用户要求新增「调色板」控件，故动作区允许且仅允许这两个
-      expect(['后台管理', '调色板'], `动作区意外的按钮 "${t}"`).toContain(t)
+      // 2026-10-13 用户先后要求新增「调色板」与「场景」控件，故动作区允许且仅允许这三个
+      expect(['后台管理', '调色板', '场景'], `动作区意外的按钮 "${t}"`).toContain(t)
   })
 
   it('导航区仍是首页入口', () => {

@@ -22,6 +22,7 @@ import { hasServerAnchor, worldDay, worldHour, worldMonth, worldYear } from '@/u
 import AppFooter from '@/v2/components/AppFooter.vue'
 import BackToTop from '@/v2/components/BackToTop.vue'
 import SceneStack from '@/v2/components/SceneStack.vue'
+import { useSceneSet } from '@/v2/data/sceneStore'
 import TopBar from '@/v2/components/TopBar.vue'
 import { resolveSceneConfig } from '@/v2/theme/sceneConfig'
 import { seasonFromMonth, timeOfDayFromHour, weatherFromDaySeed } from '@/v2/theme/sceneState'
@@ -36,6 +37,9 @@ let tickTimer: ReturnType<typeof setInterval> | undefined
 
 /** 管理员配置（不可信输入 → 强类型，非法值自动退回默认） */
 const sceneConfig = computed(() => resolveSceneConfig(appStore.publicSettings?.theme_settings))
+
+/** 场景素材组（顶栏「场景」按钮切换：gpt-image-2 / seedream） */
+const { set: sceneSet } = useSceneSet()
 
 const sceneTime = computed<TimeOfDay>(() => {
   const cfg = sceneConfig.value
@@ -100,8 +104,9 @@ onUnmounted(() => {
       :data-scene-time="sceneTime"
       :data-scene-season="sceneSeason"
       :data-scene-weather="sceneWeather"
+      :data-scene-set="sceneSet"
     >
-      <SceneStack :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" />
+      <SceneStack :time="sceneTime" :season="sceneSeason" :weather="sceneWeather" :set="sceneSet" />
       <TopBar />
       <main class="vk-main">
         <RouterView />
