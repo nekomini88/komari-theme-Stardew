@@ -78,7 +78,15 @@ describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', 
  * 因此：横幅贴顶由 CSS 保证（下面断言 padding:0），结构上横幅内不得再出现图标。
  */
 describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿）', () => {
-  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+  /** 取某选择器的主规则块：同一选择器可能在 @media 里也有覆盖，
+ *  用「最长匹配」当作主规则（主规则声明最多）。避免脆弱的首个匹配。 */
+function mainRule(cssText: string, selector: string): string {
+  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const all = [...cssText.matchAll(new RegExp(`${esc} \\{[\\s\\S]*?\\}`, 'g'))].map(m => m[0])
+  return all.sort((a, b) => b.length - a.length)[0] ?? ''
+}
+
+const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
 
   it('.vk-panel 不得有内边距（否则横幅被压低，名称"没有居上"）', () => {
     const block = css.match(/\.vk-panel \{[\s\S]*?\}/)?.[0] ?? ''
@@ -102,7 +110,7 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
   })
 
   it('横幅用「1fr | auto | 1fr」三列网格，名称占中列 —— 两翼等宽才能让名称自身居中', () => {
-    const headBlock = css.match(/\.vk-panel-head \{[\s\S]*?\}/)?.[0] ?? ''
+    const headBlock = mainRule(css, '.vk-panel-head')
     expect(headBlock, '未找到 .vk-panel-head 规则').not.toBe('')
     // 必须同时断言「布局模式」：只断言 track 列表会漏掉「有 grid-template-columns 却没有 display:grid」
     // 这种错（实测发生过 —— 规则里 grid-template-columns 在、display:grid 被删，整条网格静默失效，
@@ -115,7 +123,7 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     // 名称就偏左了（实测长名偏 10px）。百分比上限 + 0 下限 ⇒ 长名省略号截断且保持居中。
     expect(headBlock.replace(/\s+/g, ' '), '中列上限须为百分比，长名才截断而不是挤掉两翼')
       .toContain('minmax(0, 56%)')
-    const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
+    const nameBlock = mainRule(css, '.vk-panel-name')
     expect(nameBlock).toContain('grid-column: 2')
     expect(nameBlock).toContain('justify-self: center')
   })
@@ -127,7 +135,7 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     expect(meta.find('.vk-panel-flag').exists()).toBe(true)
     expect(meta.find('.vk-panel-dot').exists()).toBe(true)
 
-    const metaBlock = css.match(/\.vk-panel-meta \{[\s\S]*?\}/)?.[0] ?? ''
+    const metaBlock = mainRule(css, '.vk-panel-meta')
     expect(metaBlock, '未找到 .vk-panel-meta 规则').not.toBe('')
     // 口径从「紧跟名称右侧」改为「放到横幅右边」：必须是右侧绝对定位
     expect(metaBlock.replace(/\s+/g, ' '), '国旗要放在右边 → 需右侧绝对定位')
@@ -138,7 +146,7 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
     // 名称**不得**再被额外扣净空：曾写 max-width: calc(100% - 96px) 想把名字让开国旗，
     // 实测把名称盒压到 85.4px（内容要 95~144px）→ 6 个名字全被截断成 "…"。
     // 净空应由中列上限（minmax(0,62%)）保证，名称自身用满 100%。
-    const nameBlock = css.match(/\.vk-panel-name \{[\s\S]*?\}/)?.[0] ?? ''
+    const nameBlock = mainRule(css, '.vk-panel-name')
     // 先剥注释再断言：注释里会写到历史写法（max-width: calc(...)），
     // 直接扫原文会被自己的注释打红（这个坑已踩三次，视为默认动作而非例外）
     const nb = nameBlock.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ')

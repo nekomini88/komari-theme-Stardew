@@ -13,14 +13,25 @@
  *             投影用硬位移不用 blur、取色一律 var(--vk-*)
  */
 
-/* ---------- 卡片网格：3 列，窄屏降列 ---------- */
+/* ---------- 卡片网格：4 列（用户 2026-10-13 口径：按每行 4 台服务器的宽度），窄屏逐级降列 ---------- */
 .vk-node-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--vk-space-4);
   width: 100%;
   align-items: stretch;
   margin-top: var(--vk-scene-reveal);
+}
+
+@media (max-width: 1200px) {
+  .vk-node-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* 降为 3 列后卡片变宽（约 345px），名称恢复大字 */
+  .vk-panel-name {
+    font-size: var(--vk-fs-lg);
+  }
 }
 
 @media (max-width: 900px) {
@@ -109,14 +120,15 @@
   min-width: 0;
   /* 不要再在这里扣净空！曾写 max-width: calc(100% - 96px) 想给右下国旗让位，
      实测把名称盒压到 **85.4px**（内容要 95~144px）→ 6 个名字全被截成 "…"。
-     国旗是绝对定位在横幅右端的，净空由中列上限（minmax(0,62%)）保证：
+     国旗是绝对定位在横幅右端的，净空由中列上限（minmax(0,56%)）保证：
      66% 时名称右缘约 316px，国旗左缘约 328px，天然不重叠。 */
   max-width: 100%;
   text-align: center;
   overflow: hidden;
-  /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
-     像素字只能取 12 的整数倍，12px 明显偏小（与横幅不相称），故取 24px（= 设计尺寸 2×） */
-  font-size: var(--vk-fs-lg);
+  /* 字号：默认（4 列，卡片约 283px）用 12px —— 参考站在 303px 卡上名称仅 14px，
+     而我们用 24px 时实测 108px 的可用宽度放不下 144px 的名字，会导致 "…"。
+     像素字只能取 12 的整数倍，故取 12px；降为 3 列后卡片变宽，在下面的断点里恢复大字。 */
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: 0.02em;
