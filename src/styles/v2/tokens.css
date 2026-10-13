@@ -130,6 +130,18 @@
   /* 底板正文字纸色（= 美术底板实测）与右下角向日葵 */
   --vk-panel-paper: #fbeed2;
   --vk-panel-sunflower: url(/images/v2-panel/panel-sunflower.png);
+  /* 卡片角饰 · 槽 1（小山葵） */
+  --vk-orn-1: url(/images/v2-orn/orn-sunflower.png);
+  /* 卡片角饰 · 槽 2（浇水壶） */
+  --vk-orn-2: url(/images/v2-orn/orn-wateringcan.png);
+  /* 卡片角饰 · 槽 3（草莓） */
+  --vk-orn-3: url(/images/v2-orn/orn-strawberry.png);
+  /* 卡片角饰 · 槽 4（蘑菇） */
+  --vk-orn-4: url(/images/v2-orn/orn-mushroom.png);
+  /* 卡片角饰 · 槽 5（南瓜） */
+  --vk-orn-5: url(/images/v2-orn/orn-pumpkin.png);
+  /* 卡片角饰 · 槽 6（信箱） */
+  --vk-orn-6: url(/images/v2-orn/orn-mailbox.png);
   /* 危险档进度条色（参考稿实测的粉红，语义上作红用） */
   --vk-bar-crit: #e63e5f;
   --vk-panel-radius: 5px;

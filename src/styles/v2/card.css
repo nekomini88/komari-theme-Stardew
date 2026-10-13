@@ -69,11 +69,15 @@
      （实测 Uptime x 329.7..365.7 vs 花 x 337.7..382.7），数值只剩半个字 */
   right: -6px;
   bottom: -8px;
-  width: 36px;
+  /* 盒宽按最宽的素材（浇水壶 76px）留够；contain 让每张素材按自身比例缩放，
+     不会被拉扁（原先写 100% 100% 会把形状拉变形） */
+  width: 62px;
   height: 58px;
-  background-image: var(--vk-panel-sunflower);
+  background-image: var(--vk-orn, var(--vk-panel-sunflower));
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-size: contain;
+  background-position: right bottom;
+  image-rendering: pixelated;
   pointer-events: none;
 }
 

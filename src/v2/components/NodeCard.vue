@@ -141,6 +141,8 @@ defineExpose({ viewStatus, statusLabel })
       '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
       '--vk-node-shadow': `var(--vk-node-shadow-${accentSlot + 1})`,
       '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
+      // 每台一个不同的角饰（用户 2026-10-13：装饰物要做成不同物品）
+      '--vk-orn': `var(--vk-orn-${accentSlot + 1})`,
     }"
   >
     <!-- ① 绿色木匾标题栏 -->
