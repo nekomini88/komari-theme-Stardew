@@ -21,7 +21,7 @@
  */
 import PixelIcon from '@/components/PixelIcon.vue'
 import type { Node } from '@/v2/data/types'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   formatBytesPerSecond,
   formatDate,
@@ -38,6 +38,7 @@ import {
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
 import { getRegionCode } from '@/utils/regionHelper'
 import { getOSImage } from '@/utils/osImageHelper'
+import { loadPingSeries, SAMPLE_SLOTS, type PingSeries } from '@/v2/data/pingSamples'
 
 const props = defineProps<{ node: Node, accentIndex?: number }>()
 
@@ -127,6 +128,41 @@ const flagCode = computed(() => {
 /** 操作系统图标（放国旗旁边，参考 komari.vickypig.com）。
  *  node.os 为空时不渲染 —— 不给"未知系统"的默认图，免得图标与实际系统对不上。 */
 const osIconSrc = computed(() => (node.value.os ? getOSImage(node.value.os) : ''))
+
+/**
+ * 延迟 / 丢包的「格子条」—— 一格一个真实样本，口径对齐参考站 komari.vickypig.com
+ * （用户 2026-10-13：「按照参考站来」）。
+ * 旧做法是 `width: min(100, latency)%`，把毫秒当百分比 → 135ms 就顶满格，语义错。
+ * 数据走 `common:getRecords {type:'ping'}`；详细口径见 @/v2/data/pingSamples。
+ */
+function emptySeries(): PingSeries {
+  const blank = (level: 'none' | 'crit') => ({
+    level,
+    value: null,
+    at: '--:--',
+    title: '无数据',
+  })
+  return {
+    latency: Array.from({ length: SAMPLE_SLOTS }, () => blank('none')),
+    loss: Array.from({ length: SAMPLE_SLOTS }, () => blank('crit')),
+  }
+}
+const series = ref<PingSeries>(emptySeries())
+let seriesTimer: ReturnType<typeof setInterval> | null = null
+
+async function refreshSeries() {
+  series.value = await loadPingSeries(props.node.uuid)
+}
+
+onMounted(() => {
+  void refreshSeries()
+  seriesTimer = setInterval(() => void refreshSeries(), 120_000)
+})
+
+onBeforeUnmount(() => {
+  if (seriesTimer)
+    clearInterval(seriesTimer)
+})
 
 /** 进度条颜色：Load 用橙，其余用绿（对齐参考稿） */
 /* 进度条绿：参考稿实测为高饱和亮绿 #2a9708（此前用旧母板的 --vk-leaf #7fa851，偏灰、与参考稿不一致） */
@@ -258,16 +294,28 @@ defineExpose({ viewStatus, statusLabel })
             <PixelIcon name="clock" :size="16" />
             <span class="vk-cell-label">Latency</span>
             <span class="vk-cell-value" data-field="latency">{{ latencyText }}</span>
-            <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
-              <span class="vk-seg-fill" :style="{ width: `${Math.min(100, node.latency || 0)}%` }" />
+            <span class="vk-samples" aria-hidden="true">
+              <span
+                v-for="(s, i) in series.latency"
+                :key="i"
+                class="vk-sample"
+                :data-level="s.level"
+                :title="s.title"
+              />
             </span>
           </div>
           <div class="vk-cell">
             <PixelIcon name="shield" :size="16" />
             <span class="vk-cell-label">Packet Loss</span>
             <span class="vk-cell-value" data-field="loss">{{ lossText }}</span>
-            <span class="vk-seg" :style="{ '--vk-seg-color': GREEN }">
-              <span class="vk-seg-fill" :style="{ width: `${Math.min(100, node.loss || 0)}%` }" />
+            <span class="vk-samples" aria-hidden="true">
+              <span
+                v-for="(s, i) in series.loss"
+                :key="i"
+                class="vk-sample"
+                :data-level="s.level"
+                :title="s.title"
+              />
             </span>
           </div>
         </div>

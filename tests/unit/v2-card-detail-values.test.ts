@@ -65,8 +65,9 @@ describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', 
     expect(text(w, 'cpu')).toContain('%')
     expect(text(w, 'mem')).toContain('%')
     expect(text(w, 'disk')).toContain('%')
-    // 进度条也仍在
-    expect(w.findAll('.vk-seg').length).toBeGreaterThanOrEqual(6)
+    // 进度条也仍在（CPU/内存/硬盘/负载为比例条；延迟/丢包已按参考站改成 20 格样本条）
+    expect(w.findAll('.vk-seg').length).toBeGreaterThanOrEqual(4)
+    expect(w.findAll('.vk-samples').length).toBe(2)
   })
 })
 

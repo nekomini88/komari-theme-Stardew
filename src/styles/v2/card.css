@@ -318,6 +318,47 @@
   padding-right: 20px;
 }
 
+/* 延迟 / 丢包的「格子条」——一格一个真实样本。
+   用户 2026-10-13：「按照参考站来」。参考站实测 DOM：
+     grid-template-columns: repeat(20, minmax(0px, 1fr)) + gap: 1px，
+     逐格按该样本自己的等级上色；无数据的格子是淡色（不是"数值百分比填充"）。
+   旧做法 width: min(100, latency)% 把毫秒当百分比 → 135ms 就顶满格，语义是错的。 */
+.vk-samples {
+  grid-area: bar;
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 1px;
+  height: calc(var(--vk-seg-h) + 1px);
+  margin-top: 3px;
+  padding: 1px;
+  background: var(--vk-paper-warm);
+  border: 1px solid var(--vk-panel-border);
+}
+
+.vk-sample {
+  display: block;
+  border-radius: 1px;
+  background: var(--vk-ref-leaf);
+}
+
+/* 四档显式写全（不靠 .vk-sample 的默认背景当 ok 档）—— 漏写会静默变成"无数据"色 */
+.vk-sample[data-level='ok'] {
+  background: var(--vk-ref-leaf);
+}
+
+.vk-sample[data-level='warn'] {
+  background: var(--vk-honey);
+}
+
+.vk-sample[data-level='crit'] {
+  background: var(--vk-bar-crit);
+}
+
+/* 无数据：压向纸色（对齐参考站的淡色态；不能在注释里写死色值，单测会扫注释字面量） */
+.vk-sample[data-level='none'] {
+  background: color-mix(in srgb, var(--vk-paper-warm) 55%, var(--vk-panel-border));
+}
+
 .vk-cell-detail {
   grid-area: detail;
   /* 同站其它主题的做法：进度条下方一行实际容量，比标签更小更淡 */

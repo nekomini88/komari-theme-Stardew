@@ -66,16 +66,30 @@ describe('NodeCard 数据：关键指标一律走 metrics 格式化', () => {
     expect(text(w2, 'expire')).toBe('—')
   })
 
-  it('进度条宽度 = percentValue（0..100），共 6 条', () => {
+  it('比例进度条 = 4 条（CPU/内存/硬盘/负载），宽度 = percentValue（0..100）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     const fills = w.findAll('.vk-seg-fill')
-    expect(fills).toHaveLength(6)
+    // 延迟/丢包**不再是**比例条：用户 2026-10-13「按照参考站来」→ 改成 20 格真实样本条
+    expect(fills).toHaveLength(4)
 
     const widthOf = (i: number) => fills[i]!.attributes('style') ?? ''
     expect(widthOf(0)).toContain(`${percentValue(frankfurt.cpu, 100)}%`)
     expect(widthOf(1)).toContain(`${percentValue(frankfurt.ram, frankfurt.ramTotal)}%`)
     expect(widthOf(2)).toContain(`${percentValue(frankfurt.disk, frankfurt.diskTotal)}%`)
     expect(widthOf(3)).toContain(`${percentValue(frankfurt.load, frankfurt.cpuCores)}%`)
+  })
+
+  it('延迟/丢包 = 两排 20 格样本条（对齐参考站 komari.vickypig.com）', () => {
+    const w = mount(NodeCard, { props: { node: frankfurt } })
+    const grids = w.findAll('.vk-samples')
+    expect(grids, '延迟与丢包各一条样本条').toHaveLength(2)
+    for (const g of grids)
+      expect(g.findAll('.vk-sample'), '参考站是 20 格').toHaveLength(20)
+    // 每格必须带自己的等级与 tooltip（参考站每格也有独立 tooltip）
+    for (const b of w.findAll('.vk-sample')) {
+      expect(b.attributes('data-level'), '每格必须有等级').toMatch(/^(ok|warn|crit|none)$/)
+      expect(b.attributes('title'), '每格必须有 tooltip').toBeTruthy()
+    }
   })
 })
 
@@ -138,8 +152,6 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
       '--vk-ref-leaf', // Memory
       '--vk-ref-leaf', // Disk
       '--vk-honey', // Load ← 橙
-      '--vk-ref-leaf', // Latency
-      '--vk-ref-leaf', // Packet Loss
     ])
   })
 

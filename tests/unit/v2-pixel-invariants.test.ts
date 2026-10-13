@@ -165,7 +165,8 @@ describe('等级配色选择器必须与 usageLevel() 的返回值一致（防�
     const used = [...css.matchAll(/\[data-level='([a-z]+)'\]/g)].map(m => m[1])
     expect(used.length, '未找到任何 [data-level=...] 规则').toBeGreaterThan(0)
     // 与 metrics.ts 里 usageLevel 的返回值对齐 —— 写成 alert/danger 会永远匹配不上，是死代码
-    const allowed = ['ok', 'warn', 'crit']
+    // none = 「无数据」态（延迟格缺样本；参考站的无数据格也是淡色），其余对齐 usageLevel 的返回值
+    const allowed = ['ok', 'warn', 'crit', 'none']
     for (const v of used)
       expect(allowed, `[data-level='${v}'] 不在 usageLevel 的可能返回值 ${allowed.join('/')} 之内 → 永远不生效`).toContain(v)
   })
