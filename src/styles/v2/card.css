@@ -28,12 +28,6 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  /* 降为 3 列后卡片变宽（约 345px），名称恢复大字 */
-  
-
-.vk-panel-name {
-    font-size: var(--vk-fs-lg);
-  }
 }
 
 @media (max-width: 900px) {
@@ -144,24 +138,29 @@
   max-width: 100%;
   text-align: center;
   overflow: hidden;
-  /* 字号：默认（4 列，卡片约 283px）用 12px —— 参考站在 303px 卡上名称仅 14px，
-     而我们用 24px 时实测 108px 的可用宽度放不下 144px 的名字，会导致 "…"。
-     像素字只能取 12 的整数倍，故取 12px；降为 3 列后卡片变宽，在下面的断点里恢复大字。 */
-  font-size: 12px;
-  font-weight: 400;
+  /* 字体：几何无衬线 ExtraBold（用户 2026-10-13：「服务器字体要大, 粗体几何无衬线字体」）。
+     用真实 800 字重字体文件，不是合成加粗 —— 合成加粗会把像素格糊掉，那条纪律对像素字仍然有效。 */
+  font-family: var(--vk-font-name);
+  font-weight: 800;
+  /* 字号：24px（= --vk-fs-lg，设计体系的 2× 档）。
+     历史上这里写死 12px，理由是"4 列时可用宽只有 108px 放不下 24px 的名字"。
+     2026-10-13 实测（probe_name_font.py，在真实页面上逐档量 scrollWidth vs clientWidth）：
+     4 列下名称盒实际有 **213px**，12/14/16/18/20/22/24px 六档全部「放得下 5/6」，
+     唯一截断的是那个天生超长的 "Specials - 4GB RAM Memorial Day Special"（每一档都截断）。
+     即旧约束早已不成立，故直接上 24px。 */
+  font-size: var(--vk-fs-lg);
   line-height: 1.4;
   letter-spacing: 0.02em;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* 像素字描边：四向 1px，颜色取「与文字相反的色调」（深字配浅描边 / 浅字配深描边），
-     由底板横幅实测色决定 —— 见 tokens.css 的 --vk-node-shadow-N */
-  text-shadow:
-    1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
-    -1px 0 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
-    0 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
-    0 -1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo)),
-    1px 1px 0 var(--vk-node-shadow, var(--vk-ref-leaf-lo));
+  /* 柔和投影（**不再是**四向 1px 硬描边）。
+     原因：用户 2026-10-13 要"粗体几何无衬线"的干净现代感，而四向硬描边是像素风的招式 ——
+     放大实测（name-bar-zoom.png）确认它把干净的几何粗体做成了"贴纸 / 游戏标签"质感。
+     去掉描边不影响可读性：名称现为 24px 粗体 = WCAG **大号文本**（门槛 3:1），
+     实测六台奶白字对台色 3.13 / 3.46 / 4.54 / 6.82 / 7.38 / 9.62 : 1，全部达标。
+     描边色 token（--vk-node-shadow-N，与文字明暗相反）仍复用在此投影上。 */
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--vk-node-shadow, var(--vk-ref-leaf-lo)) 45%, transparent);
 }
 
 /* 操作系统图标：16px（16 的整数倍 = 项目像素纪律），与参考站 size-4 一致 */

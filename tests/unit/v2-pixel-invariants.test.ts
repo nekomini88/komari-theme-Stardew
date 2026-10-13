@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { contrastRatio, decodePng, dominantColor } from '../helpers/png'
 import { describe, expect, it } from 'vitest'
@@ -86,13 +86,48 @@ describe('像素风硬约束（每次改样式都要过）', () => {
     }
   })
 
-  it('像素字不使用合成加粗（会把像素格糊掉）', () => {
+  it('名称不得再用四向 1px 硬描边（会把几何粗体做成贴纸质感）', () => {
+    const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const all = [...card.matchAll(/\.vk-panel-name \{[\s\S]*?\}/g)].map(m => m[0])
+    const main = all.sort((a, b) => b.length - a.length)[0] ?? ''
+    expect(main, '名称又回到四向硬描边了').not.toMatch(/text-shadow:\s*\n?\s*1px 0 0/)
+    expect(main, '名称应使用柔和投影').toMatch(/text-shadow:\s*0 1px 2px/)
+  })
+
+  /**
+   * 用户 2026-10-13：「服务器字体要大, 粗体几何无衬线字体（Bold Geometric Sans-Serif）」。
+   * 于是加粗不再一律禁止 —— 但必须区分"真字重"与"合成加粗"：
+   *   · 像素字（Fusion Pixel 只有 400 字重）上加粗 = 浏览器合成 = 像素格被糊掉 ⇒ 仍然禁止；
+   *   · 几何无衬线用**真实 800 字重字体文件** ⇒ 允许。
+   * 判据：出现 600+ 字重的规则块，必须同时声明 font-family: var(--vk-font-name)。
+   */
+  it('加粗只允许出现在几何无衬线名上（像素字不得合成加粗）', () => {
     const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
     const home = readFileSync(resolve(v2StyleDir, 'home.css'), 'utf8')
     for (const [file, css] of [['card.css', card], ['home.css', home]] as const) {
-      const bad = [...css.matchAll(/font-weight:\s*(6\d\d|7\d\d|8\d\d|9\d\d|bold)/g)]
-      expect(bad.map(b => b[0]), `${file} 里出现合成加粗`).toEqual([])
+      // 按规则块切分（本目录 CSS 不含嵌套规则，按 } 切足够）
+      const blocks = css.split('}')
+      for (const blk of blocks) {
+        if (!/font-weight:\s*(6\d\d|7\d\d|8\d\d|9\d\d|bold)/.test(blk)) continue
+        const sel = blk.split('{')[0]?.trim().split('\n').pop()?.trim() ?? ''
+        expect(blk, `${file} 的「${sel}」用了加粗却没有用几何无衬线名 ⇒ 可能是像素字合成加粗`)
+          .toContain('font-family: var(--vk-font-name)')
+      }
     }
+  })
+
+  it('几何无衬线字体是真 800 字重文件（不是合成加粗），且文件真的在仓库里', () => {
+    const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
+    for (const f of ['montserrat-latin-800-normal.woff2', 'montserrat-latin-ext-800-normal.woff2']) {
+      expect(existsSync(resolve(ROOT, 'public/fonts', f)), `${f} 缺失`).toBe(true)
+    }
+    // @font-face 必须声明 font-weight: 800（声明 400 才会被浏览器合成加粗）
+    const faces = [...tokens.matchAll(/@font-face \{[\s\S]*?\}/g)]
+      .map(m => m[0]).filter(f => f.includes("'Montserrat ExtraBold'"))
+    expect(faces.length, 'Montserrat ExtraBold 的 @font-face 缺失').toBe(2)
+    for (const f of faces) expect(f, '@font-face 未声明 800 字重').toMatch(/font-weight:\s*800/)
+    // 名称规则必须走这个字体族
+    expect(card_css_name_rule(tokens)).toBe(true)
   })
 })
 
@@ -171,3 +206,12 @@ describe('等级配色选择器必须与 usageLevel() 的返回值一致（防�
       expect(allowed, `[data-level='${v}'] 不在 usageLevel 的可能返回值 ${allowed.join('/')} 之内 → 永远不生效`).toContain(v)
   })
 })
+
+/** 名称规则必须真的用上几何无衬线字族（防止只能改了 token 而规则没接上） */
+function card_css_name_rule(_tokens: string): boolean {
+  const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+  const all = [...card.matchAll(/\.vk-panel-name \{[\s\S]*?\}/g)].map(m => m[0])
+  const main = all.sort((a, b) => b.length - a.length)[0] ?? ''
+  return main.includes('font-family: var(--vk-font-name)')
+    && /font-weight:\s*800/.test(main)
+}

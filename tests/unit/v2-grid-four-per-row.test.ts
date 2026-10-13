@@ -29,15 +29,19 @@ describe('每行 4 台（用户 2026-10-13 口径）', () => {
     expect(byWidth.get('600')?.replace(/\s+/g, ' '), '≤600 应降为 1 列').toContain('minmax(0, 1fr)')
   })
 
-  it('名称字号：默认 12px（4 列窄卡），3 列时恢复大字', () => {
+  it('名称字号：4 列也是大字 24px（实测放得下），且用几何无衬线 ExtraBold', () => {
     const all = [...css.matchAll(/\.vk-panel-name \{[\s\S]*?\}/g)].map(m => m[0])
     const main = all.sort((a, b) => b.length - a.length)[0] ?? ''
-    expect(main.replace(/\s+/g, ' '), '4 列下名称必须缩到 12px，否则 144px 的名字放不进 108px').toContain('font-size: 12px')
-    // 12 的整数倍 = 像素纪律
-    expect(main.replace(/\s+/g, ' ')).toMatch(/font-size: 12px/)
+    const flat = main.replace(/\s+/g, ' ')
+    // 用户 2026-10-13：「服务器字体要大」。历史上此处写死 12px（理由：4 列可用宽仅 108px）。
+    // 实测（probe_name_font.py，真实页面逐档量 scrollWidth vs clientWidth）：4 列名称盒已有 213px，
+    // 12~24px 六档全部"放得下 5/6"，唯一截断的是天生超长的 Specials。故旧约束不成立，直接上 24px。
+    expect(flat, '4 列下名称应为大字 24px（= --vk-fs-lg）').toContain('font-size: var(--vk-fs-lg)')
+    expect(flat, '名称必须用几何无衬线字体').toContain('font-family: var(--vk-font-name)')
+    expect(flat, '名称必须用真实 800 字重').toMatch(/font-weight:\s*800/)
 
+    // 3 列不再需要单独覆盖字号（与 4 列同为大字）
     const m1200 = css.match(/@media \(max-width: 1200px\) \{[\s\S]*?\n\}/)?.[0] ?? ''
-    expect(m1200.replace(/\s+/g, ' '), '降到 3 列后名称应恢复大字')
-      .toContain('font-size: var(--vk-fs-lg)')
+    expect(m1200.replace(/\s+/g, ' '), '≤1200 只降列数，不再覆盖字号').not.toContain('vk-panel-name')
   })
 })

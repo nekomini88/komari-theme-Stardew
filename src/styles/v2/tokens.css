@@ -35,6 +35,40 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/**
+ * 节点名/标题字体：Montserrat ExtraBold（800）。
+ *
+ * 用户 2026-10-13：「服务器字体要大, 粗体几何无衬线字体（Bold Geometric Sans-Serif）」，
+ * 并给了 Montserrat Black/ExtraBold · Poppins ExtraBold · Inter Black · Space Grotesk Bold ·
+ * League Spartan Bold 作参考 —— 取第一顺位 Montserrat ExtraBold。
+ *
+ * 关键：这是**真实的 800 字重字体文件**，不是合成加粗。
+ * （Fusion Pixel 那条「禁用合成加粗」的纪律依然有效：合成加粗会把像素格糊掉；
+ *   换用真字重文件后，加粗与像素纪律不再冲突。）
+ * 只有拉丁字形：中文名（如「法兰克福free」）由后面的系统 CJK 粗体承担。
+ * 文件：public/fonts/montserrat-{latin,latin-ext}-800-normal.woff2，许可 OFL-Montserrat.txt
+ */
+@font-face {
+  font-family: 'Montserrat ExtraBold';
+  src: url('/fonts/montserrat-latin-ext-800-normal.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+                 U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Montserrat ExtraBold';
+  src: url('/fonts/montserrat-latin-800-normal.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
 
   /* ---- 母板取色（全部 ⊆ palette.json）—— 木材层次 ---- */
@@ -200,6 +234,9 @@
   /* ---- 字体 ----
      像素字体 Fusion Pixel（12px 设计）。**字号必须是 12 的整数倍**（12 / 24），
      否则像素格被插值糊掉、反而不如黑体清晰 —— 这条是像素风的关键约束。 */
+  /* 节点名专用：几何无衬线 ExtraBold（中文回退系统 CJK 粗体） */
+  --vk-font-name: 'Montserrat ExtraBold', 'PingFang SC', 'Microsoft YaHei',
+    'Noto Sans CJK SC', system-ui, sans-serif;
   --vk-font-display: 'Fusion Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   --vk-font-body: 'Fusion Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   --vk-fs-sm: 12px;   /* 正文/指标（= 设计尺寸 1×） */
