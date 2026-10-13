@@ -120,27 +120,30 @@
      6 张底板横幅与奶白 #f7ecd3 的对比度均 ≥3:1（青色槽的横幅已按 V 通道压暗 ~5% 达标）。
      注意：**不要**拿 accent 的十六进制值来算 —— 底板由原图色相替换而来、保留原明度，
      比 accent 暗得多，用错基准会算出深色字压在深色横幅上（slot 2/4/5 曾因此不达标）。 */
-  /* 每台底色：把"颜色框"铺满整张卡片（用户 2026-10-13：「颜色框覆盖整个服务器名称卡片」）。
-     六个色值即原底板横幅的实测主色，均已在母板 palette.json 中。
-     奶白字 #f7ecd3 对它们的对比度为 3.13 / 6.82 / 9.62 / 7.38 / 4.54 / 3.5 : 1（见下行注释）。 */
-  --vk-node-bg-1: #279a06;
-  --vk-node-bg-2: #06509a;
-  --vk-node-bg-3: #53069a;
-  --vk-node-bg-4: #9a0623;
-  --vk-node-bg-5: #9a5d06;
-  --vk-node-bg-6: #048d89;
+  /* 每台一色 —— 名称那一行的底色（用户 2026-10-13：「每台服务名称加入颜色…要铺满卡片那行」）。
+     六色取自 mycolor.space 以基色 #845ec2 生成的 Classy Palette（用户指定的配色网站；
+     另一篇 bilibili 文章是「12 个配色网站」推荐清单，mycolor.space 正在其中）。
+     槽1 把基色按同色相压暗 8% 以让文字过 4.5:1。
+     每槽的文字色与描边**明暗相反**（浅底配深字深描边反之），实测对比度：
+       槽1 奶白字 4.73:1 ｜ 槽2 近黑字 5.29:1 ｜ 槽3 6.93:1 ｜ 槽4 8.60:1 ｜ 槽5 11.86:1 ｜ 槽6 16.32:1 */
+  --vk-node-bg-1: #7956b2;
+  --vk-node-bg-2: #d65db1;
+  --vk-node-bg-3: #ff6f91;
+  --vk-node-bg-4: #ff9671;
+  --vk-node-bg-5: #ffc75f;
+  --vk-node-bg-6: #f9f871;
   --vk-node-ink-1: #f7ecd3;
-  --vk-node-shadow-1: #2b1d16;   /* 底板横幅 #279a06 → 奶白 3.13:1 */
-  --vk-node-ink-2: #f7ecd3;
-  --vk-node-shadow-2: #2b1d16;   /* 底板横幅 #06509a → 奶白 6.82:1 */
-  --vk-node-ink-3: #f7ecd3;
-  --vk-node-shadow-3: #2b1d16;   /* 底板横幅 #53069a → 奶白 9.62:1 */
-  --vk-node-ink-4: #f7ecd3;
-  --vk-node-shadow-4: #2b1d16;   /* 底板横幅 #9a0623 → 奶白 7.38:1 */
-  --vk-node-ink-5: #f7ecd3;
-  --vk-node-shadow-5: #2b1d16;   /* 底板横幅 #9a5d06 → 奶白 4.54:1 */
-  --vk-node-ink-6: #f7ecd3;
-  --vk-node-shadow-6: #2b1d16;   /* 底板横幅 #048d89（青色槽横幅压暗以提升对比）→ 奶白 3.5:1 */
+  --vk-node-shadow-1: #2b1d16;
+  --vk-node-ink-2: #101702;
+  --vk-node-shadow-2: #f7ecd3;
+  --vk-node-ink-3: #101702;
+  --vk-node-shadow-3: #f7ecd3;
+  --vk-node-ink-4: #101702;
+  --vk-node-shadow-4: #f7ecd3;
+  --vk-node-ink-5: #101702;
+  --vk-node-shadow-5: #f7ecd3;
+  --vk-node-ink-6: #101702;
+  --vk-node-shadow-6: #f7ecd3;
   /* 底板正文字纸色（= 美术底板实测）与右下角向日葵 */
   --vk-panel-paper: #fbeed2;
   /* 危险档进度条色（参考稿实测的粉红，语义上作红用） */
