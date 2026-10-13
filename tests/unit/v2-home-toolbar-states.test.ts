@@ -24,13 +24,6 @@ function fixtureFetcher(): Fetcher {
   }
 }
 
-async function settle() {
-  await flushPromises()
-  await nextTick()
-  await flushPromises()
-  await nextTick()
-}
-
 /** 轮询等待条件成立（替代固定 flush 轮数 —— 全量并行跑时异步链更慢，固定等待会早查） */
 async function waitFor(pred: () => boolean, timeoutMs = 3000) {
   const start = Date.now()
@@ -51,7 +44,8 @@ async function mountHome(fetcher: Fetcher) {
       provide: { [CLIENTS_FETCHER_KEY]: fetcher },
     },
   })
-  await settle()
+  // 条件等待卡片渲染完成（不能用固定 flush 轮数，见 waitFor 注释）
+  await waitFor(() => wrapper.findAll('.vk-node-card').length > 0)
   return wrapper
 }
 

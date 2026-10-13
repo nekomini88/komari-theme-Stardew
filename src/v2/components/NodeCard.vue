@@ -23,10 +23,10 @@ import PixelIcon from '@/components/PixelIcon.vue'
 import type { Node } from '@/v2/data/types'
 import { computed } from 'vue'
 import {
-  formatBytes,
   formatBytesPerSecond,
   formatDate,
   formatLatency,
+  formatBytes,
   formatLoad,
   formatLoadPercent,
   formatLoss,
@@ -74,6 +74,28 @@ const diskPctText = computed(() => formatPercent(node.value.disk, node.value.dis
 const diskPct = computed(() => percentValue(node.value.disk, node.value.diskTotal))
 
 const loadText = computed(() => formatLoad(node.value.load))
+
+/* 实际容量明细（用户口径：只有百分比没有关键信息）：
+   CPU  → 1/5/15 分钟负载 + 核数，形如 0.00, 0.00, 0.00 (1c)
+   Memory / Disk → 已用 / 总量，形如 245.7 MB / 932.3 MB */
+const cpuDetailText = computed(() => {
+  const n = node.value
+  const trio = [n.load, n.load5, n.load15].map(v => formatLoad(v)).join(', ')
+  const cores = n.cpuCores > 0 ? ` (${n.cpuCores}c)` : ''
+  return trio + cores
+})
+const memDetailText = computed(() => {
+  const n = node.value
+  if (!n.ramTotal)
+    return formatBytes(n.ram)
+  return `${formatBytes(n.ram)} / ${formatBytes(n.ramTotal)}`
+})
+const diskDetailText = computed(() => {
+  const n = node.value
+  if (!n.diskTotal)
+    return formatBytes(n.disk)
+  return `${formatBytes(n.disk)} / ${formatBytes(n.diskTotal)}`
+})
 const loadPct = computed(() => percentValue(node.value.load, node.value.cpuCores))
 
 const latencyText = computed(() => formatLatency(node.value.latency))
@@ -123,15 +145,17 @@ defineExpose({ viewStatus, statusLabel })
   >
     <!-- ① 绿色木匾标题栏 -->
     <header class="vk-card-head vk-panel-head">
-      <span class="vk-card-head-icon vk-panel-head-icon" aria-hidden="true">
-        <PixelIcon name="server" :size="32" />
-      </span>
+      <!-- 参考稿横幅里没有图标：左端只保留横幅自身的叶簇装饰。
+           原先在左端挂 32px 图标，使名称在视觉上被压得偏左（实测几何居中但观感失衡） -->
       <h3 class="vk-card-name vk-panel-name" :title="node.name">{{ node.name }}</h3>
-      <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
-        <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
+      <!-- 国旗与状态点同组，紧贴名称右侧（不放绝对定位：绝对定位会让名称在视觉上被推偏） -->
+      <span class="vk-panel-meta">
+        <span v-if="flagCode" class="vk-panel-flag" :title="node.region">
+          <img :src="`/images/flags/${flagCode}.svg`" :alt="node.region" loading="lazy">
+        </span>
+        <!-- 视觉上是参考稿的状态圆点；状态文字作为 tooltip + 无障碍标签，保证不只靠颜色区分 -->
+        <span class="vk-panel-dot" :data-status="viewStatus" :title="statusLabel" aria-hidden="true" />
       </span>
-      <!-- 视觉上是参考稿的状态圆点；状态文字作为 tooltip + 无障碍标签，保证不只靠颜色区分 -->
-      <span class="vk-panel-dot" :data-status="viewStatus" :title="statusLabel" aria-hidden="true" />
       <span class="vk-card-status vk-visually-hidden">{{ statusLabel }}</span>
     </header>
 
@@ -154,6 +178,7 @@ defineExpose({ viewStatus, statusLabel })
             <span class="vk-seg" :data-level="usageLevel(node.cpu)" :style="{ '--vk-seg-color': GREEN }">
               <span class="vk-seg-fill" :style="{ width: `${cpuPct}%` }" />
             </span>
+            <span class="vk-cell-detail" data-field="cpu-detail">{{ cpuDetailText }}</span>
           </div>
           <div class="vk-cell">
             <PixelIcon name="memory" :size="16" />
@@ -162,6 +187,7 @@ defineExpose({ viewStatus, statusLabel })
             <span class="vk-seg" :data-level="usageLevel(memPct)" :style="{ '--vk-seg-color': GREEN }">
               <span class="vk-seg-fill" :style="{ width: `${memPct}%` }" />
             </span>
+            <span class="vk-cell-detail" data-field="mem-detail">{{ memDetailText }}</span>
           </div>
         </div>
 
@@ -174,6 +200,7 @@ defineExpose({ viewStatus, statusLabel })
             <span class="vk-seg" :data-level="usageLevel(diskPct)" :style="{ '--vk-seg-color': GREEN }">
               <span class="vk-seg-fill" :style="{ width: `${diskPct}%` }" />
             </span>
+            <span class="vk-cell-detail" data-field="disk-detail">{{ diskDetailText }}</span>
           </div>
           <div class="vk-cell">
             <PixelIcon name="dashboard" :size="16" />

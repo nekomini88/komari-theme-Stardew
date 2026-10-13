@@ -25,6 +25,23 @@ function fixtureFetcher(): Fetcher {
   }
 }
 
+const TOTAL_NODES = Object.keys(fixture.nodes).length
+
+/**
+ * 等首屏数据落定。
+ * 不能用「固定 flush 轮数」：全量并行跑时异步链更慢，固定轮数会早查（曾导致同一批用例
+ * 在不同 run 里交替失败、单跑却全绿）。改为轮询条件 —— 卡片数达到 fixture 规模才返回。
+ */
+async function waitUntil(pred: () => boolean, timeoutMs = 4000) {
+  const start = Date.now()
+  while (Date.now() - start < timeoutMs) {
+    await flushPromises()
+    await nextTick()
+    if (pred())
+      return
+  }
+}
+
 async function mountHome() {
   const wrapper = mount(HomeView, {
     global: {
@@ -33,10 +50,7 @@ async function mountHome() {
       provide: { [CLIENTS_FETCHER_KEY]: fixtureFetcher() },
     },
   })
-  // 等首屏加载（onMounted → setTimeout(0) → Promise.all）
-  await flushPromises()
-  await nextTick()
-  await flushPromises()
+  await waitUntil(() => wrapper.findAll('.vk-node-card').length === TOTAL_NODES)
   return wrapper
 }
 
@@ -97,9 +111,8 @@ describe('HomeView：装配真实首页', () => {
     const wrapper = mount(HomeView, {
       global: { stubs: { teleport: true }, provide: { [CLIENTS_FETCHER_KEY]: failing } },
     })
-    await flushPromises()
-    await nextTick()
-    await flushPromises()
+    // 错误路径不会有卡片，故等「错误元素出现」而不是等卡片（固定 flush 轮数在并行负载下会早查）
+    await waitUntil(() => wrapper.find('[data-testid="home-error"]').exists())
     expect(wrapper.find('[data-testid="home-error"]').exists()).toBe(true)
     expect(wrapper.findAll('.vk-node-card')).toHaveLength(0)
     wrapper.unmount()

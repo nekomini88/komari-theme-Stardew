@@ -44,6 +44,9 @@
      将来任何没显式设字号的文本都会以 16px 渲染 → 像素格被插值 */
   font-family: var(--vk-font-body);
   font-size: var(--vk-fs-sm);
+  /* 横幅必须贴面板顶端满宽（参考稿如此）。原先 padding:16px 把横幅压低了 17px，
+     看起来名称"没有居上"。留白改由 .vk-panel-body 承担（它本来就有 padding）。 */
+  padding: 0;
   /* 正文高度由内容决定 —— 不再锁 aspect-ratio。
      （曾锁 428/394，导致正文比卡片高 113px 被 overflow:hidden 静默裁掉最后两行指标） */
   background-color: var(--vk-panel-paper);
@@ -75,36 +78,31 @@
 /* ---------- ① 标题栏：内容层（叶藤横幅由横幅条提供） ---------- */
 .vk-panel-head {
   position: relative;
-  display: flex;
+  /* 三列 1fr | 中列 | 1fr：两翼等宽 ⇒ **名称自身精确居中**；国旗/状态点放第三列并左对齐
+     ⇒ 紧贴名称右侧（参考稿的关系）。两个踩过的坑：
+       ① 曾用 flex + 名称/国旗整组居中 → 国旗宽度把名称推偏 23px；
+       ② 中列上限若写 auto(=max-content) → 长名撑破容器把两翼压成 0，名称偏左 10px。
+     故中列取 minmax(0, 62%)：必要时省略号截断，两翼始终等宽。 */
+  grid-template-columns: 1fr minmax(0, 62%) 1fr;
   align-items: center;
-  justify-content: center;
+  column-gap: 8px;
   /* 与横幅条严丝合缝：条图 428x56，故同一比例随卡片宽度等比缩放 */
   width: 100%;
   aspect-ratio: 428 / 56;
   flex: 0 0 auto;
-  padding: 0 16px;
+  /* 两端叶簇的净空 */
+  padding: 0 44px;
   color: var(--vk-node-ink, var(--vk-panel-head-ink));
   background: none;
   border: none;
 }
 
-.vk-panel-head-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-}
-
 .vk-panel-name {
-  flex: 0 1 auto;
+  grid-column: 2;
+  justify-self: center;
   min-width: 0;
-  /* 两端各留 58px 净空：横幅左侧是 32px 图标、右侧是国旗(22px)+状态点(12px)，
-     名称过长时否则会压到它们；max-width 对称收窄以保证仍然居中 */
-  max-width: calc(100% - 116px);
-  margin: 0 auto;
+  max-width: 100%;
+  text-align: center;
   overflow: hidden;
   /* 字号 24px：参考稿标题白字高 20px（428px 面板）→ 等比缩到本卡片约 18px；
      像素字只能取 12 的整数倍，12px 明显偏小（与横幅不相称），故取 24px（= 设计尺寸 2×） */
@@ -126,10 +124,7 @@
 }
 
 .vk-panel-flag {
-  position: absolute;
-  right: 30px;
-  top: 50%;
-  transform: translateY(-50%);
+  /* 参考稿里国旗**紧跟名称右侧**（原来钉在 right:30px，离名称很远 → 左重右轻、名称看着偏左） */
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -146,10 +141,6 @@
 
 /* 状态灯 */
 .vk-panel-dot {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
   flex: none;
   width: 12px;
   height: 12px;
@@ -221,8 +212,9 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-areas:
-    'icon label value'
-    'bar  bar   bar';
+    'icon  label  value'
+    'bar   bar    bar'
+    'detail detail detail';
   gap: 1px 8px;
   align-items: center;
   min-width: 0;
@@ -276,3 +268,23 @@
    此前写成 alert/danger → 永远匹配不上，整条规则是死代码（实测抓出）。 */
 .vk-seg[data-level='warn'] { --vk-seg-color: var(--vk-honey); }
 .vk-seg[data-level='crit'] { --vk-seg-color: var(--vk-bar-crit); }
+
+.vk-cell-detail {
+  grid-area: detail;
+  /* 同站其它主题的做法：进度条下方一行实际容量，比标签更小更淡 */
+  font-size: var(--vk-fs-sm);
+  line-height: 1.35;
+  color: var(--vk-panel-text-muted, var(--vk-ref-value));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vk-panel-meta {
+  /* 第三列左对齐 ⇒ 紧贴名称右侧；内容横排（国旗 + 状态点） */
+  grid-column: 3;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
