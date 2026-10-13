@@ -3,7 +3,7 @@
 星露谷物语像素风主题 · 基于 Vue 3 + Vite + reka-ui + Tailwind CSS v4 构建
 </p>
 
-![preview](./preview.png)
+![preview](./docs/preview.png)
 
 ## 使用
 

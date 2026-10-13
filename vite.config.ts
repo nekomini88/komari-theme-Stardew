@@ -85,7 +85,7 @@ function komariThemeZip(): Plugin {
       const zipFileName = `komari-theme-Komari-Stardew-v${version}-${commitHash}.zip`
       const distDir = resolve(__dirname, 'dist')
       const themeJsonPath = resolve(__dirname, 'komari-theme.json')
-      const previewPath = resolve(__dirname, 'preview.png')
+      const previewPath = resolve(__dirname, 'docs', 'preview.png')
       const outputPath = resolve(__dirname, 'release', zipFileName)
 
       if (!existsSync(distDir)) {
