@@ -140,9 +140,6 @@
   --vk-panel-head-ink: var(--vk-paper-cream);
   --vk-panel-face: var(--vk-ref-paper);
   --vk-panel-border: var(--vk-outline);
-  /* 玻璃卡专用文字色：参考站实测 oklch(0.141 0.005 285.823) ≈ 近黑。
-     纸卡的深棕正文色是按奶白纸底挑的，玻璃透出场景后底会变暗 ⇒ 必须换黑色才达标。 */
-  --vk-glass-ink: #0b0b0d;
   --vk-panel-text: var(--vk-ref-ink);   /* 标签/正文 */
   /* 数值色：原 #6e86bb（"数值蓝"）在**整卡铺色后**的指标区上对比度只有 1.60~2.18:1（实测，
      远低于 4.5），视觉复核也反馈"数值对比度偏低"。

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 /**
- * 调色板控件（用户 2026-10-13：「设置一个按钮控制服务器颜色, 名称为调色板, 按钮控件你选合适的」，
- * 后又定稿为「只留 flatpaper（纸卡）和 emerald（玻璃）」）。
+ * 调色板控件（用户 2026-10-13：「设置一个按钮控制服务器颜色, 名称为调色板, 按钮控件你选合适的」）。
+ *
+ * 目前菜单里只有 flatpaper 一项（玻璃已按用户口径删除）；用户明确要求**保留按钮**做占位，
+ * 以后再加配色时只需往 palettes.ts 的 PALETTE_MODES 加一项。
  *
  * 控件选型：顶栏按钮 + 下拉菜单。
  *   - 比原生 <select> 好在能直接显示外观预览（选外观的关键是"看长什么样"）；
@@ -63,7 +65,7 @@ onBeforeUnmount(() => {
         :aria-selected="o.mode === mode"
         @click.stop="choose(o.mode)"
       >
-        <span class="vk-palette-swatch" :data-material="o.material">
+        <span class="vk-palette-swatch">
           <i
             v-for="(c, i) in o.colors"
             :key="i"

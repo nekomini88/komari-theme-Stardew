@@ -54,17 +54,6 @@
   border: 1px solid var(--vk-panel-border);
 }
 
-/* 玻璃模式没有台色：用半透明格子示意"透" */
-.vk-palette-swatch[data-material='glass'] .vk-palette-chip {
-  width: 47px;
-  background-color: rgb(255 255 255 / 55%);
-  background-image: repeating-conic-gradient(
-    color-mix(in srgb, var(--vk-panel-border) 22%, transparent) 0% 25%,
-    transparent 0% 50%
-  );
-  background-size: 8px 8px;
-}
-
 .vk-palette-text {
   display: flex;
   flex-direction: column;
@@ -82,41 +71,4 @@
   font-style: normal;
   color: var(--vk-panel-text);
   opacity: 0.65;
-}
-
-/* ---------- 玻璃卡（emerald）：对齐参考站 komari.vickypig.com 的实测配方 ---------- */
-.vk-panel[data-material='glass'] {
-  /* 参考站实测：底色 50% 白 + backdrop-filter blur(8px) + 8px 圆角 + 细边框 */
-  background-color: rgb(255 255 255 / 50%);
-  background-image: none;
-  /* 顺序不能反：写成"标准在前、前缀在后"时，构建（lightningcss）会把标准声明当重复项删掉，
-     产物里只剩 -webkit-，实测浏览器算出 none ⇒ 玻璃完全不模糊。
-     与 .vk-topbar 保持同序（前缀在前）就两项都在。 */
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid oklch(0.92 0.004 286.32);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
-  /* 玻璃上没有纸面：正文/数值改用近黑色。原来的深棕（#55392a 一类）在玻璃上对比度不足 ——
-     它当初是按奶白纸底（亮度 0.85）挑的，玻璃透出场景后底会变暗。 */
-  --vk-panel-text: var(--vk-glass-ink);
-  --vk-panel-value: var(--vk-glass-ink);
-}
-
-/* 名称行不着色（"玻璃是透明无色场景"）：靠网格居中 + 近黑字 */
-.vk-panel[data-material='glass'] .vk-panel-head {
-  background-color: transparent;
-}
-
-/* 进度条槽底原本是不透明纸色，玻璃上会露出纸块 */
-.vk-panel[data-material='glass'] .vk-seg {
-  background: rgb(0 0 0 / 8%);
-  box-shadow: none;
-}
-
-/* ---------- 玻璃模式的整页底色：与参考站一致（纯白、无背景图） ---------- */
-.vk-app[data-material='glass'] {
-  /* 参考站实测：body = oklch(1 0 0)、无 background-image。
-     场景图层栈在玻璃模式下由 App.vue 直接不渲染（v-if），所以这里不会被任何图盖住。 */
-  background-color: #ffffff;
 }

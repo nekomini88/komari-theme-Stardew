@@ -72,7 +72,7 @@ const accentSlot = computed(() => {
  * 当前配色（用户 2026-10-13 的「调色板」控件）：底色/文字色/描边色都来自调色板，
  * 文字对比度已在 palettes.ts 的 resolveNode 内保证 ≥4.5:1，这里不做二次判断。
  */
-const { nodeColors, showArt, material } = usePalette()
+const { nodeColors } = usePalette()
 const slotColor = computed<NodeColor>(() =>
   nodeColors.value[accentSlot.value] ?? nodeColors.value[0] ?? DEFAULT_NODE_COLOR)
 
@@ -192,14 +192,13 @@ defineExpose({ viewStatus, statusLabel })
     :data-node-id="node.uuid"
     :data-status="viewStatus"
     :data-accent="accentSlot + 1"
-    :data-material="material"
     :style="{
       // 外观由「调色板」控件决定（用户 2026-10-13）：纸卡按台下发台色，玻璃模式无色（透明底 + 近黑字）。
       '--vk-node-bg': slotColor.bg,
       '--vk-node-ink': slotColor.ink,
       '--vk-node-shadow': slotColor.shadow,
-      // 名牌贴图里的颜色是烘死的，只在纸卡模式显示；玻璃模式不要它
-      '--vk-panel-art': showArt ? `url(/images/v2-panel/panel-${accentSlot + 1}.png)` : 'none',
+      // 名牌贴图（颜色烘在图里，与上面的台色同源）
+      '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png` + ')',
     }"
   >
     <!-- ① 绿色木匾标题栏 -->

@@ -1,20 +1,16 @@
 /**
- * 卡片外观（用户 2026-10-13 定稿：只留两种）。
+ * 卡片外观（用户 2026-10-13 定稿：**只剩 flatpaper 一种**）。
  *
- *   flatpaper —— 奶白纸卡 + 六台各一色（默认）。这是站点原本的样子：
- *                "flatpaper 是6色混搭"、"现在的配色就是默认配置保留"。
- *   emerald   —— 玻璃透明卡：对齐参考站 https://komari.vickypig.com/ 的实测配方
- *                （半透明底 + backdrop-filter blur(8px) + 8px 圆角 + 细边框）。
- *                "玻璃是透明无色场景" —— 不着色，让背后的时间场景透出来。
+ *   flatpaper —— 奶白纸卡 + 六台各一色；六色取自 hexo-theme-flatpaper（见 SLOT_COLORS）。
  *
- * 之前那套「四套配色（默认/随机/emerald/flatpaper 各自六色）」已按用户口径废弃：
- * 随机配色整块删掉，不留死代码。
+ * 沿革（都按用户口径删掉了，不留死代码）：
+ *   · "四套配色（默认/随机/emerald/flatpaper）" → 收敛为两种 → 随机整块删除；
+ *   · 玻璃（emerald）→ 「当选择玻璃颜色时, 背景跟参考站一致 不要出现背景图」→ 随后
+ *     「调色板去除玻璃选项」⇒ 玻璃卡样式、玻璃专用色、按材质隐藏场景全部撤除。
+ *   保留 `PaletteMode + 持久化` 这套机械，作为以后加配色的落点（用户要求保留按钮做占位）。
  */
 
-export type PaletteMode = 'flatpaper' | 'emerald'
-
-/** 材质：paper = 奶白纸卡；glass = 玻璃透明卡 */
-export type Material = 'paper' | 'glass'
+export type PaletteMode = 'flatpaper'
 
 export interface NodeColor {
   /** 名称行底色 */
@@ -28,8 +24,7 @@ export interface NodeColor {
 export interface PaletteDef {
   label: string
   hint: string
-  material: Material
-  /** 六台色槽（玻璃模式无色，故为空） */
+  /** 六台色槽 */
   colors: string[]
   /** 固定配对：参考稿既定美术口径，不做自动挑选（否则浅底会被换成深色字 = 改外观） */
   pairs?: NodeColor[]
@@ -39,8 +34,6 @@ export const CREAM = '#f7ecd3'
 // 注意：CREAM 现在同时充任「浅描边色」——新六色偏亮，配对是深字 + 浅描边（见 SLOT_COLORS 处注释）
 export const INK_DARK = '#101702'
 
-/** 玻璃卡上的文字色：对齐参考站的 oklch(0.141 0.005 285.823) ≈ 近黑 */
-export const GLASS_INK = '#0b0b0d'
 export const MIN_CONTRAST = 4.5
 
 /**
@@ -59,20 +52,13 @@ export const PALETTES: Record<PaletteMode, PaletteDef> = {
   flatpaper: {
     label: 'flatpaper（纸卡 · 六色）',
     hint: '奶白纸卡，六台各一色（默认）',
-    material: 'paper',
     colors: [...SLOT_COLORS],
     // 新六色整体偏亮（亮度 0.30~0.63）⇒ 配对为**深字 + 浅描边**（明暗相反，实测 5.6~10.6:1）
     pairs: SLOT_COLORS.map((bg) => ({ bg, ink: INK_DARK, shadow: CREAM })),
   },
-  emerald: {
-    label: 'emerald（玻璃）',
-    hint: '透明玻璃卡，让背后场景透出来',
-    material: 'glass',
-    colors: [],
-  },
 }
 
-export const PALETTE_MODES: PaletteMode[] = ['flatpaper', 'emerald']
+export const PALETTE_MODES: PaletteMode[] = ['flatpaper']
 
 /* ---------- 可读性工具（供实现与单测共同使用，保证"信息看得清"是可验证的） ---------- */
 
@@ -102,19 +88,11 @@ export function contrast(a: string, b: string): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
 }
 
-export function materialOf(mode: PaletteMode): Material {
-  return PALETTES[mode].material
-}
-
 /**
- * 取某外观下第 i 台（0 起）的名称行配色。
- * 玻璃模式无色 ⇒ 底色透明、文字用玻璃专用近黑色。
+ * 取第 i 台（0 起）的名称行配色。
+ * 只有纸卡一种外观了，故不再有"无色"分支。
  */
 export function nodeColorAt(mode: PaletteMode, index: number): NodeColor {
-  const def = PALETTES[mode]
-  if (def.material === 'glass') {
-    return { bg: 'transparent', ink: GLASS_INK, shadow: '#ffffff' }
-  }
-  const pairs = def.pairs ?? []
+  const pairs = PALETTES[mode].pairs ?? []
   return pairs[index % pairs.length] ?? { bg: SLOT_COLORS[0]!, ink: INK_DARK, shadow: CREAM }
 }
