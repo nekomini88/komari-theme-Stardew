@@ -27,6 +27,14 @@ function text(wrapper: ReturnType<typeof mount>, field: string): string {
  * 这些字段数据层一直就有（ram/ramTotal/disk/diskTotal/load/load5/load15/cpuCores），
  * 只是没渲染出来 —— 本组测试锁住渲染，防止回归成「只有百分比」。
  */
+function mainRule(cssText: string, selector: string): string {
+  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const all = [...cssText.matchAll(new RegExp(`${esc} \\{[\\s\\S]*?\\}`, 'g'))].map(m => m[0])
+  return all.sort((a, b) => b.length - a.length)[0] ?? ''
+}
+
+const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+
 describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', () => {
   it('CPU 明细 = 1/5/15 分钟负载 + 核数', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
@@ -58,6 +66,17 @@ describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', 
     expect(text(w, 'cpu-detail')).not.toContain('c)')
   })
 
+  it('指标格行高只由内容决定（缺明细行的格子不得被拉伸）', () => {
+    // 用户 2026-10-13：「Disk 和 load 不在一个水平线看起来不舒服」。
+    // 12 格中只有 CPU/内存/硬盘有明细行 → 缺明细的格子会空出 16.19px，
+    // 被 align-content 默认 stretch 均摊到三行（每行 +5.4px），行内又 center 居中
+    // → 内容错位 2.695px、进度条错位 8.08px（实测）。必须 start。
+    const block = mainRule(css, '.vk-cell').replace(/\s+/g, ' ')
+    expect(block, '未找到 .vk-cell 规则').not.toBe('')
+    expect(block, '行高不得拉伸，否则同排两格会不在一个水平线')
+      .toContain('align-content: start')
+  })
+
   it('明细用独立样式类，且进度条仍在（百分比与容量并存，不是替换）', () => {
     const w = mount(NodeCard, { props: { node: frankfurt } })
     expect(w.findAll('.vk-cell-detail').length).toBe(3)
@@ -81,13 +100,6 @@ describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', 
 describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿）', () => {
   /** 取某选择器的主规则块：同一选择器可能在 @media 里也有覆盖，
  *  用「最长匹配」当作主规则（主规则声明最多）。避免脆弱的首个匹配。 */
-function mainRule(cssText: string, selector: string): string {
-  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const all = [...cssText.matchAll(new RegExp(`${esc} \\{[\\s\\S]*?\\}`, 'g'))].map(m => m[0])
-  return all.sort((a, b) => b.length - a.length)[0] ?? ''
-}
-
-const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
 
   it('.vk-panel 不得有内边距（否则横幅被压低，名称"没有居上"）', () => {
     const block = css.match(/\.vk-panel \{[\s\S]*?\}/)?.[0] ?? ''

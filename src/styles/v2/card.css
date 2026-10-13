@@ -281,6 +281,13 @@
     'detail detail detail';
   gap: 1px 8px;
   align-items: center;
+  /* align-content: start 是必需的（用户 2026-10-13：「Disk 和 load 不在一个水平线」）。
+     12 个格子里只有 CPU/内存/硬盘三格有明细行（detail），同排另一格没有 ⇒
+     缺明细的格子空出 16.19px，被 align-content 默认的 stretch **均摊到三行**（每行 +5.4px），
+     行内元素再 align-items:center 居中 → 内容下移 (23.39-18)/2 = **2.695px**，
+     进度条跟着下移 8.08px（实测数值，Disc/Load 一行独有，其余五行对齐为 0）。
+     改成 start：行高只由各自内容决定，有没有明细行都不影响上下对齐。 */
+  align-content: start;
   min-width: 0;
   font-size: var(--vk-fs-sm);
   line-height: var(--vk-lh);
