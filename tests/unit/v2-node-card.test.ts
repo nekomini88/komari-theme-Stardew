@@ -275,4 +275,15 @@ describe('每台一色（参考稿本身就是每台一色，配色取自参考�
     expect(many.size).toBe(13)
     expect(Math.max(...many.values())).toBeLessThan(6)
   })
+
+  it('Inbound 不得再用 globe（蓝色球体）—— 用户口径：去掉这个小球', () => {
+    // 用户 2026-10-13：「去除所有的这个小球, 这个原来的pdf 是代表服务器状态的.」
+    // 实测：全卡只有 Inbound 这行的像素图标含蓝色（globe 是蓝色地球，512/4096 蓝色像素）。
+    const src = readFileSync(resolve(__dirname, '..', '..', 'src', 'v2', 'components', 'NodeCard.vue'), 'utf8')
+    const row = src.slice(src.indexOf('<!-- Outbound / Inbound -->'))
+    const block = row.slice(0, row.indexOf('<!-- Latency / Packet Loss -->'))
+    expect(block, 'Inbound 行不得再出现 globe 图标（蓝色球体）').not.toMatch(/name="globe"/)
+    expect(block, 'Inbound 应使用 traffic-down').toMatch(/name="traffic-down"/)
+    expect(block, 'Outbound 应使用 traffic-up').toMatch(/name="traffic-up"/)
+  })
 })

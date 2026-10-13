@@ -281,14 +281,18 @@ defineExpose({ viewStatus, statusLabel })
         </div>
 
         <!-- Outbound / Inbound -->
+        <!-- 图标：用户 2026-10-13「去除所有的这个小球」（截图是蓝色的 globe 像素图标）。
+             globe 是蓝色球体，且 reference PDF 里这个球代表服务器状态，用来标"入站流量"语义不符。
+             改为语义准确的上下行配对：Outbound = traffic-up、Inbound = traffic-down
+             （与 Upload/Download 同向同图标：实时速率与累计流量本就同方向，靠标签区分）。 -->
         <div class="vk-panel-row">
           <div class="vk-cell">
-            <PixelIcon name="transfer" :size="16" />
+            <PixelIcon name="traffic-up" :size="16" />
             <span class="vk-cell-label">Outbound</span>
             <span class="vk-cell-value" data-field="traffic-up">{{ outboundText }}</span>
           </div>
           <div class="vk-cell">
-            <PixelIcon name="globe" :size="16" />
+            <PixelIcon name="traffic-down" :size="16" />
             <span class="vk-cell-label">Inbound</span>
             <span class="vk-cell-value" data-field="traffic-down">{{ inboundText }}</span>
           </div>
