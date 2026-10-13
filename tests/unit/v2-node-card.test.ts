@@ -109,8 +109,9 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     expect(css, '名称那一行必须铺色槽色').toMatch(/\.vk-panel-head\s*\{[^}]*background-color:\s*var\(--vk-node-bg/)
     expect(css, '卡片主体必须仍是奶白纸（不能整卡染色）').toMatch(/\.vk-panel\s*\{[^}]*background-color:\s*var\(--vk-panel-paper\)/)
     expect(css).toMatch(/\.vk-panel-head\s*\{[^}]*color:\s*var\(--vk-node-ink/)
-    expect(w.attributes('style')).toContain('--vk-node-bg: var(--vk-node-bg-')
-    expect(w.attributes('style')).toContain('--vk-node-ink: var(--vk-node-ink-')
+    // 配色改由「调色板」控件决定 → 下发的是解析后的实际色值，不再是 var(--vk-node-bg-N)
+    expect(w.attributes('style'), '必须下发解析后的色槽底色').toMatch(/--vk-node-bg: #[0-9a-f]{6}/)
+    expect(w.attributes('style'), '必须下发解析后的文字色').toMatch(/--vk-node-ink: #[0-9a-f]{6}/)
   })
 
   it('系统行：os · arch · 虚拟化 整宽一行（缺项自动跳过）', () => {
@@ -253,11 +254,11 @@ describe('每台一色（参考稿本身就是每台一色，配色取自参考�
   // 对比度审核已改为对**美术底板横幅实测色**校验，见 v2-pixel-invariants.test.ts
   // （原先拿 accent 十六进制值算 —— 基准错误，正是 3 台字色压不住横幅的原因）
 
-  it('卡片根节点成对下发 --vk-node-accent 与 --vk-node-ink', () => {
+  it('卡片根节点成对下发 --vk-node-bg / --vk-node-ink / --vk-node-shadow', () => {
     const w = mount(NodeCard, { props: { node: frankfurt, accentIndex: 2 } })
     const style = w.attributes('style') ?? ''
-    expect(style).toContain('--vk-node-ink: var(--vk-node-ink-3)')
-    expect(style).toContain('--vk-node-shadow: var(--vk-node-shadow-3)')
+    expect(style, '必须下发解析后的文字色').toMatch(/--vk-node-ink: #[0-9a-f]{6}/)
+    expect(style, '描边同样来自调色板').toMatch(/--vk-node-shadow: #[0-9a-f]{6}/)
     expect(w.attributes('data-accent')).toBe('3')
   })
 

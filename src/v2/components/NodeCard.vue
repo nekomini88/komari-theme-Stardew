@@ -39,6 +39,11 @@ import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
 import { getRegionCode } from '@/utils/regionHelper'
 import { getOSImage } from '@/utils/osImageHelper'
 import { loadPingSeries, SAMPLE_SLOTS, type PingSeries } from '@/v2/data/pingSamples'
+import { usePalette } from '@/v2/data/paletteStore'
+import { resolveNode, type NodeColor } from '@/v2/data/palettes'
+
+/** 极端兜底：调色板为空时也能渲染（正常路径不会走到） */
+const DEFAULT_NODE_COLOR: NodeColor = resolveNode('#7956b2')
 
 const props = defineProps<{ node: Node, accentIndex?: number }>()
 
@@ -61,6 +66,14 @@ const accentSlot = computed(() => {
     h = (h * 31 + key.charCodeAt(i)) >>> 0
   return h % ACCENT_SLOTS
 })
+
+/**
+ * 当前配色（用户 2026-10-13 的「调色板」控件）：底色/文字色/描边色都来自调色板，
+ * 文字对比度已在 palettes.ts 的 resolveNode 内保证 ≥4.5:1，这里不做二次判断。
+ */
+const { nodeColors, showArt } = usePalette()
+const slotColor = computed<NodeColor>(() =>
+  nodeColors.value[accentSlot.value] ?? nodeColors.value[0] ?? DEFAULT_NODE_COLOR)
 
 const viewStatus = computed(() => nodeViewStatus(node.value))
 const statusLabel = computed(() => nodeStatusLabel(viewStatus.value))
@@ -179,11 +192,13 @@ defineExpose({ viewStatus, statusLabel })
     :data-status="viewStatus"
     :data-accent="accentSlot + 1"
     :style="{
-      '--vk-node-ink': `var(--vk-node-ink-${accentSlot + 1})`,
-      '--vk-node-shadow': `var(--vk-node-shadow-${accentSlot + 1})`,
-      // 每台一色：色槽色同时用于「名称那一行的底色」与顶部名牌贴图（角饰已按用户要求删除）
-      '--vk-node-bg': `var(--vk-node-bg-${accentSlot + 1})`,
-      '--vk-panel-art': `url(/images/v2-panel/panel-${accentSlot + 1}.png)`,
+      // 配色由「调色板」控件决定（用户 2026-10-13）：底色 + 文字色 + 描边色都按台下发，
+      // 文字对比度由 palettes.ts 的 resolveNode 保证 ≥4.5:1。
+      '--vk-node-bg': slotColor.bg,
+      '--vk-node-ink': slotColor.ink,
+      '--vk-node-shadow': slotColor.shadow,
+      // 名牌贴图里的颜色是烘死的，只在默认配色下显示；其余配色用纯色条避免色差接缝
+      '--vk-panel-art': showArt ? `url(/images/v2-panel/panel-${accentSlot + 1}.png)` : 'none',
     }"
   >
     <!-- ① 绿色木匾标题栏 -->

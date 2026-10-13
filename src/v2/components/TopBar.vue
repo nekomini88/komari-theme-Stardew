@@ -9,6 +9,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import PaletteMenu from '@/v2/components/PaletteMenu.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -39,8 +40,9 @@ function goAdmin() {
         </button>
       </nav>
 
-      <!-- 按用户口径去掉「明/暗切换」与「中英文切换」按钮，只留 admin 入口 -->
+      <!-- 按用户口径去掉「明/暗切换」与「中英文切换」按钮；新增「调色板」控件 -->
       <div class="vk-actions">
+        <PaletteMenu />
         <button v-if="showAdmin" class="vk-btn" type="button" :aria-label="t.admin" :title="t.admin" @click="goAdmin">
           {{ t.admin }}
         </button>

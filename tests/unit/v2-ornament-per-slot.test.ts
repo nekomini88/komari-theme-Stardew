@@ -28,7 +28,9 @@ describe('卡片装饰物已按用户要求全部删除', () => {
   })
 
   it('整卡底色改为按色槽下发 --vk-node-bg', () => {
-    expect(card).toContain("'--vk-node-bg': `var(--vk-node-bg-${accentSlot + 1})`")
+    // 配色由调色板控件决定（用户 2026-10-13）→ 下发解析后的色值
+    expect(card, '卡片应从调色板取色').toContain("'--vk-node-bg': slotColor.bg")
+    expect(card, '文字色同样来自调色板').toContain("'--vk-node-ink': slotColor.ink")
     for (let i = 1; i <= 6; i++) {
       expect(tokens, `缺少 --vk-node-bg-${i}`).toMatch(new RegExp(`--vk-node-bg-${i}:\\s*#[0-9a-f]{6};`))
     }
