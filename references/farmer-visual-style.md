@@ -36,7 +36,7 @@ Must declare for both light and dark appearances:
 ## Background contract
 
 - Replace default shader with static panoramic when `data-theme="farmer"`.
-- Both modes define `--bg-image-desktop|mobile` via `/private-assets/stardew/day.png`.
+- Both modes define `--bg-image-desktop|mobile` via （已移除的 v1 背景素材）.
 - Provide `--bg-scrim`, `--bg-size`, `--bg-position`.
 
 ## Accessibility
