@@ -17,13 +17,12 @@ describe('boundary: spec.yaml and sources', () => {
     expect(json.short.length).toBeGreaterThan(0)
   })
 
-  // 原断言为「Header.vue 必须含 stardew」,但 header 的 day/night 切换在 512da73 已移除,
-  // Header.vue 自此不再出现 'farmer' → 断言过时导致 CI/Release 长期红。
-  // 改为守当前真实不变量:header 只保留 admin 入口,且用像素齿轮素材 + pixelated 渲染。
-  it('header must keep the admin entry rendered with the pixel gear asset', () => {
-    const header = readFileSync('src/components/Header.vue', 'utf8')
-    expect(header).toContain('admin-gear.png')
-    expect(header).toContain('image-rendering: pixelated')
-    expect(header).not.toContain('<Icon v-if')       // 不能再回退成矢量图标
+  // 2026-10-13 迁移：原断言读 v1 顶栏组件（已随 v1 层删除）。
+  // 不变量不变 —— 顶栏必须保留可达的 admin 入口；改指活顶栏 src/v2/components/TopBar.vue。
+  it('top bar must keep the admin entry reachable', () => {
+    const header = readFileSync('src/v2/components/TopBar.vue', 'utf8')
+    expect(header).toContain('/admin')
+    expect(header).toContain('aria-label')
+    expect(header).toContain('type="button"')
   })
 })

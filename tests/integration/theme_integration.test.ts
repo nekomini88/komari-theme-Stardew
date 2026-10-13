@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-// 契约对齐（依据：当前 main @3ec71b7 实际源码/产物）：
-// - 主题键真身 = 'Komari-Farmer'（komari-theme.json short，旧 'stardew' 键已废弃）。
-// - 视觉风格由 useVisualStyle 把 data-theme='stardew' 挂到 document.documentElement，
-//   CSS 选择器统一用【单引号】[data-theme='stardew']，分布在 visual-styles.css /
-//   matte-pixel.css / hard-pixel-core.css；main.css 只经 @import 引入这些分层文件。
-// - Header.vue 的 day/night 与风格切换按钮在 512da73 已移除，只保留 admin 入口
-//   （/images/icons/admin-gear.png + image-rendering: pixelated）。
+// 契约对齐（2026-10-13 v3.3.x：v1 legacy 分层已删除，断言全部指向活的 v2 层）：
+// - 主题键真身 = 'Komari-Farmer'（komari-theme.json short）。
+// - 视觉风格由 useVisualStyle 把 data-theme='stardew' 挂到 document.documentElement
+//   （该键为内部标识符，与主题名无关，刻意沿用）；Provider.vue 消费 manifest 的 themeVisualStyle。
+// - 活的样式层 = src/styles/v2.css 的 @import 集合（src/styles/v2/*.css）；
+//   v1 的 main.css / visual-styles.css / matte-pixel.css / hard-pixel-core.css 已随 v1 层退役删除。
+// - 顶栏为 src/v2/components/TopBar.vue（含 admin 入口）。
 
 describe('theme integration', () => {
   it('exposes the stardew visual style through the manifest + useVisualStyle contract', () => {
@@ -24,42 +24,22 @@ describe('theme integration', () => {
     expect(util).toContain('setAttribute(\'data-theme\', \'stardew\')')
   })
 
-  it('defines stardew visual-style css tokens in the visual-styles layer', () => {
-    // 依据：src/styles/visual-styles.css 在 [data-theme='stardew']（单引号）下定义视觉令牌
-    const css = readFileSync('src/styles/visual-styles.css', 'utf-8')
-    expect(css).toContain('[data-theme=\'stardew\']')
-    expect(css).toContain('--visual-radius-panel')
-    expect(css).toContain('--visual-panel-shadow')
-
-    // 依据：src/styles/main.css L1 引入 @fontsource/press-start-2p 的真实像素字体，
-    // 且 main.css 通过 @import 汇入 visual-styles.css 分层（旧断言查 'Jersey 10' 已不在字体链中）
-    const main = readFileSync('src/styles/main.css', 'utf-8')
-    expect(main).toContain('press-start-2p')
-    expect(main).toContain('visual-styles.css')
+  it('defines the design tokens in the live v2 token layers', () => {
+    // 2026-10-13 迁移：原断言读 v1 的 visual-styles.css / main.css（已删）。
+    // 不变量不变 —— 面板视觉令牌仍必须存在且落在活的 v2 样式层里。
+    const tokens = readFileSync('src/styles/v2/tokens.css', 'utf-8')
+    expect(tokens).toContain('--vk-')
+    const card = readFileSync('src/styles/v2/card.css', 'utf-8')
+    expect(card).toContain('--vk-panel')
   })
 })
 
-describe('matte pixel surfaces under stardew theme', () => {
-  it('mUST disable glass blur and enforce matte surfaces via the matte-pixel layer', () => {
-    // 依据：main.css L10 @import './matte-pixel.css'（分层引入，规则本体不在 main.css）
-    const main = readFileSync('src/styles/main.css', 'utf8')
-    expect(main).toContain('matte-pixel.css')
-
-    // 依据：src/styles/matte-pixel.css 中 .backdrop-blur-* 覆盖为 backdrop-filter: none !important
-    const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
-    expect(matte).toContain('[data-theme=\'stardew\']')
-    expect(matte).toContain('backdrop-filter: none !important')
-    expect(matte).toContain('box-shadow:')
-    expect(matte).toContain('var(--border-strong')
-  })
-
-  it('mUST use dotted matte borders and pixel shadows in matte-pixel.css', () => {
-    const matte = readFileSync('src/styles/matte-pixel.css', 'utf8')
-    expect(matte).toContain('[data-theme=\'stardew\']')
-    // dotted 以 border-style 或简写表达均可
-    const dotted = ['border-style: dotted', 'border: 2px dotted'].some(t => matte.includes(t))
-    expect(dotted).toBe(true)
-    // 像素硬阴影签名
-    expect(matte).toContain('4px 4px 0 0 var(--border-strong')
+describe('matte pixel surfaces in the live v2 card layer', () => {
+  it('mUST keep matte surfaces: pixel hard shadow and no glass blur', () => {
+    // 2026-10-13 迁移：原断言读 v1 的 matte-pixel.css（已删）。
+    // 不变量不变 —— 卡片必须是哑光像素面：有硬像素阴影、不得回退成玻璃模糊。
+    const card = readFileSync('src/styles/v2/card.css', 'utf8')
+    expect(card).toContain('box-shadow: 3px 3px 0 0')
+    expect(card).not.toContain('backdrop-filter')
   })
 })
