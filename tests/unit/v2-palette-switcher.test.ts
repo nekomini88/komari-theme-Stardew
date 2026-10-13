@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import {
-  contrast, CREAM, DEFAULT_MODE, GLASS_INK, hexToRgb, MIN_CONTRAST, nodeColorAt,
-  PALETTES, PALETTE_MODES, relLum, SHADOW_DARK, SLOT_COUNT,
+  contrast, CREAM, DEFAULT_MODE, GLASS_INK, hexToRgb, INK_DARK, MIN_CONTRAST, nodeColorAt,
+  PALETTES, PALETTE_MODES, relLum, SLOT_COUNT,
 } from '@/v2/data/palettes'
 import { setPaletteMode, usePalette } from '@/v2/data/paletteStore'
 import PaletteMenu from '@/v2/components/PaletteMenu.vue'
@@ -42,15 +42,24 @@ describe('外观：只剩两种，且默认是纸卡', () => {
 })
 
 describe('纸卡：参考稿固定配对，文字看得清', () => {
-  it('六台的文字色 = 奶白、描边 = 深色（不参与自动挑选，否则浅底会被换成深色字 = 改外观）', () => {
+  it('六色 = hexo-theme-flatpaper 的命名色（用户：flat-paper 用项目自己的颜色，默认那套不要了）', () => {
+    // 取自上游 source/css/_partials/var.styl：--yellow / --orange / --blue / --violet / --green / --red
+    expect(PALETTES.flatpaper.colors).toEqual([
+      '#f0bd4d', '#ec9b5b', '#6fa9d9', '#9c8feb', '#6fa67c', '#d4716c',
+    ])
+    // 旧那套「站点原参考稿六色」必须整套撤除，不得残留
+    for (const gone of ['#279a06', '#06509a', '#53069a', '#9a0623', '#9a5d06', '#048d89'])
+      expect(PALETTES.flatpaper.colors, `旧色 ${gone} 又回来了`).not.toContain(gone)
+  })
+
+  it('配对 = 深字 + 浅描边（新六色偏亮），对比度每台 ≥4.5:1', () => {
     const pairs = PALETTES.flatpaper.pairs ?? []
     expect(pairs).toHaveLength(SLOT_COUNT)
     for (const [i, p] of pairs.entries()) {
       expect(p.bg).toBe(PALETTES.flatpaper.colors[i])
-      expect(p.ink).toBe(CREAM)
-      expect(p.shadow).toBe(SHADOW_DARK)
-      // 参考稿口径：深底 × 奶白字 ≥3:1（WCAG 大号文本 AA）
-      expect(contrast(p.bg, p.ink), `第 ${i + 1} 台对比度不足`).toBeGreaterThanOrEqual(3)
+      expect(p.ink).toBe(INK_DARK)
+      expect(p.shadow).toBe(CREAM)
+      expect(contrast(p.bg, p.ink), `第 ${i + 1} 台对比度不足`).toBeGreaterThanOrEqual(MIN_CONTRAST)
     }
   })
 

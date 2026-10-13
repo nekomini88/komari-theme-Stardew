@@ -4,41 +4,41 @@
     "version": 8,
     "count": 62,
     "outline": "#2b1d16",
-    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：参考稿实测的 6 个 accent 色定义「每台一色的色相槽位」；实际底色横幅由 public/images/v2-panel/panel-1..6.png 提供（对原图做色相替换、保留原明度，故比 accent 十六进制值暗）。标题文字色必须按**底板横幅实测色**配对，拿 accent 值算会得到深字压深底（v7 修正）。 ｜2026-10-13：节点色槽六色改用 mycolor.space 以基色 #845ec2 生成的 Classy Palette（用户指定配色网站），slot1 压暗 8% 保证奶白字 ≥4.5:1。 ｜2026-10-13：默认配色回退为参考稿原色（用户复核 mycolor.space 那套\"好难看\"）；mycolor.space / flatpaper / emerald 三套改由「调色板」控件切换，不再占用默认槽位。",
+    "notes": "全系统唯一取色来源；每素材 ≤12 色且取色必须 ⊆ 本母板。保留深棕描边色 #2b1d16（仅作最深文字/极轻分隔，不再做硬边像素描边）。新增木纹/纸纹/苔叶/蜜色高光材质色阶，服务木质感拟物 UI 与后续手绘平滑插画。v3 新增 plum/blossom/seafoam 三色，供卡片彩色标题栏与参考稿的「绿/蓝/紫/粉/橘/青」主题色对齐（此前母板只有土色系，凑不出紫/粉/青）。v5：并入参考稿《星露谷物语主题.pdf》实测的 6 色（纸底/叶绿三阶/文字色/数值蓝），用于像素风木牌面板的本色复刻 —— 此前凭感觉调的暗苔绿与偏黄纸底导致观感发闷，实测校色后归位。v6：参考稿实测的 6 个 accent 色定义「每台一色的色相槽位」；实际底色横幅由 public/images/v2-panel/panel-1..6.png 提供（对原图做色相替换、保留原明度，故比 accent 十六进制值暗）。标题文字色必须按**底板横幅实测色**配对，拿 accent 值算会得到深字压深底（v7 修正）。 ｜2026-10-13：节点色槽六色改用 mycolor.space 以基色 #845ec2 生成的 Classy Palette（用户指定配色网站），slot1 压暗 8% 保证奶白字 ≥4.5:1。 ｜2026-10-13：默认配色回退为参考稿原色（用户复核 mycolor.space 那套\"好难看\"）；mycolor.space / flatpaper / emerald 三套改由「调色板」控件切换，不再占用默认槽位。 ｜2026-10-13：flatpaper 配色改用 hexo-theme-flatpaper 上游命名色（黄/橙/蓝/紫罗兰/绿/红），站点原参考稿六色整套撤除；六色偏亮 ⇒ 配对改为深字 #101702 + 浅描边 #f7ecd3。",
     "accentInkPairing": {
       "slot1": {
-        "banner": "#279a06",
-        "ink": "#f7ecd3",
+        "banner": "#f0bd4d",
+        "ink": "#101702",
         "contrast": 3.13,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot2": {
-        "banner": "#06509a",
-        "ink": "#f7ecd3",
+        "banner": "#ec9b5b",
+        "ink": "#101702",
         "contrast": 6.82,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot3": {
-        "banner": "#53069a",
-        "ink": "#f7ecd3",
+        "banner": "#6fa9d9",
+        "ink": "#101702",
         "contrast": 9.62,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot4": {
-        "banner": "#9a0623",
-        "ink": "#f7ecd3",
+        "banner": "#9c8feb",
+        "ink": "#101702",
         "contrast": 7.38,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot5": {
-        "banner": "#9a5d06",
-        "ink": "#f7ecd3",
+        "banner": "#6fa67c",
+        "ink": "#101702",
         "contrast": 4.54,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       },
       "slot6": {
-        "banner": "#048d89",
-        "ink": "#f7ecd3",
+        "banner": "#d4716c",
+        "ink": "#101702",
         "contrast": 3.46,
         "criterion": "WCAG AA 大号文本 3:1（标题 24px）"
       }
@@ -317,45 +317,45 @@
     },
     {
       "id": "panel-banner-1",
-      "hex": "#279a06",
+      "hex": "#f0bd4d",
       "role": "美术底板 panel-1.png 的横幅实测色（色相槽位 1）",
-      "name": "节点色槽1（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-banner-2",
-      "hex": "#06509a",
+      "hex": "#ec9b5b",
       "role": "美术底板 panel-2.png 的横幅实测色（色相槽位 2）",
-      "name": "节点色槽2（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-banner-3",
-      "hex": "#53069a",
+      "hex": "#6fa9d9",
       "role": "美术底板 panel-3.png 的横幅实测色（色相槽位 3）",
-      "name": "节点色槽3（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-banner-4",
-      "hex": "#9a0623",
+      "hex": "#9c8feb",
       "role": "美术底板 panel-4.png 的横幅实测色（色相槽位 4）",
-      "name": "节点色槽4（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-banner-5",
-      "hex": "#9a5d06",
+      "hex": "#6fa67c",
       "role": "美术底板 panel-5.png 的横幅实测色（色相槽位 5）",
-      "name": "节点色槽5（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-banner-6",
-      "hex": "#048d89",
+      "hex": "#d4716c",
       "role": "美术底板 panel-6.png 的横幅实测色（色相槽位 6）",
-      "name": "节点色槽6（参考稿原色 · 默认配色）",
-      "note": "用户 2026-10-13 复核认定这套最好看"
+      "name": "节点色槽（flatpaper 上游命名色）",
+      "note": "取自 hexo-theme-flatpaper 的 var.styl"
     },
     {
       "id": "panel-paper",

@@ -40,11 +40,11 @@ import { getRegionCode } from '@/utils/regionHelper'
 import { getOSImage } from '@/utils/osImageHelper'
 import { loadPingSeries, SAMPLE_SLOTS, type PingSeries } from '@/v2/data/pingSamples'
 import { usePalette } from '@/v2/data/paletteStore'
-import { CREAM, PALETTES, SHADOW_DARK, type NodeColor } from '@/v2/data/palettes'
+import { CREAM, INK_DARK, PALETTES, type NodeColor } from '@/v2/data/palettes'
 
 /** 极端兜底：色槽为空时也能渲染（正常路径不会走到） */
 const DEFAULT_NODE_COLOR: NodeColor =
-  PALETTES.flatpaper.pairs?.[0] ?? { bg: 'transparent', ink: CREAM, shadow: SHADOW_DARK }
+  PALETTES.flatpaper.pairs?.[0] ?? { bg: 'transparent', ink: INK_DARK, shadow: CREAM }
 
 const props = defineProps<{ node: Node, accentIndex?: number }>()
 

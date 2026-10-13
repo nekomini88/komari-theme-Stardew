@@ -36,14 +36,20 @@ export interface PaletteDef {
 }
 
 export const CREAM = '#f7ecd3'
+// 注意：CREAM 现在同时充任「浅描边色」——新六色偏亮，配对是深字 + 浅描边（见 SLOT_COLORS 处注释）
 export const INK_DARK = '#101702'
-export const SHADOW_DARK = '#2b1d16'
+
 /** 玻璃卡上的文字色：对齐参考站的 oklch(0.141 0.005 285.823) ≈ 近黑 */
 export const GLASS_INK = '#0b0b0d'
 export const MIN_CONTRAST = 4.5
 
-/** 站点默认的六台色槽（绿/蓝/紫/红/橙/青），与 tokens.css 的 --vk-node-bg-1..6 一致 */
-const SLOT_COLORS = ['#279a06', '#06509a', '#53069a', '#9a0623', '#9a5d06', '#048d89']
+/**
+ * 六台色槽 = **hexo-theme-flatpaper 自己的命名色**（用户 2026-10-13：
+ * 「flat-paper 是项目 hexo flat-paper 颜色, 默认的颜色不要保留了」）。
+ * 取自上游 source/css/_partials/var.styl 的 --yellow / --orange / --blue / --violet / --green / --red。
+ * 此前那套「站点原参考稿六色（绿/蓝/紫/红/橙/青）」已按用户口径整套撤除。
+ */
+const SLOT_COLORS = ['#f0bd4d', '#ec9b5b', '#6fa9d9', '#9c8feb', '#6fa67c', '#d4716c']
 
 export const SLOT_COUNT = SLOT_COLORS.length
 
@@ -55,7 +61,8 @@ export const PALETTES: Record<PaletteMode, PaletteDef> = {
     hint: '奶白纸卡，六台各一色（默认）',
     material: 'paper',
     colors: [...SLOT_COLORS],
-    pairs: SLOT_COLORS.map((bg) => ({ bg, ink: CREAM, shadow: SHADOW_DARK })),
+    // 新六色整体偏亮（亮度 0.30~0.63）⇒ 配对为**深字 + 浅描边**（明暗相反，实测 5.6~10.6:1）
+    pairs: SLOT_COLORS.map((bg) => ({ bg, ink: INK_DARK, shadow: CREAM })),
   },
   emerald: {
     label: 'emerald（玻璃）',
@@ -109,5 +116,5 @@ export function nodeColorAt(mode: PaletteMode, index: number): NodeColor {
     return { bg: 'transparent', ink: GLASS_INK, shadow: '#ffffff' }
   }
   const pairs = def.pairs ?? []
-  return pairs[index % pairs.length] ?? { bg: SLOT_COLORS[0]!, ink: CREAM, shadow: SHADOW_DARK }
+  return pairs[index % pairs.length] ?? { bg: SLOT_COLORS[0]!, ink: INK_DARK, shadow: CREAM }
 }
