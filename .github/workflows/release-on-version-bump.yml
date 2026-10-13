@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  # 手动重跑：版本号已发过、但上一次 Release 步骤失败时用它补发（dispatch 无 before SHA → 视为版本已变）
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -130,4 +132,4 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |-
-            komari-theme-Komari-Stardew-v*.zip
+            release/komari-theme-Komari-Stardew-v*.zip
