@@ -16,12 +16,12 @@ import {
 const root = resolve(__dirname, '..', '..')
 
 const stackSrc = readFileSync(resolve(root, 'src/v2/components/SceneStack.vue'), 'utf8')
-const sceneCss = readFileSync(resolve(root, 'src/styles/v2/scene.css'), 'utf8')
+const sceneCss = readFileSync(resolve(root, 'src/styles/v2/base/scene.css'), 'utf8')
 
 describe('SceneStack 架构：整幅场景图（季节 × 时段，不做分层拼接）', () => {
   it('换图用 1.2s 交叉淡化，且 CSS 令牌与常量一致', () => {
     expect(TRANSITION_MS).toBe(1200)
-    const tokens = readFileSync(resolve(root, 'src/styles/v2/tokens.css'), 'utf8')
+    const tokens = readFileSync(resolve(root, 'src/styles/v2/tokens/tokens.css'), 'utf8')
     expect(tokens).toContain(`--vk-transition-ms: ${TRANSITION_MS}ms`)
     expect(sceneCss).toContain('animation: vk-scene-plate-in var(--vk-transition-ms')
     expect(sceneCss).toContain('@keyframes vk-scene-plate-in')
@@ -99,7 +99,7 @@ describe('SceneStack 渲染行为', () => {
 
   it('场景层不被内容遮挡：z-index 0，内容层在其上', () => {
     expect(sceneCss).toMatch(/\.vk-scene\s*\{[^}]*z-index:\s*0/)
-    const shell = readFileSync(resolve(root, 'src/styles/v2/shell.css'), 'utf8')
+    const shell = readFileSync(resolve(root, 'src/styles/v2/base/shell.css'), 'utf8')
     expect(shell).toMatch(/\.vk-main\s*\{[^}]*z-index:\s*1/)
   })
 

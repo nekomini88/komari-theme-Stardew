@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'components', 'card.css'), 'utf8')
 
 /**
  * 用户口径（2026-10-13）：「komari 按照每行 4 个服务器的宽度」→ 桌面 4 列。

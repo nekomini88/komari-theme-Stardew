@@ -27,9 +27,9 @@ describe('theme integration', () => {
   it('defines the design tokens in the live v2 token layers', () => {
     // 2026-10-13 迁移：原断言读 v1 的 visual-styles.css / main.css（已删）。
     // 不变量不变 —— 面板视觉令牌仍必须存在且落在活的 v2 样式层里。
-    const tokens = readFileSync('src/styles/v2/tokens.css', 'utf-8')
+    const tokens = readFileSync('src/styles/v2/tokens/tokens.css', 'utf-8')
     expect(tokens).toContain('--vk-')
-    const card = readFileSync('src/styles/v2/card.css', 'utf-8')
+    const card = readFileSync('src/styles/v2/components/card.css', 'utf-8')
     expect(card).toContain('--vk-panel')
   })
 })
@@ -38,7 +38,7 @@ describe('matte pixel surfaces in the live v2 card layer', () => {
   it('mUST keep matte surfaces: pixel hard shadow and no glass blur', () => {
     // 2026-10-13 迁移：原断言读 v1 的 matte-pixel.css（已删）。
     // 不变量不变 —— 卡片必须是哑光像素面：有硬像素阴影、不得回退成玻璃模糊。
-    const card = readFileSync('src/styles/v2/card.css', 'utf8')
+    const card = readFileSync('src/styles/v2/components/card.css', 'utf8')
     expect(card).toContain('box-shadow: 3px 3px 0 0')
     expect(card).not.toContain('backdrop-filter')
   })

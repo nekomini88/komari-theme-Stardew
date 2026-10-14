@@ -103,7 +103,7 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     expect(w.find('.vk-panel-dot').exists()).toBe(true)
     // 标题栏的叶藤造型与配色由**参考稿美术底板**提供（每台一色 = 6 张底板变体），
     // CSS 不再手搓叶边；文字色仍取 accent 配对的 ink
-    const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
+    const css = readFileSync(resolve(ROOT, 'src/styles/v2/components/card.css'), 'utf8')
     // 颜色落在**名称那一行**且铺满整卡宽度（用户 2026-10-13 目标图口径）。
     // 注意：不能只断言颜色存在 —— 必须先落到 .vk-panel-head 上，否则会退回"只有顶部一条丝带"
     expect(css, '名称那一行必须铺色槽色').toMatch(/\.vk-panel-head\s*\{[^}]*background-color:\s*var\(--vk-node-bg/)
@@ -135,7 +135,7 @@ describe('NodeCard 结构：木牌面板（复刻参考稿）', () => {
     for (const r of rows)
       expect(r.findAll('.vk-cell')).toHaveLength(2)
 
-    const css = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
+    const css = readFileSync(resolve(ROOT, 'src/styles/v2/components/card.css'), 'utf8')
     expect(css).toMatch(/\.vk-panel-row\s*\+\s*\.vk-panel-row\s*\{[^}]*border-top/)
   })
 
@@ -202,7 +202,7 @@ describe('NodeCard 状态：颜色 + 文字双重区分（不只靠颜色）', (
 })
 
 describe('NodeCard 视觉契约：取色仅走母板令牌、像素风硬边', () => {
-  const cardCss = readFileSync(resolve(ROOT, 'src/styles/v2/card.css'), 'utf8')
+  const cardCss = readFileSync(resolve(ROOT, 'src/styles/v2/components/card.css'), 'utf8')
 
   it('card.css 无裸 hex（全部走 var(--vk-*)）', () => {
     expect(cardCss.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([])
@@ -215,7 +215,7 @@ describe('NodeCard 视觉契约：取色仅走母板令牌、像素风硬边', (
   })
 
   it('tokens.css 定义木牌面板令牌，且已无 accent 令牌', () => {
-    const tokens = readFileSync(resolve(ROOT, 'src/styles/v2/tokens.css'), 'utf8')
+    const tokens = readFileSync(resolve(ROOT, 'src/styles/v2/tokens/tokens.css'), 'utf8')
     for (const t of ['--vk-panel-head-face', '--vk-panel-face', '--vk-panel-border', '--vk-panel-value', '--vk-seg-h'])
       expect(tokens).toContain(t)
     expect(tokens).not.toContain('--vk-card-accent')
@@ -230,7 +230,7 @@ describe('NodeCard 视觉契约：取色仅走母板令牌、像素风硬边', (
 })
 
 describe('每台一色（参考稿本身就是每台一色，配色取自参考稿实测）', () => {
-  const tokens = readFileSync(resolve(ROOT, 'src/styles/v2/tokens.css'), 'utf8')
+  const tokens = readFileSync(resolve(ROOT, 'src/styles/v2/tokens/tokens.css'), 'utf8')
 
   function contrast(a: string, b: string): number {
     const lum = (h: string) => {

@@ -5,11 +5,11 @@
  * 但在 v2 应用壳中不再被引入。
  */
 @import 'tailwindcss';
-@import './v2/tokens.css';
-@import './v2/scene.css';
-@import './v2/shell.css';
-@import './v2/home.css';
-@import './v2/card.css';
-@import './v2/chart.css';
-@import './v2/toolbar.css';
-@import './v2/palette.css';
+@import './v2/tokens/tokens.css';
+@import './v2/base/scene.css';
+@import './v2/base/shell.css';
+@import './v2/components/home.css';
+@import './v2/components/card.css';
+@import './v2/components/chart.css';
+@import './v2/components/toolbar.css';
+@import './v2/components/palette.css';

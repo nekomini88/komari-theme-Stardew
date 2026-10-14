@@ -141,7 +141,7 @@ describe('buildPingSeries：一格一个真实样本', () => {
 })
 
 describe('样式与旧语义防回归', () => {
-  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'components', 'card.css'), 'utf8')
   const vue = readFileSync(resolve(__dirname, '..', '..', 'src', 'v2', 'components', 'NodeCard.vue'), 'utf8')
   const strip = (t: string) => t.replace(/\/\*[\s\S]*?\*\//g, '')
 

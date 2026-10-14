@@ -33,7 +33,7 @@ function mainRule(cssText: string, selector: string): string {
   return all.sort((a, b) => b.length - a.length)[0] ?? ''
 }
 
-const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'components', 'card.css'), 'utf8')
 
 describe('NodeCard 实际容量明细：CPU/Memory/Disk 不能只有百分比', () => {
   it('CPU 明细 = 1/5/15 分钟负载 + 核数', () => {
@@ -187,7 +187,7 @@ describe('NodeCard 标题栏：贴顶 + 名称与国旗同组（复刻参考稿�
 })
 
 describe('进度条与角饰让位（用户 2026-10-13 口径）', () => {
-  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+  const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'components', 'card.css'), 'utf8')
 
   it('进度条是「连续块」：允许分块纹理，但细缝不得透明（不得露出底色 = 不得"空"）', () => {
     const raw = css.match(/\.vk-seg-fill \{[\s\S]*?\}/)?.[0] ?? ''

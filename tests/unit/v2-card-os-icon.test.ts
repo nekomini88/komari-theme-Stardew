@@ -13,7 +13,7 @@ import type { Node } from '@/v2/data/types'
  * 所在行 `flex gap-2 items-center` 宽 44px = OS 16 + 缝 8 + 国旗 20 ⇒ **OS 在国旗左侧**。
  */
 
-const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'card.css'), 'utf8')
+const css = readFileSync(resolve(__dirname, '..', '..', 'src', 'styles', 'v2', 'components', 'card.css'), 'utf8')
 
 function mkNode(over: Partial<Node> = {}): Node {
   return {

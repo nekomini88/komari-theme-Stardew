@@ -33,9 +33,9 @@ describe('外观：目前只有 flatpaper 一种', () => {
     const pal = strip(readFileSync(resolve(ROOT, 'src/v2/data/palettes.ts'), 'utf8'))
     expect(pal, 'palettes.ts 又出现玻璃模式了').not.toContain('emerald')
     expect(pal, 'palettes.ts 又出现材质分支了').not.toContain('Material')
-    const tokens = strip(readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8'))
+    const tokens = strip(readFileSync(resolve(v2StyleDir, 'tokens', 'tokens.css'), 'utf8'))
     expect(tokens, '玻璃专用文字色未清干净').not.toContain('--vk-glass-ink')
-    const css = strip(readFileSync(resolve(v2StyleDir, 'palette.css'), 'utf8'))
+    const css = strip(readFileSync(resolve(v2StyleDir, 'components', 'palette.css'), 'utf8'))
     expect(css, '玻璃卡样式未清干净').not.toContain('backdrop-filter')
     // App 不再按材质隐藏场景（玻璃模式才需要那么做）
     const app = strip(readFileSync(resolve(ROOT, 'src/App.vue'), 'utf8'))

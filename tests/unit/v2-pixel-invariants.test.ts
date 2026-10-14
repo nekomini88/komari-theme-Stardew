@@ -7,11 +7,16 @@ const ROOT = resolve(__dirname, '..', '..')
 const v2StyleDir = resolve(ROOT, 'src/styles/v2')
 const v2ComponentDir = resolve(ROOT, 'src/v2')
 
-/** 全部 v2 样式表拼接（用于「类名是否被定义」的检查） */
+/** 全部 v2 样式表拼接（用于「类名是否被定义」的检查）
+ *  2026-10-14 重构 P4：样式表已按职责归入 tokens/ base/ components/ 子目录，
+ *  因此这里改为递归收集（与下方 usedClasses() 的 walk 写法一致）。 */
 function allStyles(): string {
-  return readdirSync(v2StyleDir)
-    .filter(f => f.endsWith('.css'))
-    .map(f => readFileSync(resolve(v2StyleDir, f), 'utf8'))
+  const walk = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = resolve(dir, e.name)
+    return e.isDirectory() ? walk(p) : (e.name.endsWith('.css') ? [p] : [])
+  })
+  return walk(v2StyleDir)
+    .map(f => readFileSync(f, 'utf8'))
     .join('\n')
 }
 
@@ -78,7 +83,7 @@ describe('像素风硬约束（每次改样式都要过）', () => {
   })
 
   it('像素字号必须是设计尺寸 12px 的整数倍', () => {
-    const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
+    const tokens = readFileSync(resolve(v2StyleDir, 'tokens', 'tokens.css'), 'utf8')
     for (const name of ['--vk-fs-sm', '--vk-fs-lg']) {
       const m = tokens.match(new RegExp(`${name}:\\s*(\\d+)px`))
       expect(m, `${name} 未定义`).toBeTruthy()
@@ -87,7 +92,7 @@ describe('像素风硬约束（每次改样式都要过）', () => {
   })
 
   it('名称不得再用四向 1px 硬描边（会把几何粗体做成贴纸质感）', () => {
-    const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const card = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
     const all = [...card.matchAll(/\.vk-panel-name \{[\s\S]*?\}/g)].map(m => m[0])
     const main = all.sort((a, b) => b.length - a.length)[0] ?? ''
     expect(main, '名称又回到四向硬描边了').not.toMatch(/text-shadow:\s*\n?\s*1px 0 0/)
@@ -102,8 +107,8 @@ describe('像素风硬约束（每次改样式都要过）', () => {
    * 判据：出现 600+ 字重的规则块，必须同时声明 font-family: var(--vk-font-name)。
    */
   it('加粗只允许出现在几何无衬线名上（像素字不得合成加粗）', () => {
-    const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
-    const home = readFileSync(resolve(v2StyleDir, 'home.css'), 'utf8')
+    const card = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
+    const home = readFileSync(resolve(v2StyleDir, 'components', 'home.css'), 'utf8')
     for (const [file, css] of [['card.css', card], ['home.css', home]] as const) {
       // 按规则块切分（本目录 CSS 不含嵌套规则，按 } 切足够）
       const blocks = css.split('}')
@@ -117,7 +122,7 @@ describe('像素风硬约束（每次改样式都要过）', () => {
   })
 
   it('几何无衬线字体是真 800 字重文件（不是合成加粗），且文件真的在仓库里', () => {
-    const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
+    const tokens = readFileSync(resolve(v2StyleDir, 'tokens', 'tokens.css'), 'utf8')
     for (const f of ['montserrat-latin-800-normal.woff2', 'montserrat-latin-ext-800-normal.woff2']) {
       expect(existsSync(resolve(ROOT, 'public/fonts', f)), `${f} 缺失`).toBe(true)
     }
@@ -132,7 +137,7 @@ describe('像素风硬约束（每次改样式都要过）', () => {
 })
 
 describe('标题文字色必须与底板横幅色配对（自动审核：防「字色与横幅不配」复发）', () => {
-  const tokens = readFileSync(resolve(v2StyleDir, 'tokens.css'), 'utf8')
+  const tokens = readFileSync(resolve(v2StyleDir, 'tokens', 'tokens.css'), 'utf8')
   const panelDir = resolve(ROOT, 'public/images/v2-panel')
 
   /**
@@ -174,7 +179,7 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
   })
 
   it('标题栏比例与底板横幅条一致（条图改了必须同步 .vk-panel-head 的 aspect-ratio）', () => {
-    const cardCss = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const cardCss = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
     // 取 .vk-panel-head 规则块内的 aspect-ratio
     const headBlock = cardCss.match(/\.vk-panel-head\s*\{[^}]*\}/)?.[0] ?? ''
     const m = headBlock.match(/aspect-ratio:\s*(\d+)\s*\/\s*(\d+)/)
@@ -186,7 +191,7 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
   })
 
   it('正文高度由内容决定，不再锁 aspect-ratio（防再次静默裁掉底部指标）', () => {
-    const cardCss = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const cardCss = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
     const stripped = cardCss.replace(/\/\*[\s\S]*?\*\//g, '')   // 先剥注释：否则注释里提到该属性也会误判
     const panelBlock = stripped.match(/\.vk-panel\s*\{[^}]*\}/)?.[0] ?? ''
     expect(panelBlock, '.vk-panel 不该再锁 aspect-ratio —— 曾因此把最后两行指标裁掉')
@@ -196,7 +201,7 @@ describe('标题文字色必须与底板横幅色配对（自动审核：防「�
 
 describe('等级配色选择器必须与 usageLevel() 的返回值一致（防死规则复发）', () => {
   it('card.css 里的 [data-level=...] 取值都在 ok/warn/crit 之内', () => {
-    const css = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+    const css = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
     const used = [...css.matchAll(/\[data-level='([a-z]+)'\]/g)].map(m => m[1])
     expect(used.length, '未找到任何 [data-level=...] 规则').toBeGreaterThan(0)
     // 与 metrics.ts 里 usageLevel 的返回值对齐 —— 写成 alert/danger 会永远匹配不上，是死代码
@@ -209,7 +214,7 @@ describe('等级配色选择器必须与 usageLevel() 的返回值一致（防�
 
 /** 名称规则必须真的用上几何无衬线字族（防止只能改了 token 而规则没接上） */
 function card_css_name_rule(_tokens: string): boolean {
-  const card = readFileSync(resolve(v2StyleDir, 'card.css'), 'utf8')
+  const card = readFileSync(resolve(v2StyleDir, 'components', 'card.css'), 'utf8')
   const all = [...card.matchAll(/\.vk-panel-name \{[\s\S]*?\}/g)].map(m => m[0])
   const main = all.sort((a, b) => b.length - a.length)[0] ?? ''
   return main.includes('font-family: var(--vk-font-name)')

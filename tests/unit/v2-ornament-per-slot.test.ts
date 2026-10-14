@@ -10,8 +10,8 @@ import { describe, expect, it } from 'vitest'
 const read = (p: string) => readFileSync(resolve(__dirname, '..', '..', p), 'utf8')
 
 describe('卡片装饰物已按用户要求全部删除', () => {
-  const tokens = read('src/styles/v2/tokens.css')
-  const css = read('src/styles/v2/card.css')
+  const tokens = read('src/styles/v2/tokens/tokens.css')
+  const css = read('src/styles/v2/components/card.css')
   const card = read('src/v2/components/NodeCard.vue')
 
   it('不得再有任何 --vk-orn-N 令牌', () => {
