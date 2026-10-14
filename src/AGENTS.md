@@ -5,7 +5,7 @@ This document applies to `/src` only. Keep changes aligned with the current Vue 
 ## Core architecture
 
 - `main.ts` is bootstrap only. It creates the Vue app, installs Pinia and the router, loads global styles, sets `window.$message`, kicks off `setupIconify()`, and mounts `App.vue`. Do not move feature logic into bootstrap.
-- `App.vue` is the app shell. It owns global layout, mounts `<Toaster>` (vue-sonner) and `Provider`, runs startup lifecycle wiring (`initApp()` / `destroyInitManager()` from `@/utils/init`), and `KeepAlive`s `HomeView`.
+- `App.vue` is the app shell. It owns global layout, mounts `<Toaster>` (vue-sonner) and `Provider`, runs startup lifecycle wiring (`initApp()` / `destroyInitManager()` from `@/utils/api/init`), and `KeepAlive`s `HomeView`.
 - `src/router/index.ts` defines exactly two lazy routes:
   - `/` → `@/views/HomeView.vue`
   - `/instance/:id` → `@/views/InstanceDetail.vue`
@@ -50,11 +50,11 @@ When you need a new piece of UI:
 ## Utils
 
 - `src/utils` owns transport, formatting, lookups, and startup orchestration.
-- Keep API and RPC access in `@/utils/api` and `@/utils/rpc`.
-- Keep startup, transport selection, polling, reconnects, and WebSocket fallback in `@/utils/init`.
-- Keep formatting in helpers such as `@/utils/helper` and record shaping in `@/utils/recordHelper`.
+- Keep API and RPC access in `@/utils/api/api` and `@/utils/api/rpc`.
+- Keep startup, transport selection, polling, reconnects, and WebSocket fallback in `@/utils/api/init`.
+- Keep formatting in helpers such as `@/utils/format/helper` and record shaping in `@/utils/recordHelper`.
 - Keep region, OS, and tag lookup logic in their dedicated helper modules (`regionHelper`, `osImageHelper`, `tagHelper`).
-- `@/utils/message` is the wrapper exposed as `window.$message`. It calls into `vue-sonner`'s `toast`.
+- `@/utils/misc/message` is the wrapper exposed as `window.$message`. It calls into `vue-sonner`'s `toast`.
 - Views and components must reuse these helpers instead of duplicating parsing, formatting, lookup, or transport code.
 
 ## App globals
@@ -67,10 +67,10 @@ When you need a new piece of UI:
 ## Icons
 
 - UI icons render through `@/components/PixelIcon.vue` (`<PixelIcon name="tabler:coin" :size="28" />`).
-  It resolves the name via `@/utils/pixelIcons` to an AI-generated pixel sprite in `src/assets/pixel-icons/`;
+  It resolves the name via `@/utils/media/pixelIcons` to an AI-generated pixel sprite in `src/assets/pixel-icons/`;
   when no pixel art exists for that name it falls back to `@iconify/vue`, so nothing ever renders blank.
 - Add new pixel icons by dropping a 16px-logical PNG (1px `#3e2723` outline, ≤10 colors, 4× nearest-upscaled
-  to 64×64) into `src/assets/pixel-icons/` and listing it in `@/utils/pixelIcons.ts` plus the iconify mapping.
+  to 64×64) into `src/assets/pixel-icons/` and listing it in `@/utils/media/pixelIcons.ts` plus the iconify mapping.
 - Iconify remains the fallback pipeline (`<Icon icon="..." />` still works); do **not** add `lucide-vue-next`
   or any other icon-as-component package.
 - Lucide icons are available via the `lucide:` prefix (e.g. `lucide:x`, `lucide:minus`). Do **not** add `lucide-vue-next` or any other icon-as-component package — the project deliberately routes everything through Iconify so there is a single icon pipeline.

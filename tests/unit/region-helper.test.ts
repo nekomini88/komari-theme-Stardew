@@ -9,7 +9,7 @@ import {
   getSupportedRegions,
   isRegionMatch,
   searchRegions,
-} from '@/utils/regionHelper'
+} from '@/utils/region/regionHelper'
 
 type RegionInfo = { en: string, zh: string, code: string, aliases: string[] }
 

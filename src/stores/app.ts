@@ -1,5 +1,5 @@
-import type { PublicSettings } from '@/utils/api'
-import type { ByteDecimalsConfig } from '@/utils/helper'
+import type { PublicSettings } from '@/utils/api/api'
+import type { ByteDecimalsConfig } from '@/utils/format/helper'
 import { usePreferredDark, useStorageAsync } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'

@@ -17,7 +17,7 @@ import {
   percentValue,
 } from '@/v2/data/metrics'
 import { nodeViewStatus } from '@/v2/data/nodeStatus'
-import { getRegionCode } from '@/utils/regionHelper'
+import { getRegionCode } from '@/utils/region/regionHelper'
 
 const ROOT = resolve(__dirname, '..', '..')
 

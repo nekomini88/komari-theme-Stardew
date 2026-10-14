@@ -1,5 +1,5 @@
-import type { PublicSettings } from '@/utils/api'
-import type { Client, NodeStatus } from '@/utils/rpc'
+import type { PublicSettings } from '@/utils/api/api'
+import type { Client, NodeStatus } from '@/utils/api/rpc'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
@@ -13,10 +13,10 @@ import { useNodesStore } from '@/stores/nodes'
  * 节点列表/指标/排序）不会偷偷改变默认值、getter 派生结果或 localStorage 往返。
  *
  * 说明（为什么没有 vi.mock）：
- * - app.ts 对外部模块只有 `import type { PublicSettings } from '@/utils/api'`，
- *   nodes.ts 只有 `import type { Client, NodeStatus } from '@/utils/rpc'`；
+ * - app.ts 对外部模块只有 `import type { PublicSettings } from '@/utils/api/api'`，
+ *   nodes.ts 只有 `import type { Client, NodeStatus } from '@/utils/api/rpc'`；
  *   两者都是**纯类型导入**，编译期被擦除，运行时并不会加载 api/rpc 模块。
- * - nodes.ts 唯一的运行时外部依赖是纯函数 `@/utils/groupHelper#parseNodeGroups`。
+ * - nodes.ts 唯一的运行时外部依赖是纯函数 `@/utils/misc/groupHelper#parseNodeGroups`。
  * 因此不需要（也不应该）mock 外部模块：mock 一个只有类型导出的模块没有意义，
  * 反而会掩盖真实的 store 行为。这里只测 store 自身逻辑。
  */

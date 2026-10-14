@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { setupIconify } from '@/utils/iconify'
-import { message } from '@/utils/message'
+import { setupIconify } from '@/utils/media/iconify'
+import { message } from '@/utils/misc/message'
 import App from './App.vue'
 import router from './router'
 

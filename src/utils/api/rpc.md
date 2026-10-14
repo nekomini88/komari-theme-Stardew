@@ -5,7 +5,7 @@
 ## 安装与引入
 
 ```typescript
-import { getSharedRpc, KomariRpc, RpcError } from '@/utils/rpc'
+import { getSharedRpc, KomariRpc, RpcError } from '@/utils/api/rpc'
 ```
 
 ## 快速开始
@@ -288,7 +288,7 @@ interface MeInfo {
 SDK 使用 `RpcError` 类封装错误：
 
 ```typescript
-import { RpcError } from '@/utils/rpc'
+import { RpcError } from '@/utils/api/rpc'
 
 try {
   const result = await rpc.getNodes('invalid-uuid')
@@ -326,7 +326,7 @@ rpc.close()
 ## 单例管理
 
 ```typescript
-import { getSharedRpc, resetSharedRpc } from '@/utils/rpc'
+import { getSharedRpc, resetSharedRpc } from '@/utils/api/rpc'
 
 // 获取共享实例
 const rpc = getSharedRpc()
@@ -340,7 +340,7 @@ resetSharedRpc()
 ### 1. 在 Vue 组件中使用
 
 ```typescript
-import { getSharedRpc } from '@/utils/rpc'
+import { getSharedRpc } from '@/utils/api/rpc'
 
 const rpc = getSharedRpc()
 
@@ -354,7 +354,7 @@ onMounted(async () => {
 
 ```typescript
 import { useAsyncState } from '@vueuse/core'
-import { getSharedRpc } from '@/utils/rpc'
+import { getSharedRpc } from '@/utils/api/rpc'
 
 const rpc = getSharedRpc()
 
@@ -368,7 +368,7 @@ const { state: nodes, isLoading, error } = useAsyncState(
 
 ```typescript
 import { defineStore } from 'pinia'
-import { getSharedRpc } from '@/utils/rpc'
+import { getSharedRpc } from '@/utils/api/rpc'
 
 export const useNodeStore = defineStore('node', () => {
   const rpc = getSharedRpc()

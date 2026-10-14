@@ -1,5 +1,5 @@
 /**
- * 行为钉死测试：src/utils/rpc.ts 与 src/utils/api.ts
+ * 行为钉死测试：src/utils/api/rpc.ts 与 src/utils/api/api.ts
  *
  * 目的：重构（按职责拆分这两个文件）前，把**对外可观察行为**固定下来 ——
  * 请求 URL / 方法 / 请求体形状、错误路径与错误文案、超时/中断、WS 重连与降级。
@@ -14,14 +14,14 @@ import {
   getSharedRpc,
   RpcClient,
   RpcError,
-} from '@/utils/rpc'
+} from '@/utils/api/rpc'
 import {
   ApiError,
   KomariApi,
   RealtimeWebSocket,
   getSharedApi,
   resetSharedApi,
-} from '@/utils/api'
+} from '@/utils/api/api'
 
 // ==================== 假响应 ====================
 

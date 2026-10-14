@@ -3,11 +3,11 @@
  * 负责应用启动时的初始化流程和 WebSocket 连接管理
  */
 
-import type { Client, KomariRpc, NodeStatus } from '@/utils/rpc'
+import type { Client, KomariRpc, NodeStatus } from '@/utils/api/rpc'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
-import { getSharedApi } from '@/utils/api'
-import { getSharedRpc, RpcError } from '@/utils/rpc'
+import { getSharedApi } from '@/utils/api/api'
+import { getSharedRpc, RpcError } from '@/utils/api/rpc'
 
 /** 初始化配置 */
 interface InitConfig {

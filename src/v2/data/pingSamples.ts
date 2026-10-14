@@ -14,8 +14,8 @@
  *（3 个 ping 任务 × 60 条/分钟），每条 `{task_id, time, value(ms), client}`。
  * **某分钟缺记录 = 该分钟丢包**，这正是「丢包格」的着色依据，与参考站 1.0% 丢包 → 19 绿 + 1 红一致。
  */
-import { getSharedApi } from '@/utils/api'
-import { getSharedRpc } from '@/utils/rpc'
+import { getSharedApi } from '@/utils/api/api'
+import { getSharedRpc } from '@/utils/api/rpc'
 
 export type SampleLevel = 'ok' | 'warn' | 'crit' | 'none'
 

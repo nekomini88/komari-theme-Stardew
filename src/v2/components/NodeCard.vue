@@ -36,8 +36,8 @@ import {
   usageLevel,
 } from '@/v2/data/metrics'
 import { nodeStatusLabel, nodeViewStatus } from '@/v2/data/nodeStatus'
-import { getRegionCode } from '@/utils/regionHelper'
-import { getOSImage } from '@/utils/osImageHelper'
+import { getRegionCode } from '@/utils/region/regionHelper'
+import { getOSImage } from '@/utils/media/osImageHelper'
 import { loadPingSeries, SAMPLE_SLOTS, type PingSeries } from '@/v2/data/pingSamples'
 import { usePalette } from '@/v2/data/paletteStore'
 import { CREAM, INK_DARK, PALETTES, type NodeColor } from '@/v2/data/palettes'

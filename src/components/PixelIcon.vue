@@ -5,7 +5,7 @@
  */
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-import { ICONIFY_TO_PIXEL, PIXEL_ICONS } from '@/utils/pixelIcons'
+import { ICONIFY_TO_PIXEL, PIXEL_ICONS } from '@/utils/media/pixelIcons'
 
 const props = withDefaults(defineProps<{
   /** Iconify 名(如 mdi:earth)或像素图 key(如 globe) */
