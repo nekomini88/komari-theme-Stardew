@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Repo guide for `komari-theme-emerald`.
+Repo guide for `Komari-Farmer`（夏夜祭典/农场风格 Komari 监控主题）.
 
 ## Snapshot
 
@@ -20,7 +20,7 @@ Repo guide for `komari-theme-emerald`.
 
 ## Root structure
 
-- `src/` app source
+- `src/` app source（2026-10 重构后：utils/ 按职责分子目录，地区数据表在 `src/data/regionMap.ts`）
 - `public/images/` runtime image contract, especially flags and logos
 - `.github/` CI workflow and issue templates
 - `docs/preview.png` release preview image
@@ -44,8 +44,8 @@ Notes:
 
 - `bun run build` runs type check plus production build
 - `bun run lint` runs eslint with `--fix --cache`
-- There is no test suite in this repository
-- Do not invent `bun test` or Vitest commands here
+- 本仓库**有**测试套件：vitest，`bun run test`（当前 422 条用例，改动必须保持全绿）
+- 类型检查用 `bunx vue-tsc --noEmit`；测试与类型检查是重构时的两条生命线，不要跳过
 
 ## Build and release contract
 
@@ -54,7 +54,7 @@ Notes:
 Expected output:
 
 - `dist/`
-- `komari-theme-emerald-build-<sha>.zip`
+- `komari-theme-Komari-Farmer-v<version>-<sha>.zip`
 
 Zip contents:
 
@@ -78,7 +78,7 @@ CI does only:
 1. `bun install --frozen-lockfile`
 2. `bun run build`
 
-CI does not run tests, because there is no test suite.
+CI runs install + build. 测试需本地执行 `bun run test`（CI 目前不跑，所以别指望它替你发现回归）。
 
 ## Where to look
 
@@ -93,7 +93,7 @@ CI does not run tests, because there is no test suite.
 Contributor density, useful for triage:
 
 - `src/components/` is a dense UI change area
-- `src/utils/` is a dense logic and helper area
+- `src/utils/` 已按职责分层（api/ region/ media/ format/ …）；纯数据表在 `src/data/`
 - `src/stores/` is central state, usually affected by cross-cutting changes
 
 ## Conventions seen in this repo
@@ -104,8 +104,8 @@ Contributor density, useful for triage:
 - Preserve the `@` alias to `src` defined in `vite.config.ts`
 - Treat `komari-theme.json` as release input, not optional metadata
 - Treat `docs/preview.png` as release input, not just documentation art
-- Respect existing generated outputs and naming patterns, especially `komari-theme-emerald-build-<sha>.zip`
-- Root verification is lint plus build, not tests
+- Respect existing generated outputs and naming patterns, especially `komari-theme-Komari-Farmer-v<version>-<sha>.zip`
+- Root verification is: `bun run test` + `bunx vue-tsc --noEmit` + `bun run build`（三者都要过）
 - UI is built on `reka-ui` + Tailwind CSS v4 (shadcn-vue style under `src/components/ui/`). Do **not** reintroduce Naive UI, UnoCSS, or SCSS — they have been removed.
 
 ## Repo grounded anti-patterns

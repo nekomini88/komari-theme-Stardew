@@ -5,10 +5,10 @@
 Every change must follow these steps in order:
 
 1. Bump `version` in `komari-theme.json` (semver, match release tag)
-2. **Clean old zips**: `rm -f komari-theme-emerald-build-*.zip`
-3. `bun run build` — produces `komari-theme-emerald-build-<sha>.zip`
+2. **Clean old zips**: `rm -f komari-theme-Komari-Farmer-build-*.zip`
+3. `bun run build` — produces `komari-theme-Komari-Farmer-build-<sha>.zip`
 4. `git add -A && git commit && git push origin master`
-5. `gh release create vX.Y.Z ./komari-theme-emerald-build-<sha>.zip --repo R1ddle1337/komari-theme-emerald --title "vX.Y.Z" --notes "..."`
+5. `gh release create vX.Y.Z ./komari-theme-Komari-Farmer-build-<sha>.zip --repo R1ddle1337/komari-theme-Komari-Farmer --title "vX.Y.Z" --notes "..."`
 
 All three version numbers must match: `komari-theme.json` version = git tag = release title.
 
@@ -35,7 +35,7 @@ git merge upstream/master --no-edit
 # Resolve conflicts if any, then follow release workflow
 ```
 
-Remote `upstream` = `https://github.com/Tokinx/komari-theme-emerald.git`
+Remote `upstream` = `https://github.com/Tokinx/komari-theme-Komari-Farmer.git`
 
 ## Theme Metadata
 
